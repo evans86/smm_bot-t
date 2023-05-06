@@ -60,6 +60,7 @@ class ProxyController extends Controller
     }
 
     /**
+     * g
      * @param Request $request
      * @return array|string
      */
