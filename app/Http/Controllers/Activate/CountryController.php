@@ -31,31 +31,20 @@ class CountryController extends Controller
             'countries',
         ));
     }
-
-    /**
-     * Обновление списка стран с сервиса
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update()
-    {
-        $this->countryService->getApiCountries();
-
-        return redirect()->route('activate.countries.index');
-    }
-
-    /**
-     * Удаление всех стран
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function delete()
-    {
-        $countries = Country::all();
-
-        foreach ($countries as $country) {
-            $country->delete();
-        }
-        return redirect()->route('activate.countries.index');
-    }
+//
+//
+//    /**
+//     * Удаление всех стран
+//     *
+//     * @return \Illuminate\Http\RedirectResponse
+//     */
+//    public function delete()
+//    {
+//        $countries = Country::all();
+//
+//        foreach ($countries as $country) {
+//            $country->delete();
+//        }
+//        return redirect()->route('activate.countries.index');
+//    }
 }

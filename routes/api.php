@@ -45,14 +45,12 @@ Route::get('buyProxy', [ProxyController::class, 'buyProxy']);
  */
 Route::resources([
     'countries' => CountryController::class,
-    'services' => ProductController::class,
 ]);
 
 /**
  * Роуты API (пользователи)
  */
 Route::get('setCountry', [CountryController::class, 'setCountry']);
-Route::get('setService', [ProductController::class, 'setService']);
 Route::get('setLanguage', [UserController::class, 'setLanguage']);
 Route::get('getUser', [UserController::class, 'getUser']);
 Route::get('balance', [UserController::class, 'balance']);

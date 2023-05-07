@@ -76,7 +76,7 @@ class ProxyService extends MainService
             array_push($result, [
                 'title' => $proxy->title,
                 'version' => $proxy->version,
-                $countriesArr
+                'countries' => $countriesArr
             ]);
         }
 

@@ -22,9 +22,6 @@ Route::get('/', [Controller::class, 'home'])->name('home');
  */
 Route::group(['namespace' => 'Activate', 'prefix' => 'activate'], function () {
     Route::get('countries', 'CountryController@index')->name('activate.countries.index')->middleware('auth');
-    Route::get('countries/update', 'CountryController@update')->name('activate.countries.update')->middleware('auth');
-    Route::get('countries/delete', 'CountryController@delete')->name('activate.countries.delete')->middleware('auth');
-    Route::get('product', 'ProductController@index')->name('activate.product.index')->middleware('auth');
     Route::get('order', 'OrderController@index')->name('activate.order.index')->middleware('auth');
     Route::get('bot', 'BotController@index')->name('activate.bot.index')->middleware('auth');
 });
