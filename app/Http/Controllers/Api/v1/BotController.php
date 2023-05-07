@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Bot\BotCreateRequest;
 use App\Http\Requests\Bot\BotGetRequest;
 use App\Http\Requests\Bot\BotUpdateRequest;
-use App\Models\Bot\SmsBot;
+use App\Models\Bot\Bot;
 use App\Services\Activate\BotService;
 use Illuminate\Http\Request;
 
@@ -61,7 +61,7 @@ class BotController extends Controller
     public function get(BotGetRequest $request)
     {
         try {
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->where('private_key', $request->private_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->where('private_key', $request->private_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
             return ApiHelpers::success(BotFactory::fromEntity($bot)->getArray());
@@ -80,7 +80,7 @@ class BotController extends Controller
     {
         try {
             $bot = $this->botService->update($request->getDto());
-            $bot = SmsBot::query()->where('public_key', $bot->public_key)->where('private_key', $bot->private_key)->first();
+            $bot = Bot::query()->where('public_key', $bot->public_key)->where('private_key', $bot->private_key)->first();
             return ApiHelpers::success(BotFactory::fromEntity($bot)->getArray());
         } catch (\Exception $e) {
             return ApiHelpers::error($e->getMessage());

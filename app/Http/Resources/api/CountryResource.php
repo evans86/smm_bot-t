@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\api;
 
-use App\Models\Activate\SmsCountry;
-use App\Models\User\SmsUser;
+use App\Models\Country\Country;
+use App\Models\User\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CountryResource extends JsonResource
@@ -25,11 +25,11 @@ class CountryResource extends JsonResource
     }
 
     /**
-     * @param SmsUser $user
-     * @param SmsCountry $country
+     * @param User $user
+     * @param Country $country
      * @return array
      */
-    public static function generateUserArray(SmsUser $user, SmsCountry $country): array
+    public static function generateUserArray(User $user, Country $country): array
     {
         return [
             'id' => $user->telegram_id,

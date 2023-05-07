@@ -5,7 +5,7 @@ namespace App\Models\Bot;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SmsBot extends Model
+class Bot extends Model
 {
     use HasFactory;
 

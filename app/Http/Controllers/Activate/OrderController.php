@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Activate;
 
-use App\Models\Order\SmsOrder;
+use App\Models\Order\Order;
 
 class OrderController
 {
@@ -11,7 +11,7 @@ class OrderController
      */
     public function index()
     {
-        $orders = SmsOrder::orderBy('id', 'DESC')->Paginate(15);
+        $orders = Order::orderBy('id', 'DESC')->Paginate(15);
 
         return view('activate.order.index', compact(
             'orders',

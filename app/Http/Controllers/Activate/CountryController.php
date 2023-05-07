@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Activate;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activate\SmsCountry;
+use App\Models\Country\Country;
 use App\Services\Activate\CountryService;
 
 class CountryController extends Controller
@@ -25,7 +25,7 @@ class CountryController extends Controller
      */
     public function index()
     {
-        $countries = SmsCountry::paginate(10);
+        $countries = Country::paginate(10);
 
         return view('activate.country.index', compact(
             'countries',
@@ -51,7 +51,7 @@ class CountryController extends Controller
      */
     public function delete()
     {
-        $countries = SmsCountry::all();
+        $countries = Country::all();
 
         foreach ($countries as $country) {
             $country->delete();

@@ -1,7 +1,7 @@
 <?php
 
 use App\Dto\BotFactory;
-use App\Models\Order\SmsOrder;
+use App\Models\Order\Order;
 use App\Services\Activate\BotService;
 use App\Services\Activate\CountryService;
 use App\Services\Activate\OrderService;
@@ -150,7 +150,7 @@ class OrderServiceTest extends \Tests\TestCase
             '0',
         );
 
-        $order = SmsOrder::query()->where(['org_id' => $orderCreate['id']])->first();
+        $order = Order::query()->where(['org_id' => $orderCreate['id']])->first();
 
         // Отмена заказа
         $orderData = $this->orderService->cancel(
@@ -159,11 +159,11 @@ class OrderServiceTest extends \Tests\TestCase
             $order,
         );
 
-        self::assertEquals($order->status, SmsOrder::STATUS_CANCEL);
+        self::assertEquals($order->status, Order::STATUS_CANCEL);
 
         //Отмена заказа со статусом 8 и пустыми кодами
 
-        $order->status = SmsOrder::STATUS_CANCEL;
+        $order->status = Order::STATUS_CANCEL;
         try {
             $orderData = $this->orderService->cancel(
                 $result['data'],
@@ -175,7 +175,7 @@ class OrderServiceTest extends \Tests\TestCase
             self::assertEquals('The order has already been canceled', $e->getMessage());
         }
 
-        $order->status = SmsOrder::ACCESS_ACTIVATION;
+        $order->status = Order::ACCESS_ACTIVATION;
         try {
             $orderData = $this->orderService->cancel(
                 $result['data'],
@@ -187,7 +187,7 @@ class OrderServiceTest extends \Tests\TestCase
             self::assertEquals('The order has not been canceled, the number has been activated, Status 6', $e->getMessage());
         }
 
-        $order->status = SmsOrder::STATUS_WAIT_CODE;
+        $order->status = Order::STATUS_WAIT_CODE;
         $order->codes = '[123-132]';
         try {
             $orderData = $this->orderService->cancel(
@@ -239,7 +239,7 @@ class OrderServiceTest extends \Tests\TestCase
             '0',
         );
 
-        $order = SmsOrder::query()->where(['org_id' => $orderCreate['id']])->first();
+        $order = Order::query()->where(['org_id' => $orderCreate['id']])->first();
 
         try {
             $orderData = $this->orderService->confirm(
@@ -251,7 +251,7 @@ class OrderServiceTest extends \Tests\TestCase
             self::assertEquals('Попытка установить несуществующий статус', $e->getMessage());
         }
 
-        $order->status = SmsOrder::STATUS_CANCEL;
+        $order->status = Order::STATUS_CANCEL;
 
         try {
             $orderData = $this->orderService->confirm(
@@ -276,7 +276,7 @@ class OrderServiceTest extends \Tests\TestCase
             self::assertEquals('Activation is suspended', $e->getMessage());
         }
 
-        self::assertEquals($order->status, SmsOrder::ACCESS_ACTIVATION);
+        self::assertEquals($order->status, Order::ACCESS_ACTIVATION);
     }
 
     public function testSecondSms()
@@ -317,7 +317,7 @@ class OrderServiceTest extends \Tests\TestCase
             '0',
         );
 
-        $order = SmsOrder::query()->where(['org_id' => $orderCreate['id']])->first();
+        $order = Order::query()->where(['org_id' => $orderCreate['id']])->first();
 
         try {
             $orderData = $this->orderService->second(
@@ -330,7 +330,7 @@ class OrderServiceTest extends \Tests\TestCase
             self::assertEquals('Попытка установить несуществующий статус', $e->getMessage());
         }
 
-        self::assertEquals($order->status, SmsOrder::STATUS_WAIT_RETRY); //по аналогии с сервисом
+        self::assertEquals($order->status, Order::STATUS_WAIT_RETRY); //по аналогии с сервисом
     }
 
     public function testOrder()
@@ -371,8 +371,8 @@ class OrderServiceTest extends \Tests\TestCase
             '0',
         );
 
-        $order = SmsOrder::query()->where(['org_id' => $orderCreate['id']])->first();
-        $order->status = SmsOrder::STATUS_CANCEL;
+        $order = Order::query()->where(['org_id' => $orderCreate['id']])->first();
+        $order->status = Order::STATUS_CANCEL;
 
         $this->orderService->order(
             $result['data'],

@@ -21,22 +21,10 @@ class ProxyController extends Controller
      */
     public function getProxy()
     {
-        $data = [
-            [
-                'version' => '3',
-                'title' => 'IPv4 Shared'
-            ],
-            [
-                'version' => '4',
-                'title' => 'IPv4'
-            ],
-            [
-                'version' => '6',
-                'title' => 'IPv6'
-            ]
-        ];
 
-        return ApiHelpers::success($data);
+        $result = $this->proxyService->formingProxy();
+
+        return ApiHelpers::success($result);
     }
 
     /**
@@ -80,5 +68,17 @@ class ProxyController extends Controller
         $result = $this->proxyService->getPrice($request->count, $request->period, $request->version);
 
         return ApiHelpers::success($result);
+    }
+
+    public function buyProxy(Request $request)
+    {
+        if (is_null($request->count))
+            return ApiHelpers::error('Not found params: count');
+        if (is_null($request->period))
+            return ApiHelpers::error('Not found params: period');
+        if (is_null($request->country))
+            return ApiHelpers::error('Not found params: country');
+        if (is_null($request->version))
+            return ApiHelpers::error('Not found params: version');
     }
 }

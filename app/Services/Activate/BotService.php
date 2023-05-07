@@ -4,7 +4,7 @@ namespace App\Services\Activate;
 
 use App\Dto\BotDto;
 use App\Helpers\ApiHelpers;
-use App\Models\Bot\SmsBot;
+use App\Models\Bot\Bot;
 use App\Services\MainService;
 
 class BotService extends MainService
@@ -17,11 +17,11 @@ class BotService extends MainService
      * @param string $public_key
      * @param string $private_key
      * @param int $bot_id
-     * @return SmsBot
+     * @return Bot
      */
-    public function create(string $public_key, string $private_key, int $bot_id): SmsBot
+    public function create(string $public_key, string $private_key, int $bot_id): Bot
     {
-        $bot = new SmsBot();
+        $bot = new Bot();
         $bot->public_key = $public_key;
         $bot->private_key = $private_key;
         $bot->bot_id = $bot_id;
@@ -39,11 +39,11 @@ class BotService extends MainService
      * Обновление настроек модуля
      *
      * @param BotDto $dto
-     * @return SmsBot
+     * @return Bot
      */
-    public function update(BotDto $dto): SmsBot
+    public function update(BotDto $dto): Bot
     {
-        $bot = SmsBot::query()->where('public_key', $dto->public_key)->where('private_key', $dto->private_key)->first();
+        $bot = Bot::query()->where('public_key', $dto->public_key)->where('private_key', $dto->private_key)->first();
         if (empty($bot))
             return ApiHelpers::error('Not found module.');
         $bot->version = $dto->version;
@@ -65,7 +65,7 @@ class BotService extends MainService
      */
     public function delete(string $public_key, string $private_key): void
     {
-        $bot = SmsBot::query()->where('public_key', $public_key)->where('private_key', $private_key)->first();
+        $bot = Bot::query()->where('public_key', $public_key)->where('private_key', $private_key)->first();
         if (empty($bot))
             throw new \RuntimeException('Not found module.');
         if (!$bot->delete())

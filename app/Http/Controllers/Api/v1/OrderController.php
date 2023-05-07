@@ -6,10 +6,10 @@ use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\OrderResource;
-use App\Models\Activate\SmsCountry;
-use App\Models\Bot\SmsBot;
-use App\Models\Order\SmsOrder;
-use App\Models\User\SmsUser;
+use App\Models\Country\Country;
+use App\Models\Bot\Bot;
+use App\Models\Order\Order;
+use App\Models\User\User;
 use App\Services\Activate\OrderService;
 use App\Services\External\BottApi;
 use Exception;
@@ -46,10 +46,10 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
@@ -67,7 +67,7 @@ class OrderController extends Controller
                 throw new RuntimeException($result['message']);
             }
 
-            $result = OrderResource::collection(SmsOrder::query()->where(['user_id' => $user->id])->
+            $result = OrderResource::collection(Order::query()->where(['user_id' => $user->id])->
             where(['bot_id' => $bot->id])->get());
 
             return ApiHelpers::success($result);
@@ -95,14 +95,14 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->country))
                 return ApiHelpers::error('Not found params: country');
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
             $botDto = BotFactory::fromEntity($bot);
@@ -118,7 +118,7 @@ class OrderController extends Controller
             if ($result['data']['money'] == 0) {
                 throw new RuntimeException('Пополните баланс в боте');
             }
-            $country = SmsCountry::query()->where(['org_id' => $request->country])->first();
+            $country = Country::query()->where(['org_id' => $request->country])->first();
             $service = $user->service;
 
             $result = $this->orderService->create(
@@ -151,15 +151,15 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
@@ -177,7 +177,7 @@ class OrderController extends Controller
 
             $this->orderService->order($result['data'], $botDto, $order);
 
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (RuntimeException $e) {
             return ApiHelpers::errorNew($e->getMessage());
@@ -201,15 +201,15 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
@@ -226,7 +226,7 @@ class OrderController extends Controller
 
             $result = $this->orderService->second($botDto, $order);
 
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (Exception $e) {
             return ApiHelpers::errorNew($e->getMessage());
@@ -250,15 +250,15 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
@@ -275,7 +275,7 @@ class OrderController extends Controller
 
             $result = $this->orderService->confirm($botDto, $order);
 
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (Exception $e) {
             return ApiHelpers::errorNew($e->getMessage());
@@ -300,15 +300,15 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            $bot = SmsBot::query()->where('public_key', $request->public_key)->first();
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
@@ -325,7 +325,7 @@ class OrderController extends Controller
 
             $result = $this->orderService->cancel($result['data'], $botDto, $order);
 
-            $order = SmsOrder::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['org_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (Exception $e) {
             return ApiHelpers::errorNew($e->getMessage());

@@ -2,15 +2,15 @@
 
 namespace App\Http\Resources\api;
 
-use App\Models\User\SmsUser;
+use App\Models\User\User;
 
 class UserResource
 {
     /**
-     * @param SmsUser $user
+     * @param User $user
      * @return array
      */
-    public static function generateUserArray(SmsUser $user): array
+    public static function generateUserArray(User $user): array
     {
         return [
             'id' => (integer)$user->telegram_id,

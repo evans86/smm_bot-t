@@ -2,11 +2,11 @@
 
 namespace App\Dto;
 
-use App\Models\Bot\SmsBot;
+use App\Models\Bot\Bot;
 
 class BotFactory
 {
-    public static function fromEntity(SmsBot $bot): BotDto
+    public static function fromEntity(Bot $bot): BotDto
     {
         $dto = new BotDto();
         $dto->id = $bot->id;

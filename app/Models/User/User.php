@@ -2,12 +2,12 @@
 
 namespace App\Models\User;
 
-use App\Models\Activate\SmsCountry;
-use App\Models\Activate\SmsOperator;
+use App\Models\Country\Country;
+use App\Models\Country\SmsOperator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SmsUser extends Model
+class User extends Model
 {
     const LANGUAGE_RU = 'ru';
     const LANGUAGE_ENG = 'eng';
@@ -16,9 +16,4 @@ class SmsUser extends Model
 
     protected $guarded = false;
     protected $table = 'user';
-
-    public function country()
-    {
-        return $this->hasOne(SmsCountry::class, 'id', 'country_id');
-    }
 }

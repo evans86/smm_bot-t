@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Activate;
 
-use App\Models\Bot\SmsBot;
+use App\Models\Bot\Bot;
 
 class BotController
 {
@@ -11,7 +11,7 @@ class BotController
      */
     public function index()
     {
-        $bots = SmsBot::orderBy('id', 'DESC')->Paginate(10);
+        $bots = Bot::orderBy('id', 'DESC')->Paginate(10);
 
         return view('activate.bot.index', compact(
             'bots',

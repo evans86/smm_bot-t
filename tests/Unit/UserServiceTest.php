@@ -1,7 +1,7 @@
 
 <?php
 
-use App\Models\User\SmsUser;
+use App\Models\User\User;
 use App\Services\Activate\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -37,12 +37,12 @@ class UserServiceTest extends TestCase
             $telegram_id = 123
         );
         self::assertEquals($user->telegram_id, $telegram_id);
-        self::assertEquals($user->language, SmsUser::LANGUAGE_RU);
+        self::assertEquals($user->language, User::LANGUAGE_RU);
 
         $user = $this->userService->updateLanguage(
-            $telegram_id = 123, SmsUser::LANGUAGE_ENG
+            $telegram_id = 123, User::LANGUAGE_ENG
         );
-        self::assertEquals($user->language, SmsUser::LANGUAGE_ENG);
+        self::assertEquals($user->language, User::LANGUAGE_ENG);
 
         try {
             $user_2 = $this->userService->updateLanguage(

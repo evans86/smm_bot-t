@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\api;
 
-use App\Models\Order\SmsOrder;
+use App\Models\Order\Order;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
@@ -28,10 +28,10 @@ class OrderResource extends JsonResource
     }
 
     /**
-     * @param SmsOrder $order
+     * @param Order $order
      * @return array
      */
-    public static function generateOrderArray(SmsOrder $order): array
+    public static function generateOrderArray(Order $order): array
     {
         return [
             'id' => (integer)$order->org_id,

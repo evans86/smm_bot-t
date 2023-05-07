@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\User\SmsUser;
+use App\Models\User\User;
 use App\Services\Activate\UserService;
 
 class UserController extends Controller
@@ -25,7 +25,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = SmsUser::orderBy('id', 'DESC')->Paginate(15);
+        $users = User::orderBy('id', 'DESC')->Paginate(15);
 
         return view('user.index', compact(
             'users',

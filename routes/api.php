@@ -32,6 +32,11 @@ Route::get('getCount', [ProxyController::class, 'getCount']);
 Route::get('getPrice', [ProxyController::class, 'getPrice']);
 
 
+Route::get('buyProxy', [ProxyController::class, 'buyProxy']);
+
+
+
+
 
 
 

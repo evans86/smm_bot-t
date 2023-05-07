@@ -23,7 +23,6 @@ class CountryService extends MainService
             array_push($result, [
                 'id' => $key,
                 'title' => $country,
-//                'image' => $smsCountry->image
             ]);
         }
 
