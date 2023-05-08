@@ -22,9 +22,9 @@ class AddOrderTable extends Migration
             $table->string('count')->nullable();
             $table->string('price')->nullable();
             $table->string('period')->nullable();
-            $table->integer('proxy_id')->unsigned()->nullable();
+            $table->bigInteger('proxy_id')->unsigned()->nullable();
             $table->string('type')->nullable();
-            $table->integer('country_id')->unsigned()->nullable();
+            $table->bigInteger('country_id')->unsigned()->nullable();
             $table->string('prolong_org_id')->nullable();
             $table->string('ip')->nullable();
             $table->string('host')->nullable();
