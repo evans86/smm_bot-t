@@ -53,7 +53,8 @@ class ProxyService extends MainService
 //            . $list['ip']);
 
         $data = [
-            'user_id' => 1,
+            'user_id' => 1, //поменять на входящего пользователя
+            'bot_id' => 1, //поменять на входящего бота
             'user_org_id' => $order['user_id'],
             'balance_org' => $order['balance'],
             'order_org_id' => $order['order_id'],
