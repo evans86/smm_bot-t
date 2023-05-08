@@ -152,7 +152,7 @@ class ProxyApi
     }
 
     //Удаление прокси;
-    public function delete($ids, $descr)
+    public function delete($ids, $descr = null)
     {
         $requestParam = [
             'ids' => $ids,

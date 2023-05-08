@@ -234,4 +234,22 @@ class ProxyController extends Controller
             return ApiHelpers::errorNew($e->getMessage());
         }
     }
+
+    public function deleteProxy(Request $request)
+    {
+        try {
+            if (is_null($request->order_org_id))
+                return ApiHelpers::error('Not found params: order_org_id');
+
+            $result = $this->proxyService->deleteProxy(
+                $request->order_org_id,
+//                $result['data'],
+//                $botDto
+            );
+
+            return ApiHelpers::success($result);
+        } catch (\RuntimeException $e) {
+            return ApiHelpers::errorNew($e->getMessage());
+        }
+    }
 }

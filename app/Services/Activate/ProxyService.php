@@ -88,7 +88,7 @@ class ProxyService extends MainService
 //        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
         $user = User::query()->where(['telegram_id' => $user_id])->first();
 
-        $proxies = Order::query()->where(['user_id' => $user->id])->get();
+        $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
 
         $result = [];
 
@@ -144,6 +144,28 @@ class ProxyService extends MainService
 
         if ($result['status'] == 'no')
             throw new \RuntimeException($result['error']);
+
+        return true;
+    }
+
+    /**
+     * @param $order_org_id
+     * @return mixed
+     */
+    public function deleteProxy($order_org_id)
+    {
+        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxy = Order::query()->where(['prolong_org_id' => $order_org_id])->first();
+
+        $result = $proxyApi->delete($order_org_id);
+
+        if ($result['count'] != 1) {
+            throw new \RuntimeException('Error delete in service');
+        } else {
+            $proxy->status_org = 0;
+            $proxy->save();
+            $result = true;
+        }
 
         return true;
     }
