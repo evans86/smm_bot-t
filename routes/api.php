@@ -33,6 +33,11 @@ Route::get('getPrice', [ProxyController::class, 'getPrice']);
 
 
 Route::get('buyProxy', [ProxyController::class, 'buyProxy']);
+Route::get('getOrders', [ProxyController::class, 'getOrders']);
+
+Route::get('checkWork', [ProxyController::class, 'checkWork']);
+Route::get('updateType', [ProxyController::class, 'updateType']);
+Route::get('deleteProxy', [ProxyController::class, 'deleteProxy']);
 
 
 

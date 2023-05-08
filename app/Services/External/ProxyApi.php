@@ -118,7 +118,7 @@ class ProxyApi
     }
 
     //Покупка прокси;
-    public function buy($count, $period, $country, $descr, $version = 6, $type = 'http')
+    public function buy($count, $period, $country, $version = 6, $type = 'http', $descr =null)
     {
         $requestParam = [
             'count' => $count,
