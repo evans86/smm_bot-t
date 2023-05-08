@@ -11,7 +11,7 @@
                 <th scope="col">Links</th>
                 <th scope="col">ID категории</th>
                 <th scope="col">Процент</th>
-                <th scope="col">Баланс</th>
+{{--                <th scope="col">Баланс</th>--}}
                 <th scope="col">Создан</th>
             </tr>
             </thead>
@@ -26,7 +26,7 @@
                     <td>API key: {{ $bot->api_key }}<br>Link: {{ $bot->resource_link }}</td>
                     <td>{{ $bot->category_id }}</td>
                     <td>{{ $bot->percent }} %</td>
-                    <td>{{ \App\Helpers\BotHelpers::balance($bot) }} руб.</td>
+{{--                    <td>{{ \App\Helpers\BotHelpers::balance($bot) }} руб.</td>--}}
                     <td>{{ $bot->created_at }}</td>
                 </tr>
             @endforeach
