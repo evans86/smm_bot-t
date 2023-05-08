@@ -31,15 +31,4 @@ class UserController extends Controller
             'users',
         ));
     }
-
-    /**
-     * Значение баланса (вспомогательный)
-     * @return mixed
-     */
-    public function balance()
-    {
-        $result = $this->userService->balance();
-
-        return $result;
-    }
 }

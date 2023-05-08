@@ -31,20 +31,4 @@ class CountryController extends Controller
             'countries',
         ));
     }
-//
-//
-//    /**
-//     * Удаление всех стран
-//     *
-//     * @return \Illuminate\Http\RedirectResponse
-//     */
-//    public function delete()
-//    {
-//        $countries = Country::all();
-//
-//        foreach ($countries as $country) {
-//            $country->delete();
-//        }
-//        return redirect()->route('activate.countries.index');
-//    }
 }

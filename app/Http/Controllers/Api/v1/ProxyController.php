@@ -22,11 +22,21 @@ class ProxyController extends Controller
     }
 
     /**
-     * @return array
+     * @param Request $request
+     * @return array|string
      */
-    public function getProxy()
+    public function getProxy(Request $request)
     {
         try {
+//            if (is_null($request->public_key))
+//                return ApiHelpers::error('Not found params: public_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
+
             $result = $this->proxyService->formingProxy();
 
             return ApiHelpers::success($result);
@@ -50,6 +60,21 @@ class ProxyController extends Controller
 //            return ApiHelpers::error('Not found params: public_key');
 //        if (is_null($request->user_secret_key))
 //            return ApiHelpers::error('Not found params: user_secret_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
 
             $result = $this->proxyService->getCount($request->country, $request->version);
 
@@ -73,10 +98,14 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->period))
                 return ApiHelpers::error('Not found params: period');
-//        if (is_null($request->public_key))
-//            return ApiHelpers::error('Not found params: public_key');
-//        if (is_null($request->user_secret_key))
-//            return ApiHelpers::error('Not found params: user_secret_key');
+//            if (is_null($request->public_key))
+//                return ApiHelpers::error('Not found params: public_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
 
             $result = $this->proxyService->getPrice($request->count, $request->period, $request->version);
 
@@ -111,7 +140,7 @@ class ProxyController extends Controller
 //                return ApiHelpers::error('Not found module.');
 //            if (is_null($request->user_secret_key))
 //                return ApiHelpers::error('Not found params: user_secret_key');
-//
+//              //передать потом
 //            $botDto = BotFactory::fromEntity($bot);
 //            $result = BottApi::checkUser(
 //                $request->user_id,
@@ -193,14 +222,30 @@ class ProxyController extends Controller
     public function checkWork(Request $request)
     {
         try {
-//        if (is_null($request->user_id))
-//            return ApiHelpers::error('Not found params: user_id');
             if (is_null($request->order_org_id))
                 return ApiHelpers::error('Not found params: order_org_id');
+//        if (is_null($request->public_key))
+//            return ApiHelpers::error('Not found params: public_key');
+//        if (is_null($request->user_secret_key))
+//            return ApiHelpers::error('Not found params: user_secret_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
 
             $result = $this->proxyService->checkWork(
                 $request->order_org_id
-//                $result['data'],
 //                $botDto
             );
             return ApiHelpers::success($result);
@@ -216,12 +261,29 @@ class ProxyController extends Controller
     public function updateType(Request $request)
     {
         try {
-//        if (is_null($request->user_id))
-//            return ApiHelpers::error('Not found params: user_id');
             if (is_null($request->order_org_id))
                 return ApiHelpers::error('Not found params: order_org_id');
             if (is_null($request->type))
                 return ApiHelpers::error('Not found params: type');
+            //        if (is_null($request->public_key))
+//            return ApiHelpers::error('Not found params: public_key');
+//        if (is_null($request->user_secret_key))
+//            return ApiHelpers::error('Not found params: user_secret_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
 
             $result = $this->proxyService->updateType(
                 $request->order_org_id,
@@ -240,6 +302,25 @@ class ProxyController extends Controller
         try {
             if (is_null($request->order_org_id))
                 return ApiHelpers::error('Not found params: order_org_id');
+            //        if (is_null($request->public_key))
+//            return ApiHelpers::error('Not found params: public_key');
+//        if (is_null($request->user_secret_key))
+//            return ApiHelpers::error('Not found params: user_secret_key');
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            //позже передать
+//            $botDto = BotFactory::fromEntity($bot);
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
 
             $result = $this->proxyService->deleteProxy(
                 $request->order_org_id,

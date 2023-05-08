@@ -24,41 +24,38 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+/**
+ * Проверка соединения
+ */
 Route::get('pingProxy', [CountryController::class, 'pingProxy']);
 
+/**
+ * Получение данных
+ */
 Route::get('getProxy', [ProxyController::class, 'getProxy']);
 Route::get('getCountry', [CountryController::class, 'getCountry']);
 Route::get('getCount', [ProxyController::class, 'getCount']);
 Route::get('getPrice', [ProxyController::class, 'getPrice']);
 
-
+/**
+ * Покупка прокси
+ */
 Route::get('buyProxy', [ProxyController::class, 'buyProxy']);
 Route::get('getOrders', [ProxyController::class, 'getOrders']);
 
+/**
+ * Работа с активными заказами
+ */
 Route::get('checkWork', [ProxyController::class, 'checkWork']);
 Route::get('updateType', [ProxyController::class, 'updateType']);
 Route::get('deleteProxy', [ProxyController::class, 'deleteProxy']);
 
 
-
-
-
-
-
-/**
- * Роуты API (страны, операторы, сервисы), ресурсный подход
- */
-Route::resources([
-    'countries' => CountryController::class,
-]);
-
 /**
  * Роуты API (пользователи)
  */
-Route::get('setCountry', [CountryController::class, 'setCountry']);
 Route::get('setLanguage', [UserController::class, 'setLanguage']);
 Route::get('getUser', [UserController::class, 'getUser']);
-Route::get('balance', [UserController::class, 'balance']);
 
 /**
  * Роуты API (боты)
@@ -69,26 +66,5 @@ Route::get('error', [BotController::class, 'error']);
 Route::get('get', [BotController::class, 'get']);
 Route::post('update', [BotController::class, 'update']);
 Route::get('delete', [BotController::class, 'delete']);
-
-/**
- * Роуты API (заказы (создание, получение, все))
- */
-Route::get('createOrder', [OrderController::class, 'createOrder']);
-Route::get('getOrder', [OrderController::class, 'getOrder']);
-Route::get('orders', [OrderController::class, 'orders']);
-
-/**
- * Роуты API (заказы (изменение статусов))
- */
-Route::get('closeOrder', [OrderController::class, 'closeOrder']);
-Route::get('reportOrderSms', [OrderController::class, 'reportOrderSms']);
-Route::get('secondSms', [OrderController::class, 'secondSms']);
-Route::get('confirmOrder', [OrderController::class, 'confirmOrder']);
-
-/**
- * Роуты API (заказы (рабочие))
- */
-Route::get('getActive', [OrderController::class, 'getActive']);
-Route::get('getStatus', [OrderController::class, 'getStatus']);
 
 

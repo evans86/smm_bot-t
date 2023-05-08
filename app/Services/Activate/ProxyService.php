@@ -7,6 +7,7 @@ use App\Models\Country\Country;
 use App\Models\Order\Order;
 use App\Models\Proxy\Proxy;
 use App\Models\User\User;
+use App\Services\External\BottApi;
 use App\Services\External\ProxyApi;
 use App\Services\MainService;
 use http\Exception\RuntimeException;
@@ -25,7 +26,13 @@ class ProxyService extends MainService
      */
     public function createOrder($count, $period, $country, $version, $type, array $userData = null, BotDto $botDto = null)
     {
+        //        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+
+//        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
+//        if (is_null($user)) {
+//            throw new RuntimeException('not found user');
+//        }
 
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
         $list = $order['list'];
@@ -33,7 +40,17 @@ class ProxyService extends MainService
 
         $country = Country::query()->where(['iso_two' => $order['country']])->first();
         $proxy = Proxy::query()->where(['version' => $order['version']])->first();
+
+//        $amountStart = intval(floatval($order['price']) * 100);
+//        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+
+        //убрать потом
         $amountStart = intval(floatval($order['price']) * 100);
+        $amountFinal = $amountStart + $amountStart * 10 / 100;
+
+//        // Попытаться списать баланс у пользователя
+//        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
+//            . $list['ip']);
 
         $data = [
             'user_id' => 1,
@@ -41,7 +58,7 @@ class ProxyService extends MainService
             'balance_org' => $order['balance'],
             'order_org_id' => $order['order_id'],
             'count' => $order['count'],
-            'price' => $amountStart,
+            'price' => $amountFinal,
             'period' => $order['period'],
             'proxy_id' => $proxy->id,
             'type' => $order['type'],
@@ -82,8 +99,9 @@ class ProxyService extends MainService
         return $result;
     }
 
+    //вернуть userData
 //    public function getOrders(array $userData)
-    public function getOrders(int $user_id)
+    public function getOrders(int $user_id, array $userData = null)
     {
 //        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
         $user = User::query()->where(['telegram_id' => $user_id])->first();
@@ -119,6 +137,7 @@ class ProxyService extends MainService
 
     public function checkWork($order_org_id)
     {
+        //        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $status = $proxyApi->check($order_org_id);
 
@@ -139,6 +158,7 @@ class ProxyService extends MainService
      */
     public function updateType($order_org_id, $type)
     {
+        //        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $result = $proxyApi->settype($order_org_id, $type);
 
@@ -154,6 +174,7 @@ class ProxyService extends MainService
      */
     public function deleteProxy($order_org_id)
     {
+        //        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $proxy = Order::query()->where(['prolong_org_id' => $order_org_id])->first();
 
@@ -173,10 +194,12 @@ class ProxyService extends MainService
     /**
      * @param $country
      * @param $version
+     * @param BotDto|null $botDto
      * @return mixed
      */
-    public function getCount($country, $version)
+    public function getCount($country, $version, BotDto $botDto = null)
     {
+//        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $count = $proxyApi->getcount($country, $version);
 
@@ -187,18 +210,27 @@ class ProxyService extends MainService
      * @param $count
      * @param $period
      * @param $version
+     * @param BotDto|null $botDto
      * @return array
      */
-    public function getPrice($count, $period, $version)
+    public function getPrice($count, $period, $version, BotDto $botDto = null)
     {
+//        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $price = $proxyApi->getprice($count, $period, $version);
+
+//        $amountStart = intval(floatval($price['price']) * 100);
+//        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+
+        //убрать потом
+        $amountStart = intval(floatval($price['price']) * 100);
+        $amountFinal = $amountStart + $amountStart * 10 / 100;
 
         $result = [];
 
         array_push($result, [
             'price' => $price['price'],
-            'period' => $price['period'],
+            'period' => $amountFinal,
             'count' => $price['count'],
             'price_single' => $price['price_single'],
         ]);
@@ -207,10 +239,12 @@ class ProxyService extends MainService
     }
 
     /**
+     * @param BotDto|null $botDto
      * @return array
      */
-    public function formingProxy()
+    public function formingProxy(BotDto $botDto = null)
     {
+//        $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $proxies = Proxy::all();
 

@@ -2,8 +2,6 @@
 
 namespace App\Models\User;
 
-use App\Models\Country\Country;
-use App\Models\Country\SmsOperator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

@@ -4,7 +4,6 @@ namespace App\Services\Activate;
 
 use App\Models\User\User;
 use App\Services\MainService;
-use App\Services\External\ActivApi;
 use RuntimeException;
 
 class UserService extends MainService

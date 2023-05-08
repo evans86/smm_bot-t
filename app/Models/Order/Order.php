@@ -15,9 +15,9 @@ class Order extends Model
     protected $guarded = false;
     protected $table = 'order';
 
-    public function user()
+    public function bot()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->hasOne(User::class, 'id', 'bot_id');
     }
 
     public function country()
@@ -28,5 +28,10 @@ class Order extends Model
     public function proxy()
     {
         return $this->hasOne(Proxy::class, 'id', 'proxy_id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 }

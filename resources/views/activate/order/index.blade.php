@@ -10,7 +10,7 @@
                 <th scope="col">Страна</th>
                 <th scope="col">Заказ</th>
                 <th scope="col">Статус</th>
-{{--                <th scope="col">Бот</th>--}}
+                <th scope="col">Бот</th>
                 <th scope="col">Создан в сервисе </th>
                 <th scope="col">Окончание </th>
             </tr>
@@ -29,8 +29,8 @@
                         <br>Пароль: {{ $order->pass }}
                         <br>Версия: {{ $order->proxy->title }}
                     </td>
-                    <td>{{ $order->status_org }}</td>
-{{--                    <td>{{ $order->bot->id }}</td>--}}
+                    <td>{!!\App\Helpers\OrdersHelper::statusLabel($order->status_org)!!}</td>
+                    <td>{{ $order->bot_id }}</td>
                     <td>{{\Carbon\Carbon::createFromTimestamp($order->start_time)->toDateTimeString()}}</td>
                     <td>{{\Carbon\Carbon::createFromTimestamp($order->end_time)->toDateTimeString()}}</td>
                 </tr>
