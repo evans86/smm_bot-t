@@ -60,7 +60,7 @@ Route::get('getUser', [UserController::class, 'getUser']);
 /**
  * Роуты API (боты)
  */
-//Route::get('ping', [BotController::class, 'ping']);
+Route::get('ping', [BotController::class, 'ping']);
 Route::get('create', [BotController::class, 'create']);
 Route::get('error', [BotController::class, 'error']);
 Route::get('get', [BotController::class, 'get']);
