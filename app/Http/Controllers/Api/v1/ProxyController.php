@@ -6,15 +6,16 @@ use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\Bot\Bot;
-use App\Models\User\SmsUser;
 use App\Models\User\User;
 use App\Services\Activate\ProxyService;
 use App\Services\External\BottApi;
-use http\Exception\RuntimeException;
 use Illuminate\Http\Request;
 
 class ProxyController extends Controller
 {
+    /**
+     * @var ProxyService
+     */
     public ProxyService $proxyService;
 
     public function __construct()
@@ -63,7 +64,6 @@ class ProxyController extends Controller
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
-//            //позже передать
             $botDto = BotFactory::fromEntity($bot);
 
             $result = $this->proxyService->getCount($request->country, $request->version, $botDto);
@@ -94,7 +94,6 @@ class ProxyController extends Controller
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
-            //позже передать
             $botDto = BotFactory::fromEntity($bot);
 
             $result = $this->proxyService->getPrice($request->count, $request->period, $request->version, $botDto);
@@ -135,7 +134,7 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found module.');
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
-            //передать потом
+
             $botDto = BotFactory::fromEntity($bot);
             $result = BottApi::checkUser(
                 $request->user_id,
@@ -271,7 +270,6 @@ class ProxyController extends Controller
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
-            //позже передать
             $botDto = BotFactory::fromEntity($bot);
             $result = BottApi::checkUser(
                 $request->user_id,
@@ -310,7 +308,6 @@ class ProxyController extends Controller
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
-            //позже передать
             $botDto = BotFactory::fromEntity($bot);
             $result = BottApi::checkUser(
                 $request->user_id,

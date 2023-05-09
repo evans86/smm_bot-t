@@ -5,13 +5,11 @@ namespace App\Services\Activate;
 use App\Dto\BotDto;
 use App\Models\Country\Country;
 use App\Models\Order\Order;
-use App\Models\Order\SmsOrder;
 use App\Models\Proxy\Proxy;
 use App\Models\User\User;
 use App\Services\External\BottApi;
 use App\Services\External\ProxyApi;
 use App\Services\MainService;
-use http\Exception\RuntimeException;
 
 class ProxyService extends MainService
 {
@@ -21,6 +19,7 @@ class ProxyService extends MainService
      * @param $country
      * @param $version
      * @param $type
+     * @param $enter_amount
      * @param array $userData
      * @param BotDto $botDto
      * @return array
@@ -29,11 +28,10 @@ class ProxyService extends MainService
     public function createOrder($count, $period, $country, $version, $type, $enter_amount, array $userData, BotDto $botDto)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
-//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
 
         $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
         if (is_null($user)) {
-            throw new RuntimeException('not found user');
+            throw new \RuntimeException('not found user');
         }
 
         if ($enter_amount > $userData['money']) {
@@ -50,11 +48,6 @@ class ProxyService extends MainService
         $amountStart = intval(floatval($order['price']) * 100);
         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
-        //убрать потом
-//        $amountStart = intval(floatval($order['price']) * 100);
-//        $amountFinal = $amountStart + $amountStart * 10 / 100;
-
-//        // Попытаться списать баланс у пользователя
         $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
             . $list['ip']);
 
@@ -213,7 +206,7 @@ class ProxyService extends MainService
     public function getCount($country, $version, BotDto $botDto)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
-//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+
         $count = $proxyApi->getcount($country, $version);
 
         return $count['count'];
@@ -229,15 +222,11 @@ class ProxyService extends MainService
     public function getPrice($count, $period, $version, BotDto $botDto)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
-//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+
         $price = $proxyApi->getprice($count, $period, $version);
 
         $amountStart = intval(floatval($price['price']) * 100);
         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
-
-        //убрать потом
-//        $amountStart = intval(floatval($price['price']) * 100);
-//        $amountFinal = $amountStart + $amountStart * 10 / 100;
 
         $result = [
             'price' => $amountFinal,
@@ -256,7 +245,7 @@ class ProxyService extends MainService
     public function formingProxy(BotDto $botDto)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
-//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+
         $proxies = Proxy::all();
 
         $result = [];
