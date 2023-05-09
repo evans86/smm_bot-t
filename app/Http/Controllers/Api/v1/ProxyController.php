@@ -47,6 +47,7 @@ class ProxyController extends Controller
     /**
      * @param Request $request
      * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getCount(Request $request)
     {
@@ -57,23 +58,23 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
+//            if (is_null($request->user_secret_key))
+//                return ApiHelpers::error('Not found params: user_secret_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
 //            //позже передать
             $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
-            );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
 
             $result = $this->proxyService->getCount($request->country, $request->version, $botDto);
 
