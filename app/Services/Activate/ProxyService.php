@@ -161,18 +161,24 @@ class ProxyService extends MainService
     /**
      * @param $order_org_id
      * @param $type
-     * @return bool|string
+     * @param BotDto $botDto
+     * @return bool
      */
     public function updateType($order_org_id, $type, BotDto $botDto)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
-//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxy = Order::query()->where(['prolong_org_id' => $order_org_id])->first();
         $result = $proxyApi->settype($order_org_id, $type);
 
-        if ($result['status'] == 'no')
+        if ($result['status'] == 'no') {
             throw new \RuntimeException($result['error']);
+        } else {
+            $proxy->type = $type;
+            $proxy->save();
+            $result = true;
+        }
 
-        return true;
+        return $result;
     }
 
     /**
