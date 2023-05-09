@@ -193,10 +193,10 @@ class ProxyService extends MainService
      * @param BotDto|null $botDto
      * @return mixed
      */
-    public function getCount($country, $version, BotDto $botDto = null)
+    public function getCount($country, $version, BotDto $botDto)
     {
-//        $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
+//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $count = $proxyApi->getcount($country, $version);
 
         return $count['count'];
