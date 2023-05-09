@@ -142,12 +142,7 @@ class ProxyService extends MainService
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $status = $proxyApi->check($order_org_id);
 
-        $result = [];
-
-        array_push($result, [
-            'order_org_id' => $status['proxy_id'],
-            'proxy_status' => $status['proxy_status']
-        ]);
+        $result = $status['proxy_status'];
 
         return $result;
     }
