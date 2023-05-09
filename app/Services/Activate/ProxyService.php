@@ -5,6 +5,7 @@ namespace App\Services\Activate;
 use App\Dto\BotDto;
 use App\Models\Country\Country;
 use App\Models\Order\Order;
+use App\Models\Order\SmsOrder;
 use App\Models\Proxy\Proxy;
 use App\Models\User\User;
 use App\Services\External\BottApi;
@@ -20,18 +21,23 @@ class ProxyService extends MainService
      * @param $country
      * @param $version
      * @param $type
-     * @param array|null $userData
-     * @param BotDto|null $botDto
+     * @param array $userData
+     * @param BotDto $botDto
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createOrder($count, $period, $country, $version, $type, array $userData, BotDto $botDto)
+    public function createOrder($count, $period, $country, $version, $type, $enter_amount, array $userData, BotDto $botDto)
     {
-                $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
+//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
 
         $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
         if (is_null($user)) {
             throw new RuntimeException('not found user');
+        }
+
+        if ($enter_amount > $userData['money']) {
+            throw new RuntimeException('Пополните баланс в боте');
         }
 
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
