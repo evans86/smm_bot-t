@@ -143,10 +143,10 @@ class ProxyController extends Controller
                 $botDto->private_key
             );
             if (!$result['result']) {
-                throw new RuntimeException($result['message']);
+                throw new \RuntimeException($result['message']);
             }
             if ($result['data']['money'] == 0) {
-                throw new RuntimeException('Пополните баланс в боте');
+                throw new \RuntimeException('Пополните баланс в боте');
             }
 
             $result = $this->proxyService->createOrder(
@@ -193,10 +193,10 @@ class ProxyController extends Controller
 //                $botDto->private_key
 //            );
 //            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
+//                throw new \RuntimeException($result['message']);
 //            }
 //            if ($result['data']['money'] == 0) {
-//                throw new RuntimeException('Пополните баланс в боте');
+//                throw new \RuntimeException('Пополните баланс в боте');
 //            }
 
             $result = $this->proxyService->getOrders(
@@ -236,7 +236,7 @@ class ProxyController extends Controller
 //                $botDto->private_key
 //            );
 //            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
+//                throw new \RuntimeException($result['message']);
 //            }
 
             $result = $this->proxyService->checkWork(
@@ -277,7 +277,7 @@ class ProxyController extends Controller
 //                $botDto->private_key
 //            );
 //            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
+//                throw new \RuntimeException($result['message']);
 //            }
 
             $result = $this->proxyService->updateType(
@@ -314,7 +314,7 @@ class ProxyController extends Controller
 //                $botDto->private_key
 //            );
 //            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
+//                throw new \RuntimeException($result['message']);
 //            }
 
             $result = $this->proxyService->deleteProxy(
