@@ -183,12 +183,12 @@ class ProxyService extends MainService
 
     /**
      * @param $order_org_id
-     * @return mixed
+     * @param BotDto $botDto
+     * @return bool
      */
-    public function deleteProxy($order_org_id)
+    public function deleteProxy($order_org_id, BotDto $botDto)
     {
-        //        $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
         $proxy = Order::query()->where(['prolong_org_id' => $order_org_id])->first();
 
         $result = $proxyApi->delete($order_org_id);
@@ -201,7 +201,7 @@ class ProxyService extends MainService
             $result = true;
         }
 
-        return true;
+        return $result;
     }
 
     /**
