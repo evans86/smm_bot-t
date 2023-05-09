@@ -107,14 +107,12 @@ class ProxyService extends MainService
     }
 
     /**
-     * @param int $user_id
      * @param array $userData
      * @return array
      */
-    public function getOrders(int $user_id, array $userData)
+    public function getOrders(array $userData)
     {
         $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
-//        $user = User::query()->where(['telegram_id' => $user_id])->first();
 
         $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
 
@@ -145,10 +143,14 @@ class ProxyService extends MainService
         return $result;
     }
 
-    public function checkWork($order_org_id)
+    /**
+     * @param $order_org_id
+     * @param BotDto $botDto
+     * @return mixed
+     */
+    public function checkWork($order_org_id, BotDto $botDto)
     {
-        //        $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
         $status = $proxyApi->check($order_org_id);
 
         $result = $status['proxy_status'];
@@ -161,10 +163,10 @@ class ProxyService extends MainService
      * @param $type
      * @return bool|string
      */
-    public function updateType($order_org_id, $type)
+    public function updateType($order_org_id, $type, BotDto $botDto)
     {
-        //        $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
+//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $result = $proxyApi->settype($order_org_id, $type);
 
         if ($result['status'] == 'no')
