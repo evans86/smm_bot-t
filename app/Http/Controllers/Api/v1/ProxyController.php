@@ -28,16 +28,16 @@ class ProxyController extends Controller
     public function getProxy(Request $request)
     {
         try {
-//            if (is_null($request->public_key))
-//                return ApiHelpers::error('Not found params: public_key');
-//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-//            if (empty($bot))
-//                return ApiHelpers::error('Not found module.');
-//
-//            //позже передать
-//            $botDto = BotFactory::fromEntity($bot);
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
 
-            $result = $this->proxyService->formingProxy();
+//            //позже передать
+            $botDto = BotFactory::fromEntity($bot);
+
+            $result = $this->proxyService->formingProxy($botDto);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
