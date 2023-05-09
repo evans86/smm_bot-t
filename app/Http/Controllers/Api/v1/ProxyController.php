@@ -6,6 +6,7 @@ use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\Bot\Bot;
+use App\Models\User\SmsUser;
 use App\Models\User\User;
 use App\Services\Activate\ProxyService;
 use App\Services\External\BottApi;
@@ -111,6 +112,9 @@ class ProxyController extends Controller
     public function buyProxy(Request $request)
     {
         try {
+            if (is_null($request->user_id))
+                return ApiHelpers::error('Not found params: user_id');
+            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->count))
                 return ApiHelpers::error('Not found params: count');
             if (is_null($request->period))
@@ -121,7 +125,6 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->type))
                 return ApiHelpers::error('Not found params: type');
-
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
