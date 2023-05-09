@@ -209,18 +209,18 @@ class ProxyService extends MainService
      * @param BotDto|null $botDto
      * @return array
      */
-    public function getPrice($count, $period, $version, BotDto $botDto = null)
+    public function getPrice($count, $period, $version, BotDto $botDto)
     {
-//        $proxyApi = new ProxyApi($botDto->api_key);
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
+        $proxyApi = new ProxyApi($botDto->api_key);
+//        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
         $price = $proxyApi->getprice($count, $period, $version);
 
-//        $amountStart = intval(floatval($price['price']) * 100);
-//        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+        $amountStart = intval(floatval($price['price']) * 100);
+        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
         //убрать потом
-        $amountStart = intval(floatval($price['price']) * 100);
-        $amountFinal = $amountStart + $amountStart * 10 / 100;
+//        $amountStart = intval(floatval($price['price']) * 100);
+//        $amountFinal = $amountStart + $amountStart * 10 / 100;
 
         $result = [
             'price' => $amountFinal,

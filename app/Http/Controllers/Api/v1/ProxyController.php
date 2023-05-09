@@ -58,23 +58,12 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
-//            if (is_null($request->user_secret_key))
-//                return ApiHelpers::error('Not found params: user_secret_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
 
 //            //позже передать
             $botDto = BotFactory::fromEntity($bot);
-//            $result = BottApi::checkUser(
-//                $request->user_id,
-//                $request->user_secret_key,
-//                $botDto->public_key,
-//                $botDto->private_key
-//            );
-//            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
-//            }
 
             $result = $this->proxyService->getCount($request->country, $request->version, $botDto);
 
@@ -98,16 +87,16 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->period))
                 return ApiHelpers::error('Not found params: period');
-//            if (is_null($request->public_key))
-//                return ApiHelpers::error('Not found params: public_key');
-//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-//            if (empty($bot))
-//                return ApiHelpers::error('Not found module.');
-//
-//            //позже передать
-//            $botDto = BotFactory::fromEntity($bot);
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
 
-            $result = $this->proxyService->getPrice($request->count, $request->period, $request->version);
+            //позже передать
+            $botDto = BotFactory::fromEntity($bot);
+
+            $result = $this->proxyService->getPrice($request->count, $request->period, $request->version, $botDto);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
