@@ -106,12 +106,15 @@ class ProxyService extends MainService
         return $result;
     }
 
-    //вернуть userData
-//    public function getOrders(array $userData)
-    public function getOrders(int $user_id, array $userData = null)
+    /**
+     * @param int $user_id
+     * @param array $userData
+     * @return array
+     */
+    public function getOrders(int $user_id, array $userData)
     {
-//        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
-        $user = User::query()->where(['telegram_id' => $user_id])->first();
+        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
+//        $user = User::query()->where(['telegram_id' => $user_id])->first();
 
         $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
 
