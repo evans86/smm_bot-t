@@ -227,14 +227,12 @@ class ProxyService extends MainService
         $amountStart = intval(floatval($price['price']) * 100);
         $amountFinal = $amountStart + $amountStart * 10 / 100;
 
-        $result = [];
-
-        array_push($result, [
-            'price' => $price['price'],
-            'period' => $amountFinal,
+        $result = [
+            'price' => $amountFinal,
+            'period' => $price['period'],
             'count' => $price['count'],
             'price_single' => $price['price_single'],
-        ]);
+        ];
 
         return $result;
     }
