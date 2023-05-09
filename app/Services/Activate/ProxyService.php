@@ -37,7 +37,7 @@ class ProxyService extends MainService
         }
 
         if ($enter_amount > $userData['money']) {
-            throw new RuntimeException('Пополните баланс в боте');
+            throw new \RuntimeException('Пополните баланс в боте');
         }
 
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
