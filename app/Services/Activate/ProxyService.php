@@ -24,15 +24,15 @@ class ProxyService extends MainService
      * @param BotDto|null $botDto
      * @return array
      */
-    public function createOrder($count, $period, $country, $version, $type, array $userData = null, BotDto $botDto = null)
+    public function createOrder($count, $period, $country, $version, $type, array $userData, BotDto $botDto)
     {
-        //        $proxyApi = new ProxyApi($botDto->api_key);
+                $proxyApi = new ProxyApi($botDto->api_key);
         $proxyApi = new ProxyApi(config('services.key_proxy.key'));
 
-//        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
-//        if (is_null($user)) {
-//            throw new RuntimeException('not found user');
-//        }
+        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
+        if (is_null($user)) {
+            throw new RuntimeException('not found user');
+        }
 
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
         $list = $order['list'];
@@ -41,20 +41,20 @@ class ProxyService extends MainService
         $country = Country::query()->where(['iso_two' => $order['country']])->first();
         $proxy = Proxy::query()->where(['version' => $order['version']])->first();
 
-//        $amountStart = intval(floatval($order['price']) * 100);
-//        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+        $amountStart = intval(floatval($order['price']) * 100);
+        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
         //убрать потом
-        $amountStart = intval(floatval($order['price']) * 100);
-        $amountFinal = $amountStart + $amountStart * 10 / 100;
+//        $amountStart = intval(floatval($order['price']) * 100);
+//        $amountFinal = $amountStart + $amountStart * 10 / 100;
 
 //        // Попытаться списать баланс у пользователя
-//        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
-//            . $list['ip']);
+        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
+            . $list['ip']);
 
         $data = [
-            'user_id' => 1, //поменять на входящего пользователя
-            'bot_id' => 1, //поменять на входящего бота
+            'user_id' => $user->id,
+            'bot_id' => $botDto->id,
             'user_org_id' => $order['user_id'],
             'balance_org' => $order['balance'],
             'order_org_id' => $order['order_id'],

@@ -122,27 +122,27 @@ class ProxyController extends Controller
             if (is_null($request->type))
                 return ApiHelpers::error('Not found params: type');
 
-//            if (is_null($request->public_key))
-//                return ApiHelpers::error('Not found params: public_key');
-//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-//            if (empty($bot))
-//                return ApiHelpers::error('Not found module.');
-//            if (is_null($request->user_secret_key))
-//                return ApiHelpers::error('Not found params: user_secret_key');
-//              //передать потом
-//            $botDto = BotFactory::fromEntity($bot);
-//            $result = BottApi::checkUser(
-//                $request->user_id,
-//                $request->user_secret_key,
-//                $botDto->public_key,
-//                $botDto->private_key
-//            );
-//            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
-//            }
-//            if ($result['data']['money'] == 0) {
-//                throw new RuntimeException('Пополните баланс в боте');
-//            }
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
+            if (is_null($request->user_secret_key))
+                return ApiHelpers::error('Not found params: user_secret_key');
+            //передать потом
+            $botDto = BotFactory::fromEntity($bot);
+            $result = BottApi::checkUser(
+                $request->user_id,
+                $request->user_secret_key,
+                $botDto->public_key,
+                $botDto->private_key
+            );
+            if (!$result['result']) {
+                throw new RuntimeException($result['message']);
+            }
+            if ($result['data']['money'] == 0) {
+                throw new RuntimeException('Пополните баланс в боте');
+            }
 
             $result = $this->proxyService->createOrder(
                 $request->count,
@@ -150,8 +150,8 @@ class ProxyController extends Controller
                 $request->country,
                 $request->version,
                 $request->type,
-//                $result['data'],
-//                $botDto
+                $result['data'],
+                $botDto
             );
 
             return ApiHelpers::success($result);

@@ -6,6 +6,10 @@ use App\Models\Bot\Bot;
 
 class BotFactory
 {
+    /**
+     * @param Bot|\Illuminate\Database\Eloquent\Model|object $bot
+     * @return BotDto
+     */
     public static function fromEntity(Bot $bot): BotDto
     {
         $dto = new BotDto();
