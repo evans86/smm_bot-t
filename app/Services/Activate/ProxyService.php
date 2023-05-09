@@ -48,8 +48,11 @@ class ProxyService extends MainService
         $amountStart = intval(floatval($order['price']) * 100);
         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
-        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
+        $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
             . $list['ip']);
+
+        $resultOrder = BottApi::createOrder($botDto, $userData, $amountFinal,
+            'Покупка прокси ' . $list['ip']);
 
         $data = [
             'user_id' => $user->id,
