@@ -114,7 +114,7 @@ class ProxyController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = SmsUser::query()->where(['telegram_id' => $request->user_id])->first();
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->count))
                 return ApiHelpers::error('Not found params: count');
             if (is_null($request->period))
