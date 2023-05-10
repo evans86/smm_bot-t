@@ -88,6 +88,29 @@ class BotController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return array|string
+     */
+    public function getSettings(Request $request)
+    {
+        try {
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                throw new \RuntimeException('Not found module.');
+
+            $botDto = BotFactory::fromEntity($bot);
+
+            $result = $botDto->color;
+
+            return ApiHelpers::success($result);
+        } catch (\Exception $e) {
+            return ApiHelpers::error($e->getMessage());
+        }
+    }
+
+    /**
      * Удаление модуля
      *
      * @param Request $request
