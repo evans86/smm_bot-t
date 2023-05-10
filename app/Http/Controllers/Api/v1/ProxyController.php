@@ -370,6 +370,9 @@ class ProxyController extends Controller
             if (!$result['result']) {
                 throw new \RuntimeException($result['message']);
             }
+            if ($result['data']['money'] == 0) {
+                throw new \RuntimeException('Пополните баланс в боте');
+            }
 
             $result = $this->proxyService->prolongProxy(
                 $request->order_org_id,
