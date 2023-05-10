@@ -21,6 +21,7 @@ class BotFactory
         $dto->category_id = $bot->category_id;
         $dto->percent = $bot->percent;
         $dto->version = $bot->version;
+        $dto->color = $bot->color;
         $dto->resource_link = $bot->resource_link;
         return $dto;
     }
