@@ -178,6 +178,7 @@ class ProxyService extends MainService
                 'pass' => $proxy->pass,
                 'type' => $proxy->type,
                 'ip' => $proxy->ip,
+                'status_org' => $proxy->status_org,
                 'start_time' => $proxy->start_time,
                 'end_time' => $proxy->end_time
             ]);
