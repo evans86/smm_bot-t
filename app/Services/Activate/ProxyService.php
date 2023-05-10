@@ -103,6 +103,53 @@ class ProxyService extends MainService
     }
 
     /**
+     * @param $order_org_id
+     * @param $period
+     * @param $enter_amount
+     * @param array $userData
+     * @param BotDto $botDto
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function prolongProxy($order_org_id, $period, $enter_amount, array $userData, BotDto $botDto)
+    {
+        $proxyApi = new ProxyApi($botDto->api_key);
+        $proxy = Order::query()->where(['prolong_org_id' => $order_org_id])->first();
+
+        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
+        if (is_null($user)) {
+            throw new \RuntimeException('not found user');
+        }
+
+        if ($enter_amount > $userData['money']) {
+            throw new \RuntimeException('Пополните баланс в боте');
+        }
+
+        $order = $proxyApi->prolong($period, $order_org_id);
+
+        if ($order['count'] == 1) {
+            $list = $order['list'];
+            $list = current($list);
+
+            $amountStart = intval(floatval($order['price']) * 100);
+            $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+
+            $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для продления прокси '
+                . $list['id']);
+
+            $resultOrder = BottApi::createOrder($botDto, $userData, $amountFinal,
+                'Продление прокси ' . $list['id']);
+
+            $proxy->status_org = Order::ORDER_ACTIVE;
+
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    /**
      * @param array $userData
      * @return array
      */
@@ -192,7 +239,7 @@ class ProxyService extends MainService
         if ($result['count'] != 1) {
             throw new \RuntimeException('Error delete in service');
         } else {
-            $proxy->status_org = 0;
+            $proxy->status_org = Order::ORDER_DELETE;
             $proxy->save();
             $result = true;
         }
@@ -282,5 +329,26 @@ class ProxyService extends MainService
         }
 
         return $result;
+    }
+
+    /**
+     * Крон обновление статусов
+     *
+     * @return void
+     */
+    public function cronUpdateStatus()
+    {
+        $statuses = [Order::ORDER_ACTIVE];
+
+        $orders = Order::query()->whereIn('status_org', $statuses)
+            ->where('end_time', '<=', time())->get();
+
+        echo "START count:" . count($orders) . PHP_EOL;
+        foreach ($orders as $key => $order) {
+            echo $order->id . PHP_EOL;
+            $order->status_org = Order::ORDER_FINISH;
+            $order->save();
+            echo "FINISH" . $order->id . PHP_EOL;
+        }
     }
 }

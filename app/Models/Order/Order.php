@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    const ORDER_DELETE = 0;
+    const ORDER_ACTIVE = 1;
+    const ORDER_FINISH = 2;
+
     use HasFactory;
 
     protected $guarded = false;

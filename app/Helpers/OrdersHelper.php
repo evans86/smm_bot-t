@@ -2,24 +2,31 @@
 
 namespace App\Helpers;
 
+use App\Models\Order\Order;
+use App\Models\Proxy\Proxy;
+
 class OrdersHelper
 {
     public static function statusList(): array
     {
         return [
-            0 => 'Удалено',
-            1 => 'Активен',
+            Order::ORDER_DELETE => 'Удалено',
+            Order::ORDER_ACTIVE => 'Активен',
+            Order::ORDER_FINISH => 'Окончен',
         ];
     }
 
     public static function statusLabel($status): string
     {
         switch ($status) {
-            case 0:
+            case Order::ORDER_DELETE:
                 $class = 'badge bg-danger';
                 break;
-            case 1:
+            case Order::ORDER_ACTIVE:
                 $class = 'badge bg-success';
+                break;
+            case Order::ORDER_FINISH:
+                $class = 'badge bg-warning';
                 break;
         }
 

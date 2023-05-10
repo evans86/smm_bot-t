@@ -49,6 +49,7 @@ Route::get('getOrders', [ProxyController::class, 'getOrders']);
 Route::get('checkWork', [ProxyController::class, 'checkWork']);
 Route::get('updateType', [ProxyController::class, 'updateType']);
 Route::get('deleteProxy', [ProxyController::class, 'deleteProxy']);
+Route::get('prolongProxy', [ProxyController::class, 'prolongProxy']);
 
 
 /**
