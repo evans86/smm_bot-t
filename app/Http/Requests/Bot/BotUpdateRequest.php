@@ -24,6 +24,7 @@ class BotUpdateRequest extends FormRequest
             'version' => 'required|string|min:1|max:1',
             'category_id' => 'required|integer|min:1',
             'percent' => 'required|integer|min:0',
+            'color' => 'required|integer|min:1|max:6',
             'api_key' => 'required|string',
             'resource_link' => 'string|nullable',
         ];
@@ -42,6 +43,7 @@ class BotUpdateRequest extends FormRequest
         $dto->api_key = $this->api_key;
         $dto->category_id = intval($this->category_id);
         $dto->percent = intval($this->percent);
+        $dto->color = intval($this->color);
         $dto->version = intval($this->version);
         if(filter_var($this->resource_link, FILTER_VALIDATE_URL) === false)
             $dto->resource_link = BotService::DEFAULT_HOST;

@@ -12,6 +12,7 @@ class BotDto
     public int    $category_id;
     public int    $percent;
     public int    $version;
+    public int    $color;
     public string $resource_link;
 
     public function getArray(): array
@@ -25,6 +26,7 @@ class BotDto
             'category_id' => $this->category_id,
             'percent' => $this->percent,
             'version' => $this->version,
+            'color' => $this->color,
             'resource_link' => $this->resource_link,
          ];
     }
