@@ -95,6 +95,7 @@ class ProxyService extends MainService
             'pass' => $order->pass,
             'type' => $order->type,
             'ip' => $order->ip,
+            'status_org' => $proxy->status_org,
             'start_time' => $order->start_time,
             'end_time' => $order->end_time
         ];
@@ -108,7 +109,7 @@ class ProxyService extends MainService
      * @param $enter_amount
      * @param array $userData
      * @param BotDto $botDto
-     * @return bool
+     * @return array|false
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function prolongProxy($order_org_id, $period, $enter_amount, array $userData, BotDto $botDto)
@@ -141,8 +142,31 @@ class ProxyService extends MainService
                 'Продление прокси ' . $list['id']);
 
             $proxy->status_org = Order::ORDER_ACTIVE;
+            $proxy->end_time = $list['unixtime_end'];
+            $proxy->save();
 
-            return true;
+            $result = [
+                'order_org_id' => $order->prolong_org_id,
+                'proxy' => $order->proxy->version,
+                'country' => [
+                    'org_id' => $order->country->iso_two,
+                    'name_ru' => $order->country->name_ru,
+                    'name_en' => $order->country->name_en,
+                    'image' => $order->country->image
+                ],
+                'price' => $order->price,
+                'host' => $order->host,
+                'port' => $order->port,
+                'user' => $order->user,
+                'pass' => $order->pass,
+                'type' => $order->type,
+                'ip' => $order->ip,
+                'status_org' => $proxy->status_org,
+                'start_time' => $order->start_time,
+                'end_time' => $order->end_time
+            ];
+
+            return $result;
         } else {
             return false;
         }
