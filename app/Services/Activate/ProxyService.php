@@ -55,7 +55,7 @@ class ProxyService extends MainService
 
         $resultOrder = BottApi::createOrder($botDto, $userData, $amountFinal, 'Покупка прокси ');
 
-        $result = [];
+        $response = [];
         foreach ($lists as $key => $list) {
 
             $data = [
@@ -82,8 +82,9 @@ class ProxyService extends MainService
             ];
 
             $order = Order::create($data);
+            $order->save();
 
-            array_push($result, [
+            array_push($response, [
                 'order_org_id' => $order->prolong_org_id,
                 'proxy' => $order->proxy->version,
                 'country' => [
@@ -105,7 +106,7 @@ class ProxyService extends MainService
             ]);
         }
 
-        return $result;
+        return $response;
     }
 
     /**
