@@ -147,7 +147,7 @@ class ProxyController extends Controller
                 throw new \RuntimeException('Пополните баланс в боте');
             }
 
-            $result = $this->proxyService->createOrder(
+            $response = $this->proxyService->createOrder(
                 $request->count,
                 $request->period,
                 $request->country,
@@ -157,7 +157,7 @@ class ProxyController extends Controller
                 $result['data']
             );
 
-            return ApiHelpers::success($result);
+            return ApiHelpers::success($response);
         } catch (\RuntimeException $e) {
             return ApiHelpers::errorNew($e->getMessage());
         }

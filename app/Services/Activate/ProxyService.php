@@ -44,7 +44,6 @@ class ProxyService extends MainService
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
 
         $lists = $order['list'];
-//        $list = current($list);
 
         $country = Country::query()->where(['iso_two' => $order['country']])->first();
         $proxy = Proxy::query()->where(['version' => $order['version']])->first();
@@ -60,7 +59,7 @@ class ProxyService extends MainService
         foreach ($lists as $key => $list) {
 
             $data = [
-                'user_id' => $user->id, //
+                'user_id' => $user->id,
                 'bot_id' => $botDto->id,
                 'user_org_id' => $order['user_id'],
                 'balance_org' => $order['balance'],
