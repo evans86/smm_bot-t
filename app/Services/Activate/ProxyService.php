@@ -189,7 +189,7 @@ class ProxyService extends MainService
 
         $statuses = [Order::ORDER_FINISH, Order::ORDER_ACTIVE];
 
-        $proxies = Order::query()->whereIn('status', $statuses)
+        $proxies = Order::query()->whereIn('status_org', $statuses)
             ->where('user_id', $user->id)->get();
 
 //        $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
