@@ -187,7 +187,12 @@ class ProxyService extends MainService
     {
         $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
 
-        $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
+        $statuses = [Order::ORDER_FINISH, Order::ORDER_ACTIVE];
+
+        $proxies = Order::query()->whereIn('status', $statuses)
+            ->where('user_id', $user->id)->get();
+
+//        $proxies = Order::query()->where('status_org', 1)->where('user_id', $user->id)->get();
 
         $result = [];
 
