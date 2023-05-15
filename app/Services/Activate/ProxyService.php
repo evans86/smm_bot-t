@@ -34,8 +34,6 @@ class ProxyService extends MainService
         }
 
         $resultPrice = $this->getPrice($count, $period, $version, $botDto);
-        var_dump($resultPrice['price']);
-
 
         if ($resultPrice['price'] > $userData['money']) {
             throw new \RuntimeException('Пополните баланс в боте');
