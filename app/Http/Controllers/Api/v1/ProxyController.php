@@ -125,8 +125,6 @@ class ProxyController extends Controller
                 return ApiHelpers::error('Not found params: version');
             if (is_null($request->type))
                 return ApiHelpers::error('Not found params: type');
-            if (is_null($request->enter_amount))
-                return ApiHelpers::error('Not found params: enter_amount');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
@@ -155,9 +153,8 @@ class ProxyController extends Controller
                 $request->country,
                 $request->version,
                 $request->type,
-                $request->enter_amount,
-                $result['data'],
-                $botDto
+                $botDto,
+                $result['data']
             );
 
             return ApiHelpers::success($result);

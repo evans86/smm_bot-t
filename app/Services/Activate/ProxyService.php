@@ -19,13 +19,12 @@ class ProxyService extends MainService
      * @param $country
      * @param $version
      * @param $type
-     * @param $enter_amount
-     * @param array $userData
      * @param BotDto $botDto
+     * @param array $userData
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createOrder($count, $period, $country, $version, $type, $enter_amount, array $userData, BotDto $botDto)
+    public function createOrder($count, $period, $country, $version, $type, BotDto $botDto, array $userData)
     {
         $proxyApi = new ProxyApi($botDto->api_key);
 
@@ -34,13 +33,18 @@ class ProxyService extends MainService
             throw new \RuntimeException('not found user');
         }
 
-        if ($enter_amount > $userData['money']) {
+        $resultPrice = $this->getPrice($count, $period, $version, $botDto);
+        var_dump($resultPrice['price']);
+
+
+        if ($resultPrice['price'] > $userData['money']) {
             throw new \RuntimeException('Пополните баланс в боте');
         }
 
         $order = $proxyApi->buy($count, $period, $country, $version, $type);
-        $list = $order['list'];
-        $list = current($list);
+
+        $lists = $order['list'];
+//        $list = current($list);
 
         $country = Country::query()->where(['iso_two' => $order['country']])->first();
         $proxy = Proxy::query()->where(['version' => $order['version']])->first();
@@ -48,57 +52,59 @@ class ProxyService extends MainService
         $amountStart = intval(floatval($order['price']) * 100);
         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
-        $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси '
-            . $list['ip']);
+        $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси ');
 
-        $resultOrder = BottApi::createOrder($botDto, $userData, $amountFinal,
-            'Покупка прокси ' . $list['ip']);
+        $resultOrder = BottApi::createOrder($botDto, $userData, $amountFinal, 'Покупка прокси ');
 
-        $data = [
-            'user_id' => $user->id,
-            'bot_id' => $botDto->id,
-            'user_org_id' => $order['user_id'],
-            'balance_org' => $order['balance'],
-            'order_org_id' => $order['order_id'],
-            'count' => $order['count'],
-            'price' => $amountFinal,
-            'period' => $order['period'],
-            'proxy_id' => $proxy->id,
-            'type' => $order['type'],
-            'country_id' => $country->id,
-            'prolong_org_id' => $list['id'],
-            'ip' => $list['ip'],
-            'host' => $list['host'],
-            'port' => $list['port'],
-            'user' => $list['user'],
-            'pass' => $list['pass'],
-            'status_org' => $list['active'],
-            'start_time' => $list['unixtime'],
-            'end_time' => $list['unixtime_end'],
-        ];
+        $result = [];
+        foreach ($lists as $key => $list) {
 
-        $order = Order::create($data);
+            $data = [
+                'user_id' => $user->id, //
+                'bot_id' => $botDto->id,
+                'user_org_id' => $order['user_id'],
+                'balance_org' => $order['balance'],
+                'order_org_id' => $order['order_id'],
+                'count' => $order['count'],
+                'price' => $amountFinal,
+                'period' => $order['period'],
+                'proxy_id' => $proxy->id,
+                'type' => $order['type'],
+                'country_id' => $country->id,
+                'prolong_org_id' => $list['id'],
+                'ip' => $list['ip'],
+                'host' => $list['host'],
+                'port' => $list['port'],
+                'user' => $list['user'],
+                'pass' => $list['pass'],
+                'status_org' => $list['active'],
+                'start_time' => $list['unixtime'],
+                'end_time' => $list['unixtime_end'],
+            ];
 
-        $result = [
-            'order_org_id' => $order->prolong_org_id,
-            'proxy' => $order->proxy->version,
-            'country' => [
-                'org_id' => $order->country->iso_two,
-                'name_ru' => $order->country->name_ru,
-                'name_en' => $order->country->name_en,
-                'image' => $order->country->image
-            ],
-            'price' => $order->price,
-            'host' => $order->host,
-            'port' => $order->port,
-            'user' => $order->user,
-            'pass' => $order->pass,
-            'type' => $order->type,
-            'ip' => $order->ip,
-            'status_org' => $proxy->status_org,
-            'start_time' => $order->start_time,
-            'end_time' => $order->end_time
-        ];
+            $order = Order::create($data);
+
+            array_push($result, [
+                'order_org_id' => $order->prolong_org_id,
+                'proxy' => $order->proxy->version,
+                'country' => [
+                    'org_id' => $order->country->iso_two,
+                    'name_ru' => $order->country->name_ru,
+                    'name_en' => $order->country->name_en,
+                    'image' => $order->country->image
+                ],
+                'price' => $order->price,
+                'host' => $order->host,
+                'port' => $order->port,
+                'user' => $order->user,
+                'pass' => $order->pass,
+                'type' => $order->type,
+                'ip' => $order->ip,
+                'status_org' => $list['active'],
+                'start_time' => $order->start_time,
+                'end_time' => $order->end_time
+            ]);
+        }
 
         return $result;
     }
