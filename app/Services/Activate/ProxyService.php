@@ -270,15 +270,15 @@ class ProxyService extends MainService
 
         $result = $proxyApi->delete($order_org_id);
 
-        if ($result['count'] != 1) {
-            throw new \RuntimeException($result['count']);
-        } else {
-            $proxy->status_org = Order::ORDER_DELETE;
-            $proxy->save();
-            $result = true;
-        }
+        $proxy->status_org = Order::ORDER_DELETE;
+        $proxy->save();
+        return true;
 
-        return $result;
+//        if ($result['count'] != 1) {
+//            throw new \RuntimeException('Error delete in service');
+//        } else {
+//
+//        }
     }
 
     /**
