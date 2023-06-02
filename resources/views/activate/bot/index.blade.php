@@ -1,39 +1,52 @@
-@extends('layouts.main')
+{{--@extends('layouts.main')--}}
+@extends('layouts.app', ['page' => __('Боты'), 'pageSlug' => 'bots'])
+
 @section('content')
-    <div class="container mt-2">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Ключи</th>
-                <th scope="col">Bot-t ID</th>
-                <th scope="col">Версия</th>
-                <th scope="col">Links</th>
-                <th scope="col">ID категории</th>
-                <th scope="col">Процент</th>
-{{--                <th scope="col">Баланс</th>--}}
-                <th scope="col">Создан</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-            @foreach($bots as $bot)
-                <tr>
-                    <td>{{ $bot->id }}</td>
-                    <td>Private: {{ $bot->public_key }}<br>Public: {{ $bot->private_key }}</td>
-                    <td>{{ $bot->bot_id }}</td>
-                    <td>{{ $bot->version }}</td>
-                    <td>API key: {{ $bot->api_key }}<br>Link: {{ $bot->resource_link }}</td>
-                    <td>{{ $bot->category_id }}</td>
-                    <td>{{ $bot->percent }} %</td>
-{{--                    <td>{{ \App\Helpers\BotHelpers::balance($bot) }} руб.</td>--}}
-                    <td>{{ $bot->created_at }}</td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <div class="d-flex">
-            {!! $bots->links() !!}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card ">
+                <div class="card-header">
+                    <h4 class="card-title"> Боты ({{ $allCount }})</h4>
+                    <h4 class="card-title"> Новых после релиза ({{ $newBots }})</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table tablesorter " id="">
+                            <thead class=" text-primary">
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Ключи</th>
+                                <th class="text-center">Bot-t ID</th>
+                                <th class="text-center">Версия</th>
+                                <th class="text-center">Links</th>
+                                <th class="text-center">ID категории</th>
+                                <th class="text-center">Процент</th>
+                                <th class="text-center">Создан</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($bots as $bot)
+                                <tr>
+                                    <td class="text-center">{{ $bot->id }}</td>
+                                    <td class="text-center">Private: {{ $bot->public_key }}
+                                        <br>Public: {{ $bot->private_key }}</td>
+                                    <td class="text-center">{{ $bot->bot_id }}</td>
+                                    <td class="text-center">{{ $bot->version }}</td>
+                                    <td class="text-center">API key: {{ $bot->api_key }}
+                                        <br>Link: {{ $bot->resource_link }}</td>
+                                    <td class="text-center">{{ $bot->category_id }}</td>
+                                    <td class="text-center">{{ $bot->percent }} %</td>
+                                    <td class="text-center">{{ $bot->created_at }}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex">
+                        {!! $bots->links() !!}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

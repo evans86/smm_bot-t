@@ -4363,6 +4363,102 @@
             /**
      * 
      *
+     * @see \Illuminate\Encryption\Encrypter
+     */ 
+        class Crypt {
+                    /**
+         * Determine if the given key and cipher combination is valid.
+         *
+         * @param string $key
+         * @param string $cipher
+         * @return bool 
+         * @static 
+         */ 
+        public static function supported($key, $cipher)
+        {
+                        return \Illuminate\Encryption\Encrypter::supported($key, $cipher);
+        }
+                    /**
+         * Create a new encryption key for the given cipher.
+         *
+         * @param string $cipher
+         * @return string 
+         * @static 
+         */ 
+        public static function generateKey($cipher)
+        {
+                        return \Illuminate\Encryption\Encrypter::generateKey($cipher);
+        }
+                    /**
+         * Encrypt the given value.
+         *
+         * @param mixed $value
+         * @param bool $serialize
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\EncryptException
+         * @static 
+         */ 
+        public static function encrypt($value, $serialize = true)
+        {
+                        /** @var \Illuminate\Encryption\Encrypter $instance */
+                        return $instance->encrypt($value, $serialize);
+        }
+                    /**
+         * Encrypt a string without serialization.
+         *
+         * @param string $value
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\EncryptException
+         * @static 
+         */ 
+        public static function encryptString($value)
+        {
+                        /** @var \Illuminate\Encryption\Encrypter $instance */
+                        return $instance->encryptString($value);
+        }
+                    /**
+         * Decrypt the given value.
+         *
+         * @param string $payload
+         * @param bool $unserialize
+         * @return mixed 
+         * @throws \Illuminate\Contracts\Encryption\DecryptException
+         * @static 
+         */ 
+        public static function decrypt($payload, $unserialize = true)
+        {
+                        /** @var \Illuminate\Encryption\Encrypter $instance */
+                        return $instance->decrypt($payload, $unserialize);
+        }
+                    /**
+         * Decrypt the given string without unserialization.
+         *
+         * @param string $payload
+         * @return string 
+         * @throws \Illuminate\Contracts\Encryption\DecryptException
+         * @static 
+         */ 
+        public static function decryptString($payload)
+        {
+                        /** @var \Illuminate\Encryption\Encrypter $instance */
+                        return $instance->decryptString($payload);
+        }
+                    /**
+         * Get the encryption key.
+         *
+         * @return string 
+         * @static 
+         */ 
+        public static function getKey()
+        {
+                        /** @var \Illuminate\Encryption\Encrypter $instance */
+                        return $instance->getKey();
+        }
+         
+    }
+            /**
+     * 
+     *
      * @see https://carbon.nesbot.com/docs/
      * @see https://github.com/briannesbitt/Carbon/blob/master/src/Carbon/Factory.php
      * @method static \Illuminate\Support\Carbon create($year = 0, $month = 1, $day = 1, $hour = 0, $minute = 0, $second = 0, $tz = null)
@@ -16985,6 +17081,828 @@
      
 }
 
+    namespace Laravel\Ui { 
+            /**
+     * 
+     *
+     */ 
+        class UiCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class AuthCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ControllersCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Console { 
+            /**
+     * 
+     *
+     */ 
+        class Command {
+                    /**
+         * 
+         *
+         * @see \LaravelFrontendPresets\BlackPreset\BlackPresetServiceProvider::boot()
+         * @param mixed $command
+         * @static 
+         */ 
+        public static function black($command)
+        {
+                        return \Illuminate\Console\Command::black($command);
+        }
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class GeneratorCommand {
+         
+    }
+     
+}
+
+    namespace App\Console\Commands { 
+            /**
+     * 
+     *
+     */ 
+        class UpdateStatus {
+         
+    }
+     
+}
+
+    namespace Illuminate\Foundation\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ClosureCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ClearCompiledCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ConfigCacheCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ConfigClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class DownCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EnvironmentCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EventCacheCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EventClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EventListCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class KeyGenerateCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class OptimizeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class OptimizeClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PackageDiscoverCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RouteCacheCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RouteClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RouteListCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class StorageLinkCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class UpCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ViewCacheCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ViewClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class CastMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ChannelMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ComponentMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ConsoleMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EventGenerateCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class EventMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ExceptionMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class JobMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ListenerMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class MailMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ModelMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class NotificationMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ObserverMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PolicyMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ProviderMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RequestMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ResourceMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RuleMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ServeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class StubPublishCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class TestMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class VendorPublishCommand {
+         
+    }
+     
+}
+
+    namespace Barryvdh\Debugbar\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ClearCommand {
+         
+    }
+     
+}
+
+    namespace Laravel\Sanctum\Console\Commands { 
+            /**
+     * 
+     *
+     */ 
+        class PruneExpired {
+         
+    }
+     
+}
+
+    namespace NunoMaduro\Collision\Adapters\Laravel\Commands { 
+            /**
+     * 
+     *
+     * @internal 
+     * @final 
+     */ 
+        class TestCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Cache\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ForgetCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class CacheTableCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Auth\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ClearResetsCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Database\Console { 
+            /**
+     * 
+     *
+     */ 
+        class DbCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PruneCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class WipeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class DumpCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Queue\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ClearCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ListFailedCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class FlushFailedCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ForgetFailedCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ListenCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class MonitorCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PruneBatchesCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PruneFailedJobsCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RestartCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RetryCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RetryBatchCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class WorkCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class FailedTableCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class TableCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class BatchesTableCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Database\Console\Seeds { 
+            /**
+     * 
+     *
+     */ 
+        class SeedCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class SeederMakeCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Console\Scheduling { 
+            /**
+     * 
+     *
+     */ 
+        class ScheduleFinishCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ScheduleListCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ScheduleRunCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ScheduleClearCacheCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ScheduleTestCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ScheduleWorkCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Routing\Console { 
+            /**
+     * 
+     *
+     */ 
+        class ControllerMakeCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class MiddlewareMakeCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Database\Console\Factories { 
+            /**
+     * 
+     *
+     */ 
+        class FactoryMakeCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Notifications\Console { 
+            /**
+     * 
+     *
+     */ 
+        class NotificationTableCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Session\Console { 
+            /**
+     * 
+     *
+     */ 
+        class SessionTableCommand {
+         
+    }
+     
+}
+
+    namespace Illuminate\Database\Console\Migrations { 
+            /**
+     * 
+     *
+     */ 
+        class MigrateCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class BaseCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class FreshCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class InstallCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RefreshCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class ResetCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class RollbackCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class StatusCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class MigrateMakeCommand {
+         
+    }
+     
+}
+
+    namespace Barryvdh\LaravelIdeHelper\Console { 
+            /**
+     * A command to generate autocomplete information for your IDE
+     *
+     * @author Barry vd. Heuvel <barryvdh@gmail.com>
+     */ 
+        class GeneratorCommand {
+         
+    }
+            /**
+     * A command to generate autocomplete information for your IDE
+     *
+     * @author Barry vd. Heuvel <barryvdh@gmail.com>
+     */ 
+        class ModelsCommand {
+         
+    }
+            /**
+     * A command to generate phpstorm meta data
+     *
+     * @author Barry vd. Heuvel <barryvdh@gmail.com>
+     */ 
+        class MetaCommand {
+         
+    }
+            /**
+     * A command to add \Eloquent mixin to Eloquent\Model
+     *
+     * @author Charles A. Peterson <artistan@gmail.com>
+     */ 
+        class EloquentCommand {
+         
+    }
+     
+}
+
+    namespace Laravel\Sail\Console { 
+            /**
+     * 
+     *
+     */ 
+        class InstallCommand {
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class PublishCommand {
+         
+    }
+     
+}
+
+    namespace Laravel\Tinker\Console { 
+            /**
+     * 
+     *
+     */ 
+        class TinkerCommand {
+         
+    }
+     
+}
+
 
 namespace  { 
             class App extends \Illuminate\Support\Facades\App {}
@@ -16997,6 +17915,7 @@ namespace  {
             class Cache extends \Illuminate\Support\Facades\Cache {}
             class Config extends \Illuminate\Support\Facades\Config {}
             class Cookie extends \Illuminate\Support\Facades\Cookie {}
+            class Crypt extends \Illuminate\Support\Facades\Crypt {}
             class Date extends \Illuminate\Support\Facades\Date {}
             class DB extends \Illuminate\Support\Facades\DB {}
             class Eloquent extends \Illuminate\Database\Eloquent\Model {             
