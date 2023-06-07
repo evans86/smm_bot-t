@@ -10,6 +10,7 @@ use App\Models\User\User;
 use App\Services\External\BottApi;
 use App\Services\External\ProxyApi;
 use App\Services\MainService;
+use AmrShawky\LaravelCurrency\Facade\Currency;
 
 class ProxyService extends MainService
 {
@@ -46,8 +47,22 @@ class ProxyService extends MainService
         $country = Country::query()->where(['iso_two' => $order['country']])->first();
         $proxy = Proxy::query()->where(['version' => $order['version']])->first();
 
-        $amountStart = intval(floatval($order['price']) * 100);
-        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+//        $amountStart = intval(floatval($order['price']) * 100);
+//        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+
+        switch ($order['currency']) {
+            case 'USD':
+                $price = Currency::convert()->from('USD')->to('RUB')->amount($order['price'])->get();
+                $amountStart = intval(floatval($price) * 100);
+                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                break;
+            case 'RUB':
+            default:
+                $amountStart = intval(floatval($order['price']) * 100);
+                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                break;
+
+        }
 
         $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для прокси ');
 
@@ -136,8 +151,19 @@ class ProxyService extends MainService
             $list = $order['list'];
             $list = current($list);
 
-            $amountStart = intval(floatval($order['price']) * 100);
-            $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+            switch ($order['currency']) {
+                case 'USD':
+                    $price = Currency::convert()->from('USD')->to('RUB')->amount($order['price'])->get();
+                    $amountStart = intval(floatval($price) * 100);
+                    $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                    break;
+                case 'RUB':
+                default:
+                    $amountStart = intval(floatval($order['price']) * 100);
+                    $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                    break;
+
+            }
 
             $resultBalance = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса для продления прокси '
                 . $list['id']);
@@ -309,8 +335,19 @@ class ProxyService extends MainService
 
         $price = $proxyApi->getprice($count, $period, $version);
 
-        $amountStart = intval(floatval($price['price']) * 100);
-        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+        switch ($price['currency']) {
+            case 'USD':
+                $price = Currency::convert()->from('USD')->to('RUB')->amount($price['price'])->get();
+                $amountStart = intval(floatval($price) * 100);
+                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                break;
+            case 'RUB':
+            default:
+                $amountStart = intval(floatval($price['price']) * 100);
+                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                break;
+
+        }
 
         $result = [
             'price' => $amountFinal,
