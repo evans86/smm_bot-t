@@ -333,17 +333,17 @@ class ProxyService extends MainService
     {
         $proxyApi = new ProxyApi($botDto->api_key);
 
-        $price = $proxyApi->getprice($count, $period, $version);
+        $price_result = $proxyApi->getprice($count, $period, $version);
 
-        switch ($price['currency']) {
+        switch ($price_result['currency']) {
             case 'USD':
-                $price = Currency::convert()->from('USD')->to('RUB')->amount($price['price'])->get();
+                $price = Currency::convert()->from('USD')->to('RUB')->amount($price_result['price'])->get();
                 $amountStart = intval(floatval($price) * 100);
                 $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
                 break;
             case 'RUB':
             default:
-                $amountStart = intval(floatval($price['price']) * 100);
+                $amountStart = intval(floatval($price_result['price']) * 100);
                 $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
                 break;
 
@@ -351,9 +351,9 @@ class ProxyService extends MainService
 
         $result = [
             'price' => $amountFinal,
-            'period' => $price['period'],
-            'count' => $price['count'],
-            'price_single' => $price['price_single'],
+            'period' => $price_result['period'],
+            'count' => $price_result['count'],
+            'price_single' => $price_result['price_single'],
         ];
 
         return $result;
