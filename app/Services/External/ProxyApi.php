@@ -36,6 +36,9 @@ class ProxyApi
 
         $client = new Client(['base_uri' => self::HOST]);
         $response = $client->get($this->apiKey . '/' . __FUNCTION__ . '?' . http_build_query($requestParam));
+//        $response = $client->get($this->apiKey . '/' . __FUNCTION__ . '?' . http_build_query($requestParam), [
+//            'proxy' => 'http://VtZNR9Hb:nXC9nQ45@86.62.52.85:62959'
+//        ]);
 
         $result = $response->getBody()->getContents();
         return json_decode($result, true);
