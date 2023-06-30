@@ -1,14 +1,19 @@
 <div class="sidebar">
     <div class="sidebar-wrapper">
         <div class="logo">
-            <a href="/" class="simple-text logo-mini">{{ __('PX') }}</a>
-            <a href="/" class="simple-text logo-normal">{{ __('Proxy') }}</a>
+            <a href="/" class="simple-text logo-normal">{{ __('SMM') }}</a>
         </div>
         <ul class="nav">
+{{--            <li @if ($pageSlug == 'countries') class="active " @endif>--}}
+{{--                <a href="{{ route('activate.countries.index') }}">--}}
+{{--                    <i class="tim-icons icon-world"></i>--}}
+{{--                    <p>{{ __('Список стран') }}</p>--}}
+{{--                </a>--}}
+{{--            </li>--}}
             <li @if ($pageSlug == 'countries') class="active " @endif>
-                <a href="{{ route('activate.countries.index') }}">
+                <a href="{{ route('activate.social.index') }}">
                     <i class="tim-icons icon-world"></i>
-                    <p>{{ __('Список стран') }}</p>
+                    <p>{{ __('Список соц.сетей') }}</p>
                 </a>
             </li>
             <li @if ($pageSlug == 'users') class="active " @endif>

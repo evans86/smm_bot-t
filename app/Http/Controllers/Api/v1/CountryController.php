@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
+use App\Models\Bot\Bot;
+use App\Models\Social\Social;
 use App\Services\Activate\CountryService;
-use App\Services\External\ProxyApi;
 use Illuminate\Http\Request;
 
 class CountryController extends Controller
@@ -20,29 +22,69 @@ class CountryController extends Controller
         $this->countryService = new CountryService();
     }
 
-    public function pingProxy()
+    /**
+     * @return array
+     */
+    public function getSocial()
     {
-        $proxyApi = new ProxyApi(config('services.key_proxy.key'));
-        $result = $proxyApi->getcountry();
-        dd($result);
-    }
+        try {
+            $socials = Social::all();
 
+            $result = $this->countryService->formingSocialArray($socials);
+
+            return ApiHelpers::success($result);
+        } catch (\RuntimeException $e) {
+            return ApiHelpers::errorNew($e->getMessage());
+        }
+    }
 
     /**
      * @param Request $request
      * @return array|string
      */
-    public function getCountry(Request $request)
+    public function getCategories(Request $request)
     {
-        if (is_null($request->version))
-            return ApiHelpers::error('Not found params: version');
-//        if (is_null($request->public_key))
-//            return ApiHelpers::error('Not found params: public_key');
-//        if (is_null($request->user_secret_key))
-//            return ApiHelpers::error('Not found params: user_secret_key');
+        try {
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            if (is_null($request->social))
+                return ApiHelpers::error('Not found params: social');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
 
-        $result = $this->countryService->formingCountriesArray($request->version);
+            $botDto = BotFactory::fromEntity($bot);
 
-        return ApiHelpers::success($result);
+            $result = $this->countryService->formingCategoriesArray($botDto, $request->social);
+
+            return ApiHelpers::success($result);
+        } catch (\RuntimeException $e) {
+            return ApiHelpers::errorNew($e->getMessage());
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return array|string
+     */
+    public function getTypes(Request $request)
+    {
+        try {
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            if (is_null($request->name_category))
+                return ApiHelpers::error('Not found params: name_category');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
+
+            $botDto = BotFactory::fromEntity($bot);
+
+            $result = $this->countryService->formingTypesArray($botDto, $request->name_category);
+
+            return ApiHelpers::success($result);
+        } catch (\RuntimeException $e) {
+            return ApiHelpers::errorNew($e->getMessage());
+        }
     }
 }

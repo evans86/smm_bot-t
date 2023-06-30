@@ -22,6 +22,7 @@ use App\Http\Controllers\Controller;
  */
 Route::group(['namespace' => 'Activate', 'prefix' => 'activate'], function () {
     Route::get('countries', 'CountryController@index')->name('activate.countries.index')->middleware('auth');
+    Route::get('social', 'SocialController@index')->name('activate.social.index')->middleware('auth');
     Route::get('order', 'OrderController@index')->name('activate.order.index')->middleware('auth');
     Route::get('bot', 'BotController@index')->name('activate.bot.index')->middleware('auth');
 });

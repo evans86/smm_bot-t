@@ -30,8 +30,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'key_proxy' => [
-        'key' => env('PROXY_KEY'),
+    'key_partner' => [
+        'key' => env('PARTNER_KEY'),
     ],
 
 ];

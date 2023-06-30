@@ -7,7 +7,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Proxy</title>
+    <title>Smm</title>
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('black') }}/img/apple-icon.png">
     <link rel="icon" href="{{ url('css/favicon.ico') }}">

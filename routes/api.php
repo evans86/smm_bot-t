@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\CountryController;
 use App\Http\Controllers\Api\v1\ProxyController;
 use App\Http\Controllers\Api\v1\UserController;
-use App\Http\Controllers\Api\v1\ProductController;
+use App\Http\Controllers\Api\v1\SupportController;
 use App\Http\Controllers\Api\v1\OrderController;
 
 /*
@@ -27,7 +27,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 /**
  * Проверка соединения
  */
-Route::get('pingProxy', [CountryController::class, 'pingProxy']);
+Route::get('getSocial', [CountryController::class, 'getSocial']);
+Route::get('getCategories', [CountryController::class, 'getCategories']);
+Route::get('getTypes', [CountryController::class, 'getTypes']);
 
 /**
  * Получение данных
