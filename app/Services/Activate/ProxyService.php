@@ -337,7 +337,7 @@ class ProxyService extends MainService
 
         switch ($price_result['currency']) {
             case 'USD':
-                $price = Currency::convert()->from('USD')->to('RUB')->amount($price_result['price'])->get();
+                $price = 12;
                 $amountStart = intval(floatval($price) * 100);
                 $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
                 break;
