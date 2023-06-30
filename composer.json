@@ -64,11 +64,11 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform-check": false,
         "platform": {
             "php": "7.4"
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "platform-check": false
+    "prefer-stable": true
 }
