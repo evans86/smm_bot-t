@@ -44,9 +44,8 @@ class OrderController extends Controller
     public function createOrder(Request $request)
     {
         try {
-//
-//            if (is_null($request->user_secret_key))
-//                return ApiHelpers::error('Not found params: user_secret_key');
+            if (is_null($request->user_secret_key))
+                return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
@@ -54,15 +53,15 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-//            $result = BottApi::checkUser(
-//                $request->user_id,
-//                $request->user_secret_key,
-//                $botDto->public_key,
-//                $botDto->private_key
-//            );
-//            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
-//            }
+            $result = BottApi::checkUser(
+                $request->user_id,
+                $request->user_secret_key,
+                $botDto->public_key,
+                $botDto->private_key
+            );
+            if (!$result['result']) {
+                throw new RuntimeException($result['message']);
+            }
 //            if ($result['data']['money'] == 0) {
 //                throw new RuntimeException('Пополните баланс в боте');
 //            }
@@ -70,7 +69,7 @@ class OrderController extends Controller
             $result = $this->orderService->create(
                 $request,
                 $botDto,
-//                $result['data']
+                $result['data']
             );
 
             return ApiHelpers::success($result);
@@ -145,14 +144,14 @@ class OrderController extends Controller
     public function getOrder(Request $request)
     {
         try {
-//            if (is_null($request->user_id))
-//                return ApiHelpers::error('Not found params: user_id');
-//            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
+            if (is_null($request->user_id))
+                return ApiHelpers::error('Not found params: user_id');
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
             $order = Order::query()->where(['order_id' => $request->order_id])->first();
-//            if (is_null($request->user_secret_key))
-//                return ApiHelpers::error('Not found params: user_secret_key');
+            if (is_null($request->user_secret_key))
+                return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
@@ -160,20 +159,20 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-//            $result = BottApi::checkUser(
-//                $request->user_id,
-//                $request->user_secret_key,
-//                $botDto->public_key,
-//                $botDto->private_key
-//            );
-//            if (!$result['result']) {
-//                throw new RuntimeException($result['message']);
-//            }
+            $result = BottApi::checkUser(
+                $request->user_id,
+                $request->user_secret_key,
+                $botDto->public_key,
+                $botDto->private_key
+            );
+            if (!$result['result']) {
+                throw new RuntimeException($result['message']);
+            }
 
             $this->orderService->order(
                 $botDto,
                 $order,
-//                $result['data']
+                $result['data']
             );
 
             $order = Order::query()->where(['order_id' => $request->order_id])->first();

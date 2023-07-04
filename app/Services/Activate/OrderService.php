@@ -25,7 +25,7 @@ class OrderService extends MainService
      * @param array|null $userData
      * @return array
      */
-    public function create($request, BotDto $botDto, array $userData = null)
+    public function create($request, BotDto $botDto, array $userData)
     {
         //проверка наличия типа товара
         if (is_null($request->type))
@@ -35,8 +35,8 @@ class OrderService extends MainService
         $orderStrategy = new OrderStrategy($type, $botDto);
 
         //получение пользователя
-//        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
-        $user = User::query()->where(['id' => 1])->first();
+        $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
+//        $user = User::query()->where(['id' => 1])->first();
 
         if (is_null($user))
             throw new RuntimeException('not found user');
