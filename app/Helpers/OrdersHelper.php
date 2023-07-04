@@ -10,27 +10,44 @@ class OrdersHelper
     public static function statusList(): array
     {
         return [
-            Order::ORDER_DELETE => 'Удалено',
-            Order::ORDER_ACTIVE => 'Активен',
-            Order::ORDER_FINISH => 'Окончен',
+            Order::CREATE_STATUS => 'Ожидание',
+            Order::TO_PROCESS_STATUS => 'В процессе',
+            Order::FINISH_STATUS => 'Завершен',
         ];
     }
 
     public static function statusLabel($status): string
     {
         switch ($status) {
-            case Order::ORDER_DELETE:
-                $class = 'badge bg-danger';
+            case Order::CREATE_STATUS:
+                $class = 'badge bg-primary';
                 break;
-            case Order::ORDER_ACTIVE:
+            case Order::FINISH_STATUS:
                 $class = 'badge bg-success';
                 break;
-            case Order::ORDER_FINISH:
+            case Order::TO_PROCESS_STATUS:
                 $class = 'badge bg-warning';
                 break;
         }
 
 
         return '<span class="' . $class . '">' . \Arr::get(self::statusList(), $status) . '</span>';
+    }
+
+    /**
+     * @param $result
+     * @return false|int
+     */
+    public static function requestArray($result)
+    {
+        $errorCodes = [
+            'neworder.error.link_duplicate' => 'Ошибка создания нового заказа - сслыка дублируется',
+        ];
+
+        if (array_key_exists($result, $errorCodes)) {
+            return $errorCodes[$result];
+        } else {
+            return $result;
+        }
     }
 }

@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Services\Activate\Order\Strategy;
+
+use App\Dto\BotDto;
+use App\Helpers\OrdersHelper;
+use App\Models\Order\Order;
+use App\Services\Activate\Order\OrderInterface;
+use App\Services\External\PartnerApi;
+use Illuminate\Http\Request;
+
+class SubscriptionsConcreteStrategy extends MainConcreteStrategy implements OrderInterface
+{
+    public function __construct(BotDto $botDto)
+    {
+        parent::__construct($botDto);
+    }
+
+    public function create(Request $request): array
+    {
+        if (is_null($request->type_id))
+            throw new \RuntimeException('Not Found Params: type_id');
+        if (is_null($request->username))
+            throw new \RuntimeException('Not Found Params: username');
+        if (is_null($request->min))
+            throw new \RuntimeException('Not Found Params: min');
+        if (is_null($request->max))
+            throw new \RuntimeException('Not Found Params: username');
+
+
+        $type_id = $request->type_id;
+        $link = $request->link;
+        $username = $request->username;
+        $min = $request->min;
+        $max = $request->max;
+
+        $partnerApi = new PartnerApi($this->botDto->api_key);
+
+        $order = $partnerApi->add(
+            $type_id, //id товара в ресрусе
+            $link, //ссылка на ресурс
+            null,
+            null,
+            $username,
+            null,
+            $min,
+            $max,
+            $request->posts,
+            $request->old_posts,
+            $request->delay,
+            $request->expiry
+        );
+
+        if(isset($order['error']))
+            throw new \RuntimeException(OrdersHelper::requestArray($order['error']));
+
+        return $order;
+    }
+}

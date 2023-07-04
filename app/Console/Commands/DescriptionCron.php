@@ -2,18 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Activate\OrderService;
-use App\Services\Activate\ProxyService;
+use App\Services\Activate\CountryService;
 use Illuminate\Console\Command;
 
-class UpdateStatus extends Command
+class DescriptionCron extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'demo:status';
+    protected $signature = 'description:cron';
 
     /**
      * The console command description.
@@ -39,8 +38,8 @@ class UpdateStatus extends Command
      */
     public function handle()
     {
-        $orderService = new ProxyService();
-        $orderService->cronUpdateStatus();
+        $orderService = new CountryService();
+        $orderService->cronUpdateDescription();
         return 0;
     }
 }

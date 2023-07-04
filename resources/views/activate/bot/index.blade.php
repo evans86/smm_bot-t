@@ -28,8 +28,8 @@
                             @foreach($bots as $bot)
                                 <tr>
                                     <td class="text-center">{{ $bot->id }}</td>
-                                    <td class="text-center">Private: {{ $bot->public_key }}
-                                        <br>Public: {{ $bot->private_key }}</td>
+                                    <td class="text-center">Private: {{ $bot->private_key }}
+                                        <br>Public: {{ $bot->public_key }}</td>
                                     <td class="text-center">{{ $bot->bot_id }}</td>
                                     <td class="text-center">{{ $bot->version }}</td>
                                     <td class="text-center">API key: {{ $bot->api_key }}

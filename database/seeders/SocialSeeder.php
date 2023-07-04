@@ -46,7 +46,7 @@ class SocialSeeder extends Seeder
         ];
         $data[] = [
             'id' => 6,
-            'name_en' => 'VK.com',
+            'name_en' => 'VK',
             'name_ru' => 'ВК',
             'short_name' => 'VK',
             'image' => 'https://upload.wikimedia.org/wikipedia/commons/f/f3/VK_Compact_Logo_%282021-present%29.svg',
@@ -60,7 +60,7 @@ class SocialSeeder extends Seeder
         ];
         $data[] = [
             'id' => 8,
-            'name_en' => 'Web Traffic',
+            'name_en' => 'Web трафик',
             'name_ru' => 'Веб Трафик',
             'short_name' => '',
             'image' => 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Web-icon-voltrans.png',

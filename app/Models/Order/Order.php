@@ -2,6 +2,7 @@
 
 namespace App\Models\Order;
 
+use App\Models\Bot\Bot;
 use App\Models\Country\Country;
 use App\Models\Proxy\Proxy;
 use App\Models\User\User;
@@ -10,9 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    const ORDER_DELETE = 0;
-    const ORDER_ACTIVE = 1;
-    const ORDER_FINISH = 2;
+    const DEFAULT_TYPE = 'Default';
+    const PACKAGE_TYPE = 'Package';
+    const CUSTOM_COMMENTS_TYPE = 'Custom Comments';
+    const MENTIONS_USER_FOLLOWERS_TYPE = 'Mentions User Followers';
+    const CUSTOM_COMMENTS_PACKAGE_TYPE = 'Custom Comments Package';
+    const POLL_TYPE = 'Poll';
+    const SUBSCRIPTIONS_TYPE = 'Subscriptions';
+
+    const CREATE_STATUS = 'Pending';
+    const TO_PROCESS_STATUS = 'Partial';
+    const FINISH_STATUS = 'Completed';
+    const CANCEL_STATUS = 'Canceled'; //?
 
     use HasFactory;
 
@@ -21,17 +31,7 @@ class Order extends Model
 
     public function bot()
     {
-        return $this->hasOne(User::class, 'id', 'bot_id');
-    }
-
-    public function country()
-    {
-        return $this->hasOne(Country::class, 'id', 'country_id');
-    }
-
-    public function proxy()
-    {
-        return $this->hasOne(Proxy::class, 'id', 'proxy_id');
+        return $this->hasOne(Bot::class, 'id', 'bot_id');
     }
 
     public function user()

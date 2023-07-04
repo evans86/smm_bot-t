@@ -29,6 +29,57 @@ class OrderController extends Controller
     }
 
     /**
+     * Создание заказа
+     *
+     * Request[
+     *  'user_id'
+     *  'country'
+     *  'user_secret_key'
+     *  'public_key'
+     * ]
+     * @param Request $request
+     * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function createOrder(Request $request)
+    {
+        try {
+//
+//            if (is_null($request->user_secret_key))
+//                return ApiHelpers::error('Not found params: user_secret_key');
+            if (is_null($request->public_key))
+                return ApiHelpers::error('Not found params: public_key');
+            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+            if (empty($bot))
+                return ApiHelpers::error('Not found module.');
+
+            $botDto = BotFactory::fromEntity($bot);
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
+//            if ($result['data']['money'] == 0) {
+//                throw new RuntimeException('Пополните баланс в боте');
+//            }
+
+            $result = $this->orderService->create(
+                $request,
+                $botDto,
+//                $result['data']
+            );
+
+            return ApiHelpers::success($result);
+        } catch (Exception $e) {
+            return ApiHelpers::error($e->getMessage());
+        }
+    }
+
+    /**
      * Передача значений заказаов для пользователя
      *
      * Request[
@@ -77,61 +128,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Создание заказа
-     *
-     * Request[
-     *  'user_id'
-     *  'country'
-     *  'user_secret_key'
-     *  'public_key'
-     * ]
-     * @param Request $request
-     * @return array|string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function createOrder(Request $request)
-    {
-        try {
-            if (is_null($request->user_id))
-                return ApiHelpers::error('Not found params: user_id');
-            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
-            if (is_null($request->country))
-                return ApiHelpers::error('Not found params: country');
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
-            if (is_null($request->public_key))
-                return ApiHelpers::error('Not found params: public_key');
-            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-            if (empty($bot))
-                return ApiHelpers::error('Not found module.');
-            $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
-            );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
-            if ($result['data']['money'] == 0) {
-                throw new RuntimeException('Пополните баланс в боте');
-            }
-            $country = Country::query()->where(['org_id' => $request->country])->first();
-            $service = $user->service;
-
-            $result = $this->orderService->create(
-                $result['data'],
-                $botDto,
-                $country->org_id,
-            );
-
-            return ApiHelpers::success($result);
-        } catch (Exception $e) {
-            return ApiHelpers::error($e->getMessage());
-        }
-    }
 
     /**
      * Получение активного заказа
@@ -149,14 +145,14 @@ class OrderController extends Controller
     public function getOrder(Request $request)
     {
         try {
-            if (is_null($request->user_id))
-                return ApiHelpers::error('Not found params: user_id');
-            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
+//            if (is_null($request->user_id))
+//                return ApiHelpers::error('Not found params: user_id');
+//            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
+            $order = Order::query()->where(['order_id' => $request->order_id])->first();
+//            if (is_null($request->user_secret_key))
+//                return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
@@ -164,170 +160,25 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
+//            $result = BottApi::checkUser(
+//                $request->user_id,
+//                $request->user_secret_key,
+//                $botDto->public_key,
+//                $botDto->private_key
+//            );
+//            if (!$result['result']) {
+//                throw new RuntimeException($result['message']);
+//            }
+
+            $this->orderService->order(
+                $botDto,
+                $order,
+//                $result['data']
             );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
 
-
-            $this->orderService->order($result['data'], $botDto, $order);
-
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
+            $order = Order::query()->where(['order_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (RuntimeException $e) {
-            return ApiHelpers::errorNew($e->getMessage());
-        }
-    }
-
-    /**
-     * Установить статус 3 (Запросить еще одну смс)
-     *
-     * Request[
-     *  'user_id'
-     *  'order_id'
-     *  'public_key'
-     * ]
-     *
-     * @param Request $request
-     * @return array|string
-     */
-    public function secondSms(Request $request)
-    {
-        try {
-            if (is_null($request->user_id))
-                return ApiHelpers::error('Not found params: user_id');
-            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
-            if (is_null($request->order_id))
-                return ApiHelpers::error('Not found params: order_id');
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
-            if (is_null($request->public_key))
-                return ApiHelpers::error('Not found params: public_key');
-            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-            if (empty($bot))
-                return ApiHelpers::error('Not found module.');
-
-            $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
-            );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
-
-            $result = $this->orderService->second($botDto, $order);
-
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            return ApiHelpers::success(OrderResource::generateOrderArray($order));
-        } catch (Exception $e) {
-            return ApiHelpers::errorNew($e->getMessage());
-        }
-    }
-
-    /**
-     * Установить статус 6 (Подтвердить SMS-код и завершить активацию)
-     *
-     * Request[
-     *  'user_id'
-     *  'order_id'
-     *  'public_key'
-     * ]
-     *
-     * @param Request $request
-     * @return array|string
-     */
-    public function confirmOrder(Request $request)
-    {
-        try {
-            if (is_null($request->user_id))
-                return ApiHelpers::error('Not found params: user_id');
-            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
-            if (is_null($request->order_id))
-                return ApiHelpers::error('Not found params: order_id');
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
-            if (is_null($request->public_key))
-                return ApiHelpers::error('Not found params: public_key');
-            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-            if (empty($bot))
-                return ApiHelpers::error('Not found module.');
-
-            $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
-            );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
-
-            $result = $this->orderService->confirm($botDto, $order);
-
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            return ApiHelpers::success(OrderResource::generateOrderArray($order));
-        } catch (Exception $e) {
-            return ApiHelpers::errorNew($e->getMessage());
-        }
-    }
-
-    /**
-     * Установить статус 8 (Отменить активацию (если номер Вам не подошел))
-     *
-     * Request[
-     *  'user_id'
-     *  'order_id'
-     *  'public_key'
-     * ]
-     *
-     * @param Request $request
-     * @return array|string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function closeOrder(Request $request)
-    {
-        try {
-            if (is_null($request->user_id))
-                return ApiHelpers::error('Not found params: user_id');
-            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
-            if (is_null($request->order_id))
-                return ApiHelpers::error('Not found params: order_id');
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            if (is_null($request->user_secret_key))
-                return ApiHelpers::error('Not found params: user_secret_key');
-            if (is_null($request->public_key))
-                return ApiHelpers::error('Not found params: public_key');
-            $bot = Bot::query()->where('public_key', $request->public_key)->first();
-            if (empty($bot))
-                return ApiHelpers::error('Not found module.');
-
-            $botDto = BotFactory::fromEntity($bot);
-            $result = BottApi::checkUser(
-                $request->user_id,
-                $request->user_secret_key,
-                $botDto->public_key,
-                $botDto->private_key
-            );
-            if (!$result['result']) {
-                throw new RuntimeException($result['message']);
-            }
-
-            $result = $this->orderService->cancel($result['data'], $botDto, $order);
-
-            $order = Order::query()->where(['org_id' => $request->order_id])->first();
-            return ApiHelpers::success(OrderResource::generateOrderArray($order));
-        } catch (Exception $e) {
             return ApiHelpers::errorNew($e->getMessage());
         }
     }

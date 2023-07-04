@@ -16132,41 +16132,7 @@
      
 }
 
-        namespace AmrShawky\LaravelCurrency\Facade { 
-            /**
-     * 
-     *
-     */ 
-        class Currency {
-                    /**
-         * 
-         *
-         * @param \GuzzleHttp\Client|null $client
-         * @return \AmrShawky\CurrencyConversion 
-         * @static 
-         */ 
-        public static function convert($client = null)
-        {
-                        /** @var \AmrShawky\CurrencyFactory $instance */
-                        return $instance->convert($client);
-        }
-                    /**
-         * 
-         *
-         * @return \AmrShawky\CurrencyRatesProxy 
-         * @static 
-         */ 
-        public static function rates()
-        {
-                        /** @var \AmrShawky\CurrencyFactory $instance */
-                        return $instance->rates();
-        }
-         
-    }
-     
-}
-
-    namespace Barryvdh\Debugbar\Facades { 
+        namespace Barryvdh\Debugbar\Facades { 
             /**
      * 
      *
@@ -21415,7 +21381,6 @@ namespace  {
             class URL extends \Illuminate\Support\Facades\URL {}
             class Validator extends \Illuminate\Support\Facades\Validator {}
             class View extends \Illuminate\Support\Facades\View {}
-            class Currency extends \AmrShawky\LaravelCurrency\Facade\Currency {}
             class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
             class Flare extends \Facade\Ignition\Facades\Flare {}
      

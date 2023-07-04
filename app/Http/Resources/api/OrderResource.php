@@ -16,14 +16,14 @@ class OrderResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => (integer)$this->org_id,
-            'phone' => $this->phone,
-            'time' => (integer)$this->start_time,
-            'status' => (integer)$this->status,
-            'codes' => json_decode($this->codes),
-            'country' => $this->country->org_id,
-            'service' => $this->service,
-            'cost' => $this->price_final / 100
+            'id' => (integer)$this->order_id,
+            'link' => $this->link,
+            'start_count' => $this->start_count,
+            'remains' => $this->remains,
+            'type_name' => $this->type_name,
+            'cost' => $this->price,
+            'status' => $this->status,
+            'created_at' => $this->created_at,
         ];
     }
 
@@ -34,15 +34,23 @@ class OrderResource extends JsonResource
     public static function generateOrderArray(Order $order): array
     {
         return [
-            'id' => (integer)$order->org_id,
-            'phone' => $order->phone,
-            'time' => $order->start_time,
-            'status' => (integer)$order->status,
-            'codes' => $order->codes,
-            'country' => $order->country->org_id,
-            'operator' => $order->operator,
-            'service' => $order->service,
-            'cost' => $order->price_final / 100
+            'id' => (integer)$order->order_id,
+            'link' => $order->link,
+            'start_count' => $order->start_count,
+            'remains' => $order->remains,
+            'type_name' => $order->type_name,
+            'cost' => $order->price,
+            'status' => $order->status,
+            'created_at' => $order->created_at,
         ];
     }
+
+
+
+
+
+
+
+
+
 }
