@@ -44,6 +44,9 @@ class OrderController extends Controller
     public function createOrder(Request $request)
     {
         try {
+            if (is_null($request->user_id))
+                return ApiHelpers::error('Not found params: user_id');
+            $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))

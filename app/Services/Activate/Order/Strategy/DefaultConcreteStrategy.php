@@ -29,6 +29,7 @@ class DefaultConcreteStrategy extends MainConcreteStrategy implements OrderInter
         $link = $request->link;
         $quantity = $request->quantity;
 
+        //optional
         $runs = $request->runs;
         $interval = $request->interval;
 
