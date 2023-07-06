@@ -56,7 +56,9 @@ class PartnerApi
         $posts = null, // Ограничить количество новых (будущих) записей, которые будут проанализированы и для которых будут создаваться заказы
         $old_posts = null, // Количество существующих записей, которые будут проанализированы и для которых будут созданы заказы
         $delay = null, // Задержка в минутах. Возможные значения: 0, 5, 10, 15, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 360, 420, 480, 540, 600
-        $expiry = null // Дата истечения срока действия. Формат d/m/Y
+        $expiry = null, // Дата истечения срока действия. Формат d/m/Y
+        $runs = null,
+        $interval = null
     )
     {
         $requestParam = [
@@ -75,6 +77,8 @@ class PartnerApi
             'old_posts' => $old_posts,
             'delay' => $delay,
             'expiry' => $expiry,
+            'runs' => $runs,
+            'interval' => $interval,
         ];
 
         $client = new Client(['base_uri' => self::HOST]);

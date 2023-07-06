@@ -29,12 +29,26 @@ class DefaultConcreteStrategy extends MainConcreteStrategy implements OrderInter
         $link = $request->link;
         $quantity = $request->quantity;
 
+        $runs = $request->runs;
+        $interval = $request->interval;
+
         $partnerApi = new PartnerApi($this->botDto->api_key);
 
         $order = $partnerApi->add(
             $type_id, //id товара в ресрусе
             $link, //ссылка на ресурс
-            $quantity //необходимое количество
+            $quantity, //необходимое количество
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $runs,
+            $interval
         );
 
         if(isset($order['error']))
