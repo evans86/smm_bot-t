@@ -65,9 +65,9 @@ class OrderController extends Controller
             if (!$result['result']) {
                 throw new RuntimeException($result['message']);
             }
-//            if ($result['data']['money'] == 0) {
-//                throw new RuntimeException('Пополните баланс в боте');
-//            }
+            if ($result['data']['money'] == 0) {
+                throw new RuntimeException('Пополните баланс в боте');
+            }
 
             $result = $this->orderService->create(
                 $request,
