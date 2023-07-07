@@ -94,9 +94,26 @@ class CountryService extends MainService
 
         $result = [];
 
-        //отработать black и white list
+        $black_array = explode(',', $botDto->black);
+        if ($botDto->black[0] == '-')
+            $black_array = null;
+
+        $white_array = explode(',', $botDto->white);
+        if ($botDto->white[0] == '-')
+            $white_array = null;
+
 
         foreach ($services as $key => $service) {
+
+            if(!is_null($black_array)){
+                if (in_array($service['service'], $black_array))
+                    continue;
+            }
+            if(!is_null($white_array)){
+                if (!in_array($service['service'], $white_array))
+                    continue;
+            }
+
             switch ($service['type']) {
                 case 'Package':
                 case 'Subscriptions ':
