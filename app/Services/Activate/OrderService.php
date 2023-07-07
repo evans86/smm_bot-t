@@ -122,7 +122,7 @@ class OrderService extends MainService
      */
     public function updateOrders(BotDto $botDto, $user_id)
     {
-        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS];
+        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
 
         $orders = Order::query()->whereIn('status', $statuses)
             ->where(['user_id' => $user_id])
@@ -144,7 +144,8 @@ class OrderService extends MainService
     public function order(BotDto $botDto, Order $order)
     {
         $partnerApi = new PartnerApi($botDto->api_key);
-        $request_order = $partnerApi->status($order->order_id);
+        $request_order = $partnerApi->status(42958657);
+//        dd($request_order);
 
         $status = $request_order['status'];
         $start_count = $request_order['start_count'];
@@ -202,7 +203,7 @@ class OrderService extends MainService
      */
     public function cronUpdateOrders()
     {
-        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS];
+        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
         $orders = Order::query()->whereIn('status', $statuses)->get();
 
         echo "START count:" . count($orders) . PHP_EOL;

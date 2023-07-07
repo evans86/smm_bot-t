@@ -11,8 +11,9 @@ class OrdersHelper
     {
         return [
             Order::CREATE_STATUS => 'Ожидание',
-            Order::TO_PROCESS_STATUS => 'В процессе',
+            Order::TO_PROCESS_STATUS => 'Ожидание',
             Order::FINISH_STATUS => 'Завершен',
+            Order::WORK_STATUS => 'Выполняется',
         ];
     }
 
@@ -21,6 +22,9 @@ class OrdersHelper
         switch ($status) {
             case Order::CREATE_STATUS:
                 $class = 'badge bg-primary';
+                break;
+            case Order::WORK_STATUS:
+                $class = 'badge bg-secondary';
                 break;
             case Order::FINISH_STATUS:
                 $class = 'badge bg-success';

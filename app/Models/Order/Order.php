@@ -20,6 +20,7 @@ class Order extends Model
     const SUBSCRIPTIONS_TYPE = 'Subscriptions';
 
     const CREATE_STATUS = 'Pending';
+    const WORK_STATUS = 'In progress';
     const TO_PROCESS_STATUS = 'Partial';
     const FINISH_STATUS = 'Completed';
     const CANCEL_STATUS = 'Canceled'; //?
