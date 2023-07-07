@@ -53,7 +53,7 @@ class OrderService extends MainService
             //надо думать как здесь формировать цену
             $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
         } else {
-            if (is_null($request->runs)) {
+            if (!is_null($request->runs)) {
                 $amountQuantity = (($request->quantity * $amountStart) / 1000) * $request->runs;
                 $amountFinal = $amountQuantity + $amountQuantity * $botDto->percent / 100;
             } else {
