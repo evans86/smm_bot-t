@@ -144,7 +144,7 @@ class OrderService extends MainService
     public function order(BotDto $botDto, Order $order)
     {
         $partnerApi = new PartnerApi($botDto->api_key);
-        $request_order = $partnerApi->status(42958657);
+        $request_order = $partnerApi->status($order->order_id);
 //        dd($request_order);
 
         $status = $request_order['status'];
