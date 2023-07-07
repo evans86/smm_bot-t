@@ -47,14 +47,19 @@ class OrderService extends MainService
 //        dd($service);
 
         $service_name = $service['name'];
-        $amountStart = (int) ceil(floatval($service['rate']) * 100); //цена за 1000
+        $amountStart = (int)ceil(floatval($service['rate']) * 100); //цена за 1000
 
-        if (is_null($request->quantity)){
+        if (is_null($request->quantity)) {
             //надо думать как здесь формировать цену
             $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
-        }else{
-            $amountQuantity = ($request->quantity * $amountStart) / 1000;
-            $amountFinal = $amountQuantity + $amountQuantity * $botDto->percent / 100;
+        } else {
+            if (is_null($request->runs)) {
+                $amountQuantity = (($request->quantity * $amountStart) / 1000) * $request->runs;
+                $amountFinal = $amountQuantity + $amountQuantity * $botDto->percent / 100;
+            } else {
+                $amountQuantity = ($request->quantity * $amountStart) / 1000;
+                $amountFinal = $amountQuantity + $amountQuantity * $botDto->percent / 100;
+            }
         }
 
 //        dd($amountFinal);
@@ -106,6 +111,29 @@ class OrderService extends MainService
     }
 
     /**
+     * Обновление информации при полуение orders
+     *
+     * @param BotDto $botDto
+     * @param $user_id
+     * @return void
+     */
+    public function updateOrders(BotDto $botDto, $user_id)
+    {
+        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS];
+
+        $orders = Order::query()->whereIn('status', $statuses)
+            ->where(['user_id' => $user_id])
+            ->where(['bot_id' => $botDto->id])
+            ->get();
+
+        foreach ($orders as $key => $order) {
+            $this->order($botDto, $order);
+        }
+    }
+
+    /**
+     * Обновление информации заказа
+     *
      * @param BotDto $botDto
      * @param Order $order
      * @return void
@@ -120,7 +148,7 @@ class OrderService extends MainService
         $remains = $request_order['remains'];
 
         $order->status = $status;
-        $order->start_count = $start_count;
+        $order->start_count = $start_count;//убрать
         $order->remains = $remains;
 
         $order->save();
@@ -149,8 +177,8 @@ class OrderService extends MainService
 
         $result = [];
 
-        foreach ($services as $key => $service){
-            if (($service['service'] == $service_id)){
+        foreach ($services as $key => $service) {
+            if (($service['service'] == $service_id)) {
 
                 $result = [
                     'type_id' => $service['service'],//ид типа товара
@@ -162,6 +190,28 @@ class OrderService extends MainService
         }
 
         return $result;
+    }
+
+    /**
+     * Крон обновление информации заказов
+     *
+     * @return void
+     */
+    public function cronUpdateOrders()
+    {
+        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS];
+        $orders = Order::query()->whereIn('status', $statuses)->get();
+
+        echo "START count:" . count($orders) . PHP_EOL;
+
+        foreach ($orders as $key => $order) {
+            echo "START" . $order->id . PHP_EOL;
+
+            $botDto = BotFactory::fromEntity($order->bot);
+            $this->order($botDto, $order);
+
+            echo "FINISH" . $order->id . PHP_EOL;
+        }
     }
 }
 

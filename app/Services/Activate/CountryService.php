@@ -46,21 +46,36 @@ class CountryService extends MainService
     {
         $partnerApi = new PartnerApi($botDto->api_key);
         $services = $partnerApi->services();
-//        dd($services);
+//        echo '<pre>';
+//        var_dump($services);
+//        echo '</pre>';
+//        dd($services[500]);
         $social = Social::query()->where(['id' => $social])->first();
 
         $result = [];
 
         foreach ($services as $key => $service) {
-            if (str_contains($service['category'], $social->name_en)) {
+            switch ($service['type']) {
+                case 'Package':
+                case 'Subscriptions ':
+                case 'Custom Comments':
+                case 'Mentions User Followers':
+                case 'Custom Comments Package':
+                    break;
+                case 'Default':
+                case 'Poll':
+                    if (str_contains($service['category'], $social->name_en)) {
 
-                array_push($result, [
-                    'name_category' => $service['category'],
-                ]);
+                        array_push($result, [
+                            'name_category' => $service['category'],
+                        ]);
+                    }
             }
         }
 
         $result = array_unique($result, SORT_REGULAR);
+
+//        dd($result);
 
         return $result;
     }
@@ -79,24 +94,37 @@ class CountryService extends MainService
 
         $result = [];
 
+        //отработать black и white list
+
         foreach ($services as $key => $service) {
-            if (($service['category'] == $name_category)) {
+            switch ($service['type']) {
+                case 'Package':
+                case 'Subscriptions ':
+                case 'Custom Comments':
+                case 'Mentions User Followers':
+                case 'Custom Comments Package':
+                    break;
+                case 'Default':
+                case 'Poll':
+                    if (($service['category'] == $name_category)) {
 
-                $description = Description::query()->where(['type_id' => $service['service']])->first();
-                $amountStart = (int) ceil(floatval($service['rate']) * 100);
-                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+                        $description = Description::query()->where(['type_id' => $service['service']])->first();
+                        $amountStart = (int)ceil(floatval($service['rate']) * 100);
+                        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
-                array_push($result, [
-                    'type_id' => $service['service'],//ид типа товара
-                    'name' => $service['name'],//название товара
-                    'min' => $service['min'],//минимаьлное количество товара
-                    'max' => $service['max'],//максимально возможное количество единиц товара
-                    'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
-                    'type' => $service['type'],//с каким типом дальше создавать заказ
-                    'desc_ru' => $description->desc_ru,
-                    'desc_eng' => $description->desc_eng,
-                ]);
+                        array_push($result, [
+                            'type_id' => $service['service'],//ид типа товара
+                            'name' => $service['name'],//название товара
+                            'min' => $service['min'],//минимаьлное количество товара
+                            'max' => $service['max'],//максимально возможное количество единиц товара
+                            'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
+                            'type' => $service['type'],//с каким типом дальше создавать заказ
+                            'desc_ru' => $description->desc_ru,
+                            'desc_eng' => $description->desc_eng,
+                        ]);
+                    }
             }
+
         }
 
 //        dd($result);
@@ -108,6 +136,8 @@ class CountryService extends MainService
      * Крон для обновления описания
      *
      * @return void
+     * @throws \DiDom\Exceptions\InvalidSelectorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function cronUpdateDescription()
     {

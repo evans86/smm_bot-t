@@ -120,6 +120,8 @@ class OrderController extends Controller
                 throw new RuntimeException($result['message']);
             }
 
+            $this->orderService->updateOrders($botDto, $user->id);
+
             $result = OrderResource::collection(Order::query()->where(['user_id' => $user->id])->
             where(['bot_id' => $bot->id])->get());
 
