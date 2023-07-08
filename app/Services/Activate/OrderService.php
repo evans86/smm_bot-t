@@ -68,18 +68,18 @@ class OrderService extends MainService
             throw new RuntimeException('Пополните баланс в боте');
         }
 
-//        //Попытаться списать баланс у пользователя
-        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса SMM');
+        $order_strategy = $orderStrategy->create($request);
+        $order_id = intval($order_strategy['order']);
+
+        //Попытаться списать баланс у пользователя
+        $result = BottApi::subtractBalance($botDto, $userData, $amountFinal, 'Списание баланса SMM Module');
 
         if (!$result['result']) {
             throw new RuntimeException('При списании баланса произошла ошибка: ' . $result['message']);
         }
 
         BottApi::createOrder($botDto, $userData, $amountFinal,
-            'Заказ SMM');
-
-        $order_strategy = $orderStrategy->create($request);
-        $order_id = intval($order_strategy['order']);
+            'Покупка "' . $service_name . '" на сумму ' . $amountFinal);
 
         $data = [
             'user_id' => $user->id,
