@@ -54,7 +54,7 @@
                                     </td>
                                     <td class="text-center">{!!\App\Helpers\OrdersHelper::statusLabel($order->status)!!}</td>
                                     <td class="text-center">{{ $order->bot_id }}</td>
-                                    <td class="text-center">{{\Carbon\Carbon::createFromTimestamp($order->created_at)->toDateTimeString()}}</td>
+                                    <td class="text-center">{{$order->created_at}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
