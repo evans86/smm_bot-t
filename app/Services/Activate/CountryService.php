@@ -103,11 +103,11 @@ class CountryService extends MainService
 
         foreach ($services as $key => $service) {
 
-            if (!is_null($black_array)) {
+            if (!is_null($botDto->black)) {
                 if (in_array($service['service'], $black_array))
                     continue;
             }
-            if (!is_null($white_array)) {
+            if (!is_null($botDto->white)) {
                 if (!in_array($service['service'], $white_array))
                     continue;
             }
