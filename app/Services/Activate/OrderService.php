@@ -79,7 +79,7 @@ class OrderService extends MainService
         }
 
         BottApi::createOrder($botDto, $userData, $amountFinal,
-            'Покупка "' . $service_name . '" на сумму ' . $amountFinal / 100);
+            'Покупка "' . $service_name . '"');
 
         $data = [
             'user_id' => $user->id,
