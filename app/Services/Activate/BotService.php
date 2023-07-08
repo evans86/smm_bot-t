@@ -30,8 +30,8 @@ class BotService extends MainService
         $bot->percent = 5;
         $bot->version = 1;
         $bot->color = 1;
-        $bot->black = '-';
-        $bot->white = '-';
+        $bot->black = null;
+        $bot->white = null;
         $bot->resource_link = self::DEFAULT_HOST;
         if(!$bot->save())
             throw new \RuntimeException('bot dont save');
