@@ -94,22 +94,20 @@ class CountryService extends MainService
 
         $result = [];
 
-        $black_array = explode(',', $botDto->black);
-        if ($botDto->black[0] == '-')
-            $black_array = null;
+        if (!is_null($botDto->black))
+            $black_array = explode(',', $botDto->black);
 
-        $white_array = explode(',', $botDto->white);
-        if ($botDto->white[0] == '-')
-            $white_array = null;
+        if (!is_null($botDto->white))
+            $white_array = explode(',', $botDto->white);
 
 
         foreach ($services as $key => $service) {
 
-            if(!is_null($black_array)){
+            if (!is_null($black_array)) {
                 if (in_array($service['service'], $black_array))
                     continue;
             }
-            if(!is_null($white_array)){
+            if (!is_null($white_array)) {
                 if (!in_array($service['service'], $white_array))
                     continue;
             }
