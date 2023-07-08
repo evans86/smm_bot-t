@@ -13,8 +13,8 @@ class BotDto
     public int    $percent;
     public int    $version;
     public int    $color;
-    public string $black;
-    public string $white;
+    public ?string $black;
+    public ?string $white;
     public string $resource_link;
 
     public function getArray(): array
