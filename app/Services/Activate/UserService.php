@@ -21,7 +21,7 @@ class UserService extends MainService
             $user = new User();
             $user->telegram_id = $telegram_id;
             $user->language = User::LANGUAGE_RU;
-            if(!$user->save())
+            if (!$user->save())
                 throw new RuntimeException('user not created');
         }
         return $user;

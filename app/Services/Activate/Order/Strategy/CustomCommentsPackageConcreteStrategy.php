@@ -37,7 +37,7 @@ class CustomCommentsPackageConcreteStrategy extends MainConcreteStrategy impleme
             $comments //необходимый комментариии
         );
 
-        if(isset($order['error']))
+        if (isset($order['error']))
             throw new \RuntimeException(OrdersHelper::requestArray($order['error']));
 
         return $order;

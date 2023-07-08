@@ -15,6 +15,12 @@ class PartnerApi
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * Массив товаров (типов), содержит всю информацию
+     *
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function services()
     {
         $requestParam = [
@@ -29,6 +35,13 @@ class PartnerApi
         return json_decode($result, true);
     }
 
+    /**
+     * Статус заказа
+     *
+     * @param $order
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function status($order)
     {
         $requestParam = [
@@ -44,6 +57,26 @@ class PartnerApi
         return json_decode($result, true);
     }
 
+    /**
+     * Создание заказа (пока работает Default, Poll)
+     *
+     * @param $type_id
+     * @param $link
+     * @param $quantity
+     * @param $comments
+     * @param $username
+     * @param $answer_number
+     * @param $min
+     * @param $max
+     * @param $posts
+     * @param $old_posts
+     * @param $delay
+     * @param $expiry
+     * @param $runs
+     * @param $interval
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function add(
         $type_id,
         $link = null, // Ссылка на страницу

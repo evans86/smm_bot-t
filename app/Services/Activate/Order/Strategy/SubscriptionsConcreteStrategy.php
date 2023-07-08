@@ -51,7 +51,7 @@ class SubscriptionsConcreteStrategy extends MainConcreteStrategy implements Orde
             $request->expiry
         );
 
-        if(isset($order['error']))
+        if (isset($order['error']))
             throw new \RuntimeException(OrdersHelper::requestArray($order['error']));
 
         return $order;

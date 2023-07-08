@@ -3,7 +3,7 @@
 use App\Dto\BotFactory;
 use App\Models\Order\Order;
 use App\Services\Activate\BotService;
-use App\Services\Activate\CountryService;
+use App\Services\Activate\SmmService;
 use App\Services\Activate\OrderService;
 use App\Services\Activate\UserService;
 use App\Services\External\BottApi;
@@ -21,14 +21,14 @@ class OrderServiceTest extends \Tests\TestCase
 
     private BotService $botService;
     private OrderService $orderService;
-    private CountryService $countryService;
+    private SmmService $countryService;
     private UserService $userService;
 
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         $this->botService = new BotService();
         $this->orderService = new OrderService();
-        $this->countryService = new CountryService();
+        $this->countryService = new SmmService();
         $this->userService = new UserService();
         parent::__construct($name, $data, $dataName);
     }

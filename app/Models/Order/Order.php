@@ -3,7 +3,7 @@
 namespace App\Models\Order;
 
 use App\Models\Bot\Bot;
-use App\Models\Country\Country;
+use App\Models\Description\Country;
 use App\Models\Proxy\Proxy;
 use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

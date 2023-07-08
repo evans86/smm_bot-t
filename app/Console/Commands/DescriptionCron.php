@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Activate\CountryService;
+use App\Services\Activate\SmmService;
 use Illuminate\Console\Command;
 
 class DescriptionCron extends Command
@@ -38,7 +38,7 @@ class DescriptionCron extends Command
      */
     public function handle()
     {
-        $orderService = new CountryService();
+        $orderService = new SmmService();
         $orderService->cronUpdateDescription();
         return 0;
     }

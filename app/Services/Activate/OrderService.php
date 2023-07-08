@@ -5,7 +5,7 @@ namespace App\Services\Activate;
 use App\Dto\BotDto;
 use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
-use App\Models\Country\Country;
+use App\Models\Description\Country;
 use App\Models\Bot\Bot;
 use App\Models\Order\Order;
 use App\Models\User\User;
@@ -20,10 +20,13 @@ class OrderService extends MainService
 {
 
     /**
+     * Создание заказа
+     *
      * @param $request
      * @param BotDto $botDto
-     * @param array|null $userData
+     * @param array $userData
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function create($request, BotDto $botDto, array $userData)
     {
@@ -36,15 +39,12 @@ class OrderService extends MainService
 
         //получение пользователя
         $user = User::query()->where(['telegram_id' => $userData['user']['telegram_id']])->first();
-//        $user = User::query()->where(['id' => 1])->first();
 
         if (is_null($user))
             throw new RuntimeException('not found user');
 
         //получить товар который покупают, цену и название
-
         $service = $this->getServiceInform($botDto, $request->type_id);
-//        dd($service);
 
         $service_name = $service['name'];
         $amountStart = (int)ceil(floatval($service['rate']) * 100); //цена за 1000
@@ -61,8 +61,6 @@ class OrderService extends MainService
                 $amountFinal = $amountQuantity + $amountQuantity * $botDto->percent / 100;
             }
         }
-
-//        dd($amountFinal);
 
         //проверка и списание баланса
 
@@ -145,26 +143,16 @@ class OrderService extends MainService
     {
         $partnerApi = new PartnerApi($botDto->api_key);
         $request_order = $partnerApi->status($order->order_id);
-//        dd($request_order);
 
         $status = $request_order['status'];
         $start_count = $request_order['start_count'];
         $remains = $request_order['remains'];
 
         $order->status = $status;
-        $order->start_count = $start_count;//убрать
+        $order->start_count = $start_count;
         $order->remains = $remains;
 
         $order->save();
-
-
-//        array:5 [▼
-//            "charge" => "2.80"
-//            "start_count" => "100"
-//            "status" => "Pending"
-//            "remains" => "100"
-//            "currency" => "RUB"
-//        ]
     }
 
     /**

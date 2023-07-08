@@ -56,7 +56,6 @@
                             </li>
                         @endguest
 
-                        <a class="nav-link" href="{{ route('activate.countries.index') }}">Список стран</a>
                         <a class="nav-link" href="{{ route('users.index') }}">Пользователи</a>
                         <a class="nav-link" href="{{ route('activate.order.index') }}">Заказы</a>
                         <a class="nav-link" href="{{ route('activate.bot.index') }}">Боты</a>

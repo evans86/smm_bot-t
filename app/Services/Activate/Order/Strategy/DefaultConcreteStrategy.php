@@ -52,7 +52,7 @@ class DefaultConcreteStrategy extends MainConcreteStrategy implements OrderInter
             $interval
         );
 
-        if(isset($order['error']))
+        if (isset($order['error']))
             throw new \RuntimeException(OrdersHelper::requestArray($order['error']));
 
         return $order;

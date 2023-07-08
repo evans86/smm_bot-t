@@ -46,11 +46,11 @@ class BotUpdateRequest extends FormRequest
         $dto->category_id = intval($this->category_id);
         $dto->percent = intval($this->percent);
         $dto->color = intval($this->color);
-        if(!is_null($this->white))
+        if (!is_null($this->white))
             $dto->black = null;
         else
             $dto->black = $this->black;
-        if(!is_null($this->black))
+        if (!is_null($this->black))
             $dto->white = null;
         else
             $dto->white = $this->white;

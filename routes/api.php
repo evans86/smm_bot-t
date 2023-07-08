@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\v1\BotController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\v1\CountryController;
+use App\Http\Controllers\Api\v1\SmmController;
 use App\Http\Controllers\Api\v1\ProxyController;
 use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\SupportController;
@@ -25,11 +25,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 /**
- * Получение данных
+ * Получение данных (Товары, категории, соц. сети)
  */
-Route::get('getSocial', [CountryController::class, 'getSocial']);
-Route::get('getCategories', [CountryController::class, 'getCategories']);
-Route::get('getTypes', [CountryController::class, 'getTypes']);
+Route::get('getSocial', [SmmController::class, 'getSocial']);
+Route::get('getCategories', [SmmController::class, 'getCategories']);
+Route::get('getTypes', [SmmController::class, 'getTypes']);
 
 
 Route::get('createOrder', [OrderController::class, 'createOrder']);

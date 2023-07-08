@@ -3,14 +3,14 @@
 namespace App\Services\Activate;
 
 use App\Dto\BotDto;
-use App\Models\Country\Description;
+use App\Models\Description\Description;
 use App\Models\Social\Social;
 use App\Services\External\PartnerApi;
 use App\Services\MainService;
 use DiDom\Document;
 use GuzzleHttp\Client;
 
-class CountryService extends MainService
+class SmmService extends MainService
 {
     /**
      * Формирование массива соц.сетей
@@ -41,15 +41,12 @@ class CountryService extends MainService
      * @param BotDto $botDto
      * @param $social
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function formingCategoriesArray(BotDto $botDto, $social)
     {
         $partnerApi = new PartnerApi($botDto->api_key);
         $services = $partnerApi->services();
-//        echo '<pre>';
-//        var_dump($services);
-//        echo '</pre>';
-//        dd($services[500]);
         $social = Social::query()->where(['id' => $social])->first();
 
         $result = [];
@@ -75,8 +72,6 @@ class CountryService extends MainService
 
         $result = array_unique($result, SORT_REGULAR);
 
-//        dd($result);
-
         return $result;
     }
 
@@ -86,6 +81,7 @@ class CountryService extends MainService
      * @param BotDto $botDto
      * @param $name_category
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function formingTypesArray(BotDto $botDto, $name_category)
     {
@@ -142,39 +138,7 @@ class CountryService extends MainService
 
         }
 
-//        dd($result);
-
         return $result;
-    }
-
-    /**
-     * Крон для обновления описания
-     *
-     * @return void
-     * @throws \DiDom\Exceptions\InvalidSelectorException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function cronUpdateDescription()
-    {
-        $descriptions = $this->getDescription();
-
-        echo 'Получен массив описаний' . PHP_EOL;
-
-        foreach ($descriptions as $key => $description) {
-            echo 'start to: ' . $key . PHP_EOL;
-
-            $data = [
-                'type_id' => $key,
-                'desc_ru' => $description['desc_ru'],
-                'desc_eng' => $description['desc_eng'],
-            ];
-
-            Description::updateOrCreate($data);
-
-            echo 'finish to: ' . $key . PHP_EOL;
-        }
-
-        echo 'Массив описаний обновлен' . PHP_EOL;
     }
 
     /**
@@ -213,9 +177,37 @@ class CountryService extends MainService
             $desc = $modal->first('.modal-body')->text();
             $results[$id]['desc_eng'] = $desc;
         }
-//        dd($results);
 
         return $results;
-//        dd(json_encode($results));
+    }
+
+    /**
+     * Крон для обновления описания
+     *
+     * @return void
+     * @throws \DiDom\Exceptions\InvalidSelectorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function cronUpdateDescription()
+    {
+        $descriptions = $this->getDescription();
+
+        echo 'Получен массив описаний' . PHP_EOL;
+
+        foreach ($descriptions as $key => $description) {
+            echo 'start to: ' . $key . PHP_EOL;
+
+            $data = [
+                'type_id' => $key,
+                'desc_ru' => $description['desc_ru'],
+                'desc_eng' => $description['desc_eng'],
+            ];
+
+            Description::updateOrCreate($data);
+
+            echo 'finish to: ' . $key . PHP_EOL;
+        }
+
+        echo 'Массив описаний обновлен' . PHP_EOL;
     }
 }

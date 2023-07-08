@@ -6,7 +6,7 @@ use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\OrderResource;
-use App\Models\Country\Country;
+use App\Models\Description\Country;
 use App\Models\Bot\Bot;
 use App\Models\Order\Order;
 use App\Models\User\User;
@@ -33,7 +33,6 @@ class OrderController extends Controller
      *
      * Request[
      *  'user_id'
-     *  'country'
      *  'user_secret_key'
      *  'public_key'
      * ]
@@ -82,17 +81,11 @@ class OrderController extends Controller
     }
 
     /**
-     * Передача значений заказаов для пользователя
-     *
-     * Request[
-     *  'user_id'
-     *  'user_secret_key'
-     *  'public_key'
-     *
-     * ]
+     * Получение списка заказов
      *
      * @param Request $request
      * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function orders(Request $request)
     {
@@ -136,15 +129,9 @@ class OrderController extends Controller
     /**
      * Получение активного заказа
      *
-     * Request[
-     *  'user_id'
-     *  'order_id'
-     *  'user_secret_key'
-     *  'public_key'
-     * ]
-     *
      * @param Request $request
      * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getOrder(Request $request)
     {

@@ -33,7 +33,7 @@ class BotService extends MainService
         $bot->black = null;
         $bot->white = null;
         $bot->resource_link = self::DEFAULT_HOST;
-        if(!$bot->save())
+        if (!$bot->save())
             throw new \RuntimeException('bot dont save');
         return $bot;
     }

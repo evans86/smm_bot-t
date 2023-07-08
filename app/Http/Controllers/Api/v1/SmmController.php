@@ -7,22 +7,24 @@ use App\Helpers\ApiHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\Bot\Bot;
 use App\Models\Social\Social;
-use App\Services\Activate\CountryService;
+use App\Services\Activate\SmmService;
 use Illuminate\Http\Request;
 
-class CountryController extends Controller
+class SmmController extends Controller
 {
     /**
-     * @var CountryService
+     * @var SmmService
      */
-    public CountryService $countryService;
+    public SmmService $smmService;
 
     public function __construct()
     {
-        $this->countryService = new CountryService();
+        $this->smmService = new SmmService();
     }
 
     /**
+     * Список социальных сетей
+     *
      * @return array
      */
     public function getSocial()
@@ -30,7 +32,7 @@ class CountryController extends Controller
         try {
             $socials = Social::all();
 
-            $result = $this->countryService->formingSocialArray($socials);
+            $result = $this->smmService->formingSocialArray($socials);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
@@ -39,6 +41,8 @@ class CountryController extends Controller
     }
 
     /**
+     * Список доступных категорий
+     *
      * @param Request $request
      * @return array|string
      */
@@ -55,7 +59,7 @@ class CountryController extends Controller
 
             $botDto = BotFactory::fromEntity($bot);
 
-            $result = $this->countryService->formingCategoriesArray($botDto, $request->social);
+            $result = $this->smmService->formingCategoriesArray($botDto, $request->social);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
@@ -64,6 +68,8 @@ class CountryController extends Controller
     }
 
     /**
+     * Список доступных товаров (типов)
+     *
      * @param Request $request
      * @return array|string
      */
@@ -80,7 +86,7 @@ class CountryController extends Controller
 
             $botDto = BotFactory::fromEntity($bot);
 
-            $result = $this->countryService->formingTypesArray($botDto, $request->name_category);
+            $result = $this->smmService->formingTypesArray($botDto, $request->name_category);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {

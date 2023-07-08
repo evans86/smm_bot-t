@@ -42,7 +42,7 @@ class PollConcreteStrategy extends MainConcreteStrategy implements OrderInterfac
             $answer_number
         );
 
-        if(isset($order['error']))
+        if (isset($order['error']))
             throw new \RuntimeException(OrdersHelper::requestArray($order['error']));
 
         return $order;

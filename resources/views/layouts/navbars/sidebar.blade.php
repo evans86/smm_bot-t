@@ -4,12 +4,6 @@
             <a href="/" class="simple-text logo-normal">{{ __('SMM') }}</a>
         </div>
         <ul class="nav">
-{{--            <li @if ($pageSlug == 'countries') class="active " @endif>--}}
-{{--                <a href="{{ route('activate.countries.index') }}">--}}
-{{--                    <i class="tim-icons icon-world"></i>--}}
-{{--                    <p>{{ __('Список стран') }}</p>--}}
-{{--                </a>--}}
-{{--            </li>--}}
             <li @if ($pageSlug == 'countries') class="active " @endif>
                 <a href="{{ route('activate.social.index') }}">
                     <i class="tim-icons icon-world"></i>
