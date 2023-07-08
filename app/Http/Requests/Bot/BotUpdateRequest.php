@@ -46,8 +46,14 @@ class BotUpdateRequest extends FormRequest
         $dto->category_id = intval($this->category_id);
         $dto->percent = intval($this->percent);
         $dto->color = intval($this->color);
-        $dto->black = $this->black;
-        $dto->white = $this->white;
+        if(!is_null($this->white))
+            $dto->black = null;
+        else
+            $dto->black = $this->black;
+        if(!is_null($this->black))
+            $dto->white = null;
+        else
+            $dto->white = $this->white;
         $dto->version = intval($this->version);
         if (filter_var($this->resource_link, FILTER_VALIDATE_URL) === false)
             $dto->resource_link = BotService::DEFAULT_HOST;
