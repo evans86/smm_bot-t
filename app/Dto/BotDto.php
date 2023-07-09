@@ -31,7 +31,7 @@ class BotDto
             'color' => $this->color,
             'black' => $this->black,
             'white' => $this->white,
-            'resource_link' => $this->resource_link,
+//            'resource_link' => $this->resource_link,
          ];
     }
 

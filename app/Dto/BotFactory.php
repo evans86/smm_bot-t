@@ -24,7 +24,7 @@ class BotFactory
         $dto->color = $bot->color;
         $dto->black = $bot->black;
         $dto->white = $bot->white;
-//        $dto->resource_link = $bot->resource_link;
+        $dto->resource_link = $bot->resource_link;
         return $dto;
     }
 }
