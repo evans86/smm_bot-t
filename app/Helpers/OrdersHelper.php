@@ -43,7 +43,8 @@ class OrdersHelper
     public static function requestArray($result)
     {
         $errorCodes = [
-            'neworder.error.link_duplicate' => 'Ошибка создания нового заказа - сслыка дублируется',
+            'neworder.error.link_duplicate' => 'Ошибка создания нового заказа: сслыка дублируется',
+            'neworder.error.not_enough_funds' => 'Ошибка создания нового заказа: админимтратор должен пополнить баланс на сервисе'
         ];
 
         if (array_key_exists($result, $errorCodes)) {
