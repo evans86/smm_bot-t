@@ -28,8 +28,10 @@ class OrdersHelper
                 break;
             case Order::TO_PROCESS_STATUS:
             case Order::WORK_STATUS:
-                $class = 'badge bg-warning';
+                $class = 'badge bg-secondary';
                 break;
+            default:
+
         }
 
 
