@@ -21,17 +21,17 @@ class OrdersHelper
     {
         switch ($status) {
             case Order::CREATE_STATUS:
-                $class = 'badge bg-primary';
+                $class = 'badge bg-info text-dark';
                 break;
             case Order::FINISH_STATUS:
                 $class = 'badge bg-success';
                 break;
             case Order::TO_PROCESS_STATUS:
             case Order::WORK_STATUS:
-                $class = 'badge bg-secondary';
+                $class = 'badge bg-warning text-dark';
                 break;
             default:
-
+                $class = 'badge bg-secondary';
         }
 
 
