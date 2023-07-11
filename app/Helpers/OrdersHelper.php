@@ -24,7 +24,7 @@ class OrdersHelper
                 $class = 'badge bg-info text-dark';
                 break;
             case Order::FINISH_STATUS:
-                $class = 'badge bg-success';
+                $class = 'badge bg-success text-dark';
                 break;
             case Order::TO_PROCESS_STATUS:
             case Order::WORK_STATUS:
