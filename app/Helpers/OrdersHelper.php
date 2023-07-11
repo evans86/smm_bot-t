@@ -12,8 +12,10 @@ class OrdersHelper
         return [
             Order::CREATE_STATUS => 'Ожидание',
             Order::TO_PROCESS_STATUS => 'Выполняется',
-            Order::FINISH_STATUS => 'Завершен',
+            Order::TO_PROCESSING_STATUS => 'Выполняется',
             Order::WORK_STATUS => 'Выполняется',
+            Order::FINISH_STATUS => 'Завершен',
+            Order::CANCEL_STATUS => 'Отменен',
         ];
     }
 
@@ -21,13 +23,17 @@ class OrdersHelper
     {
         switch ($status) {
             case Order::CREATE_STATUS:
-                $class = 'badge bg-info text-dark';
+                $class = 'badge bg-primary text-dark';
                 break;
             case Order::FINISH_STATUS:
                 $class = 'badge bg-success text-dark';
                 break;
+            case Order::CANCEL_STATUS:
+                $class = 'badge bg-light text-dark';
+                break;
             case Order::TO_PROCESS_STATUS:
             case Order::WORK_STATUS:
+            case Order::TO_PROCESSING_STATUS:
                 $class = 'badge bg-warning text-dark';
                 break;
             default:

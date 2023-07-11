@@ -22,6 +22,7 @@ class Order extends Model
     const CREATE_STATUS = 'Pending';
     const WORK_STATUS = 'In progress';
     const TO_PROCESS_STATUS = 'Partial';
+    const TO_PROCESSING_STATUS = 'Processing';
     const FINISH_STATUS = 'Completed';
     const CANCEL_STATUS = 'Canceled'; //?
 
