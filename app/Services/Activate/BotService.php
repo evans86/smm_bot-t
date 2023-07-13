@@ -9,7 +9,7 @@ use App\Services\MainService;
 
 class BotService extends MainService
 {
-    const DEFAULT_HOST = 'https://proxy6.net/api/';
+    const DEFAULT_HOST = 'https://partner.soc-proof.su/api/v2';
 
     /**
      * Создание модуля
