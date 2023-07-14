@@ -50,11 +50,4 @@ class OrderResource extends JsonResource
     }
 
 
-
-
-
-
-
-
-
 }

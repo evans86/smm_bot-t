@@ -14,6 +14,8 @@ use App\Services\External\BottApi;
 use App\Services\External\ActivApi;
 use App\Services\External\PartnerApi;
 use App\Services\MainService;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use RuntimeException;
 
 class OrderService extends MainService
@@ -191,19 +193,43 @@ class OrderService extends MainService
      */
     public function cronUpdateOrders()
     {
-        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
-        $orders = Order::query()->whereIn('status', $statuses)->get();
+        try {
+            $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
+            $orders = Order::query()->whereIn('status', $statuses)->get();
 
-        echo "START count:" . count($orders) . PHP_EOL;
+            echo "START count:" . count($orders) . PHP_EOL;
 
-        foreach ($orders as $key => $order) {
-            echo "START" . $order->id . PHP_EOL;
+            $start_text = "Smm Start count: " . count($orders) . PHP_EOL;
+            $this->notifyTelegram($start_text);
 
-            $botDto = BotFactory::fromEntity($order->bot);
-            $this->order($botDto, $order);
+            foreach ($orders as $key => $order) {
+                echo "START" . $order->id . PHP_EOL;
 
-            echo "FINISH" . $order->id . PHP_EOL;
+                $botDto = BotFactory::fromEntity($order->bot);
+                $this->order($botDto, $order);
+
+                echo "FINISH" . $order->id . PHP_EOL;
+            }
+
+            $finish_text = "Smm finish count: " . count($orders) . PHP_EOL;
+            $this->notifyTelegram($finish_text);
+
+        } catch (\Exception $e) {
+            $this->notifyTelegram($e->getMessage());
         }
+    }
+
+    public function notifyTelegram($text)
+    {
+        $client = new Client();
+
+        $client->post('https://api.telegram.org/bot6331654488:AAEmDoHZLV6D3YYShrwdanKlWCbo9nBjQy4/sendMessage', [
+
+            RequestOptions::JSON => [
+                'chat_id' => 398981226,
+                'text' => $text,
+            ]
+        ]);
     }
 }
 

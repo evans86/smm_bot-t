@@ -9,6 +9,7 @@ use App\Services\External\PartnerApi;
 use App\Services\MainService;
 use DiDom\Document;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 
 class SmmService extends MainService
 {
@@ -190,24 +191,48 @@ class SmmService extends MainService
      */
     public function cronUpdateDescription()
     {
-        $descriptions = $this->getDescription();
+        try {
+            $descriptions = $this->getDescription();
 
-        echo 'Получен массив описаний' . PHP_EOL;
+            echo 'Получен массив описаний' . PHP_EOL;
 
-        foreach ($descriptions as $key => $description) {
-            echo 'start to: ' . $key . PHP_EOL;
+            $start_text = 'Smm: Получен массив описаний' . PHP_EOL;
+            $this->notifyTelegram($start_text);
 
-            $data = [
-                'type_id' => $key,
-                'desc_ru' => $description['desc_ru'],
-                'desc_eng' => $description['desc_eng'],
-            ];
+            foreach ($descriptions as $key => $description) {
+                echo 'start to: ' . $key . PHP_EOL;
 
-            Description::updateOrCreate($data);
+                $data = [
+                    'type_id' => $key,
+                    'desc_ru' => $description['desc_ru'],
+                    'desc_eng' => $description['desc_eng'],
+                ];
 
-            echo 'finish to: ' . $key . PHP_EOL;
+                Description::updateOrCreate($data);
+
+                echo 'finish to: ' . $key . PHP_EOL;
+            }
+
+            echo 'Массив описаний обновлен' . PHP_EOL;
+
+            $finish_text = 'Smm: Массив описаний обновлен' . PHP_EOL;
+            $this->notifyTelegram($finish_text);
+
+        } catch (\Exception $e) {
+            $this->notifyTelegram($e->getMessage());
         }
+    }
 
-        echo 'Массив описаний обновлен' . PHP_EOL;
+    public function notifyTelegram($text)
+    {
+        $client = new Client();
+
+        $client->post('https://api.telegram.org/bot6331654488:AAEmDoHZLV6D3YYShrwdanKlWCbo9nBjQy4/sendMessage', [
+
+            RequestOptions::JSON => [
+                'chat_id' => 398981226,
+                'text' => $text,
+            ]
+        ]);
     }
 }
