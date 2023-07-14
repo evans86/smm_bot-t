@@ -147,7 +147,10 @@ class OrderService extends MainService
         $request_order = $partnerApi->status($order->order_id);
 
         $status = $request_order['status'];
-        $start_count = $request_order['start_count'];
+        try {
+            $start_count = $request_order['start_count'];
+        }catch (\Exception $e){
+        }
         $remains = $request_order['remains'];
 
         $order->status = $status;
