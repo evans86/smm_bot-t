@@ -148,8 +148,8 @@ class OrderService extends MainService
 
         $status = $request_order['status'];
 
-        isset($request_order['start_count']) ? $start_count = $request_order['start_count'] : $start_count = '';
-        isset($request_order['remains']) ? $remains = $request_order['remains'] : $remains = '';
+        isset($request_order['start_count']) ? $start_count = $request_order['start_count'] : $start_count = null;
+        isset($request_order['remains']) ? $remains = $request_order['remains'] : $remains = null;
 
         $order->status = $status;
         $order->start_count = $start_count;
