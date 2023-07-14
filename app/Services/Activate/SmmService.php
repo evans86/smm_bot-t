@@ -219,7 +219,7 @@ class SmmService extends MainService
             $this->notifyTelegram($finish_text);
 
         } catch (\Exception $e) {
-            $this->notifyTelegram($e->getMessage());
+            $this->notifyTelegram('🔴' . $e->getMessage());
         }
     }
 
