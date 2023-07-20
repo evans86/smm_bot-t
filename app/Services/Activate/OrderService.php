@@ -48,7 +48,7 @@ class OrderService extends MainService
         //получить товар который покупают, цену и название
         $service = $this->getServiceInform($botDto, $request->type_id);
 
-        $service_name = $service['name'];
+        $service_name = $service['nadbgfhjkme'];
         $amountStart = (int)ceil(floatval($service['rate']) * 100); //цена за 1000
 
         if (is_null($request->quantity)) {
