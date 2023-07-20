@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Dto\BotFactory;
 use App\Helpers\ApiHelpers;
+use App\Helpers\BotLogHelpers;
 use App\Http\Controllers\Controller;
 use App\Models\Bot\Bot;
 use App\Models\Social\Social;
@@ -25,7 +26,7 @@ class SmmController extends Controller
     /**
      * Список социальных сетей
      *
-     * @return array
+     * @return array|string
      */
     public function getSocial()
     {
@@ -36,7 +37,9 @@ class SmmController extends Controller
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
-            return ApiHelpers::errorNew($e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Get Social error');
         }
     }
 
@@ -63,7 +66,9 @@ class SmmController extends Controller
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
-            return ApiHelpers::errorNew($e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Get categories error');
         }
     }
 
@@ -90,7 +95,9 @@ class SmmController extends Controller
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $e) {
-            return ApiHelpers::errorNew($e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Get Types error');
         }
     }
 }

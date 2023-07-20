@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Helpers\ApiHelpers;
+use App\Helpers\BotLogHelpers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\UserResource;
 use App\Services\Activate\UserService;
@@ -32,10 +33,16 @@ class UserController extends Controller
      */
     public function getUser(Request $request)
     {
-        if (is_null($request->user_id))
-            return ApiHelpers::error('Not found params: user_id');
-        $user = $this->userService->getOrCreate($request->user_id);
-        return ApiHelpers::success(UserResource::generateUserArray($user));
+        try {
+            if (is_null($request->user_id))
+                return ApiHelpers::error('Not found params: user_id');
+            $user = $this->userService->getOrCreate($request->user_id);
+            return ApiHelpers::success(UserResource::generateUserArray($user));
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Get user error');
+        }
     }
 
     /**
@@ -52,13 +59,19 @@ class UserController extends Controller
      */
     public function setLanguage(Request $request)
     {
-        if (is_null($request->user_id))
-            return ApiHelpers::error('Not found params: user_id');
-        if (is_null($request->language))
-            return ApiHelpers::error('Not found params: language');
-        if (is_null($request->user_secret_key))
-            return ApiHelpers::error('Not found params: user_secret_key');
-        $user = $this->userService->updateLanguage($request->user_id, $request->language);
-        return ApiHelpers::success(UserResource::generateUserArray($user));
+        try {
+            if (is_null($request->user_id))
+                return ApiHelpers::error('Not found params: user_id');
+            if (is_null($request->language))
+                return ApiHelpers::error('Not found params: language');
+            if (is_null($request->user_secret_key))
+                return ApiHelpers::error('Not found params: user_secret_key');
+            $user = $this->userService->updateLanguage($request->user_id, $request->language);
+            return ApiHelpers::success(UserResource::generateUserArray($user));
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Language error');
+        }
     }
 }
