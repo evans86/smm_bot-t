@@ -76,8 +76,11 @@ class OrderController extends Controller
             );
 
             return ApiHelpers::success($result);
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
         } catch (Exception $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Create order error');
         }
@@ -122,9 +125,11 @@ class OrderController extends Controller
             where(['bot_id' => $bot->id])->get());
 
             return ApiHelpers::success($result);
-
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
         } catch (Exception $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Orders error');
         }
@@ -174,8 +179,11 @@ class OrderController extends Controller
 
             $order = Order::query()->where(['order_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
-        } catch (RuntimeException $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
+        } catch (Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get order error');
         }

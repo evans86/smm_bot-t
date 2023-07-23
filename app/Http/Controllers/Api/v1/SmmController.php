@@ -36,8 +36,11 @@ class SmmController extends Controller
             $result = $this->smmService->formingSocialArray($socials);
 
             return ApiHelpers::success($result);
-        } catch (\RuntimeException $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get Social error');
         }
@@ -65,8 +68,11 @@ class SmmController extends Controller
             $result = $this->smmService->formingCategoriesArray($botDto, $request->social);
 
             return ApiHelpers::success($result);
-        } catch (\RuntimeException $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get categories error');
         }
@@ -94,8 +100,11 @@ class SmmController extends Controller
             $result = $this->smmService->formingTypesArray($botDto, $request->name_category);
 
             return ApiHelpers::success($result);
-        } catch (\RuntimeException $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get Types error');
         }

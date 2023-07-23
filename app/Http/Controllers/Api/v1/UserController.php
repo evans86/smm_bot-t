@@ -38,8 +38,11 @@ class UserController extends Controller
                 return ApiHelpers::error('Not found params: user_id');
             $user = $this->userService->getOrCreate($request->user_id);
             return ApiHelpers::success(UserResource::generateUserArray($user));
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
         } catch (\Exception $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get user error');
         }
@@ -68,8 +71,11 @@ class UserController extends Controller
                 return ApiHelpers::error('Not found params: user_secret_key');
             $user = $this->userService->updateLanguage($request->user_id, $request->language);
             return ApiHelpers::success(UserResource::generateUserArray($user));
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
         } catch (\Exception $e) {
-            BotLogHelpers::notifyBotLog('(🟣Smm): ' . $e->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Language error');
         }
