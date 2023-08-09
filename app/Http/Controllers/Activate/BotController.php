@@ -13,7 +13,7 @@ class BotController
     {
         $bots = Bot::orderBy('id', 'DESC')->Paginate(10);
 
-        $newBots = count(Bot::query()->where('created_at', '>', '2023-06-09 15:12:53')->get());
+        $newBots = count(Bot::query()->where('created_at', '>', '2023-08-09 18:13:25')->get());
         $allCount = count(Bot::get());
 
         return view('activate.bot.index', compact(
