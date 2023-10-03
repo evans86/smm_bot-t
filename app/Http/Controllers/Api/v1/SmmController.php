@@ -31,7 +31,12 @@ class SmmController extends Controller
     public function getSocial()
     {
         try {
-            $socials = Social::all();
+
+            $socials = \Cache::get('social');
+            if($socials === null){
+                $socials = Social::all();
+                \Cache::put('social', $socials, 900);
+            }
 
             $result = $this->smmService->formingSocialArray($socials);
 
