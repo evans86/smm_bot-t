@@ -2,6 +2,7 @@
 
 namespace App\Services\External;
 
+use App\Helpers\BotLogHelpers;
 use GuzzleHttp\Client;
 
 class PartnerApi
@@ -23,16 +24,21 @@ class PartnerApi
      */
     public function services()
     {
-        $requestParam = [
-            'key' => $this->apiKey,
-            'action' => __FUNCTION__,
-        ];
+        try {
+            $requestParam = [
+                'key' => $this->apiKey,
+                'action' => __FUNCTION__,
+            ];
 
-        $client = new Client(['base_uri' => self::HOST]);
-        $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $client = new Client(['base_uri' => self::HOST]);
+            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
+            $result = $response->getBody()->getContents();
+            return json_decode($result, true);
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            throw new \RuntimeException('Ошибка в получении данных провайдера');
+        }
     }
 
     /**
@@ -44,17 +50,22 @@ class PartnerApi
      */
     public function status($order)
     {
-        $requestParam = [
-            'key' => $this->apiKey,
-            'action' => __FUNCTION__,
-            'order' => $order
-        ];
+        try {
+            $requestParam = [
+                'key' => $this->apiKey,
+                'action' => __FUNCTION__,
+                'order' => $order
+            ];
 
-        $client = new Client(['base_uri' => self::HOST]);
-        $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $client = new Client(['base_uri' => self::HOST]);
+            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
+            $result = $response->getBody()->getContents();
+            return json_decode($result, true);
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            throw new \RuntimeException('Ошибка в получении данных провайдера');
+        }
     }
 
     /**
@@ -94,30 +105,35 @@ class PartnerApi
         $interval = null
     )
     {
-        $requestParam = [
-            'key' => $this->apiKey,
-            'action' => __FUNCTION__,
+        try {
+            $requestParam = [
+                'key' => $this->apiKey,
+                'action' => __FUNCTION__,
 
-            'service' => $type_id,
-            'link' => $link,
-            'quantity' => $quantity,
-            'comments' => $comments,
-            'username' => $username,
-            'answer_number' => $answer_number,
-            'min' => $min,
-            'max' => $max,
-            'posts' => $posts,
-            'old_posts' => $old_posts,
-            'delay' => $delay,
-            'expiry' => $expiry,
-            'runs' => $runs,
-            'interval' => $interval,
-        ];
+                'service' => $type_id,
+                'link' => $link,
+                'quantity' => $quantity,
+                'comments' => $comments,
+                'username' => $username,
+                'answer_number' => $answer_number,
+                'min' => $min,
+                'max' => $max,
+                'posts' => $posts,
+                'old_posts' => $old_posts,
+                'delay' => $delay,
+                'expiry' => $expiry,
+                'runs' => $runs,
+                'interval' => $interval,
+            ];
 
-        $client = new Client(['base_uri' => self::HOST]);
-        $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $client = new Client(['base_uri' => self::HOST]);
+            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
+            $result = $response->getBody()->getContents();
+            return json_decode($result, true);
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            throw new \RuntimeException('Ошибка в получении данных провайдера');
+        }
     }
 }
