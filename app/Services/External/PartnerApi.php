@@ -36,7 +36,7 @@ class PartnerApi
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
         } catch (\RuntimeException $r) {
-            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             throw new \RuntimeException('Ошибка в получении данных провайдера');
         }
     }
@@ -63,7 +63,7 @@ class PartnerApi
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
         } catch (\RuntimeException $r) {
-            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             throw new \RuntimeException('Ошибка в получении данных провайдера');
         }
     }
@@ -132,7 +132,7 @@ class PartnerApi
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
         } catch (\RuntimeException $r) {
-            BotLogHelpers::notifyBotLog('(🟢E ' . __FUNCTION__ . ' Vak): ' . $r->getMessage());
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             throw new \RuntimeException('Ошибка в получении данных провайдера');
         }
     }
