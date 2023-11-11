@@ -11,10 +11,10 @@ class BotLogHelpers
     {
         $client = new Client();
 
-        $client->post('https://api.telegram.org/bot6355061130:AAEKDaNvf22iRtd7-E5o5hUxNyMgn0ZIcMM/sendMessage', [
+        $client->post('https://api.telegram.org/bot6967494667:AAHx-f9rORNBcHM7DqTUx2EBhGTxVVUvesA/sendMessage', [
 
             RequestOptions::JSON => [
-                'chat_id' => 398981226,
+                'chat_id' => 6715142449,
                 'text' => $message,
             ]
         ]);
