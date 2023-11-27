@@ -54,7 +54,7 @@ class OrderServiceTest extends \Tests\TestCase
         self::assertEquals($bot->api_key, $dto->api_key);
 
 
-        $user = $this->userService->getOrCreate($telegram_id = 398981226);
+        $user = $this->userService->getOrCreate($telegram_id = 6715142449);
 
         $botDto = BotFactory::fromEntity($bot);
         $result = BottApi::checkUser(
@@ -132,7 +132,7 @@ class OrderServiceTest extends \Tests\TestCase
         $bot = $this->botService->update($dto);
         self::assertEquals($bot->api_key, $dto->api_key);
 
-        $user = $this->userService->getOrCreate($telegram_id = 398981226);
+        $user = $this->userService->getOrCreate($telegram_id = 6715142449);
 
         $botDto = BotFactory::fromEntity($bot);
         $result = BottApi::checkUser(
@@ -221,7 +221,7 @@ class OrderServiceTest extends \Tests\TestCase
         $bot = $this->botService->update($dto);
         self::assertEquals($bot->api_key, $dto->api_key);
 
-        $user = $this->userService->getOrCreate($telegram_id = 398981226);
+        $user = $this->userService->getOrCreate($telegram_id = 6715142449);
 
         $botDto = BotFactory::fromEntity($bot);
         $result = BottApi::checkUser(
@@ -299,7 +299,7 @@ class OrderServiceTest extends \Tests\TestCase
         $bot = $this->botService->update($dto);
         self::assertEquals($bot->api_key, $dto->api_key);
 
-        $user = $this->userService->getOrCreate($telegram_id = 398981226);
+        $user = $this->userService->getOrCreate($telegram_id = 6715142449);
 
         $botDto = BotFactory::fromEntity($bot);
         $result = BottApi::checkUser(
@@ -353,7 +353,7 @@ class OrderServiceTest extends \Tests\TestCase
         $bot = $this->botService->update($dto);
         self::assertEquals($bot->api_key, $dto->api_key);
 
-        $user = $this->userService->getOrCreate($telegram_id = 398981226);
+        $user = $this->userService->getOrCreate($telegram_id = 6715142449);
 
         $botDto = BotFactory::fromEntity($bot);
         $result = BottApi::checkUser(
