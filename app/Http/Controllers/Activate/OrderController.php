@@ -11,9 +11,9 @@ class OrderController
      */
     public function index()
     {
-        $orders = Order::orderBy('id', 'DESC')->Paginate(15);
+        $orders = Order::orderBy('id', 'DESC')->limit(1000)->Paginate(15);
 
-        $allCount = count(Order::get());
+        $allCount = Order::count();
 
         return view('activate.order.index', compact(
             'orders',
