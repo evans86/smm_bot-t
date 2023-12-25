@@ -227,12 +227,17 @@ class SmmService extends MainService
     {
         $client = new Client();
 
-        $client->post('https://api.telegram.org/bot6794994258:AAHuRzPhDb2z11_j-BRhQIRzuwI7fC8S-14/sendMessage', [
+//         1028741753
+        $ids = [6715142449, 778591134];
 
-            RequestOptions::JSON => [
-                'chat_id' => 6715142449,
-                'text' => $text,
-            ]
-        ]);
+        foreach ($ids as $id){
+            $client->post('https://api.telegram.org/bot6794994258:AAHuRzPhDb2z11_j-BRhQIRzuwI7fC8S-14/sendMessage', [
+
+                RequestOptions::JSON => [
+                    'chat_id' => $id,
+                    'text' => $text,
+                ]
+            ]);
+        }
     }
 }
