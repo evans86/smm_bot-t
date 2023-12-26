@@ -4,14 +4,10 @@ namespace App\Services\Activate;
 
 use App\Dto\BotDto;
 use App\Dto\BotFactory;
-use App\Helpers\ApiHelpers;
-use App\Models\Description\Country;
-use App\Models\Bot\Bot;
 use App\Models\Order\Order;
 use App\Models\User\User;
 use App\Services\Activate\Order\OrderStrategy;
 use App\Services\External\BottApi;
-use App\Services\External\ActivApi;
 use App\Services\External\PartnerApi;
 use App\Services\MainService;
 use GuzzleHttp\Client;
@@ -224,17 +220,33 @@ class OrderService extends MainService
     {
         $client = new Client();
 
-//         1028741753
-        $ids = [6715142449, 778591134];
+        $ids = [
+            6715142449,
+//            778591134
+        ];
 
-        foreach ($ids as $id){
-            $client->post('https://api.telegram.org/bot6794994258:AAHuRzPhDb2z11_j-BRhQIRzuwI7fC8S-14/sendMessage', [
+        //CronLogBot#1
+        try {
+            foreach ($ids as $id) {
+                $client->post('https://api.telegram.org/bot6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY/sendMessage', [
 
-                RequestOptions::JSON => [
-                    'chat_id' => $id,
-                    'text' => $text,
-                ]
-            ]);
+                    RequestOptions::JSON => [
+                        'chat_id' => $id,
+                        'text' => $text,
+                    ]
+                ]);
+            }
+            //CronLogBot#2
+        } catch (\Exception $e) {
+            foreach ($ids as $id) {
+                $client->post('https://api.telegram.org/bot6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg/sendMessage', [
+
+                    RequestOptions::JSON => [
+                        'chat_id' => $id,
+                        'text' => $text,
+                    ]
+                ]);
+            }
         }
     }
 }
