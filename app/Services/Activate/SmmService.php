@@ -162,7 +162,7 @@ class SmmService extends MainService
             $id = substr($modal->getAttribute('id'), 6);
             $id = intval($id);
             $results[$id]['id'] = $id;
-            $desc = $modal->first('.modal-body')->text();
+            $desc = $modal->first('.modal-body')->innerHtml();
             $results[$id]['desc_ru'] = $desc;
         }
 
@@ -175,7 +175,7 @@ class SmmService extends MainService
         foreach ($modals as $modal) {
             $id = substr($modal->getAttribute('id'), 6);
             $id = intval($id);
-            $desc = $modal->first('.modal-body')->text();
+            $desc = $modal->first('.modal-body')->innerHtml();
             $results[$id]['desc_eng'] = $desc;
         }
 
