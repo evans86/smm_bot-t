@@ -16,6 +16,7 @@ class OrdersHelper
             Order::WORK_STATUS => 'Выполняется',
             Order::FINISH_STATUS => 'Завершен',
             Order::CANCEL_STATUS => 'Отменен',
+            Order::OLD_STATUS => 'Устарел',
         ];
     }
 
@@ -30,6 +31,9 @@ class OrdersHelper
                 break;
             case Order::CANCEL_STATUS:
                 $class = 'badge bg-light text-dark';
+                break;
+            case Order::OLD_STATUS:
+                $class = 'badge bg-dark';
                 break;
             case Order::TO_PROCESS_STATUS:
             case Order::WORK_STATUS:

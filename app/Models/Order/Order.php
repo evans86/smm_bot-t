@@ -25,6 +25,7 @@ class Order extends Model
     const TO_PROCESSING_STATUS = 'Processing';
     const FINISH_STATUS = 'Completed';
     const CANCEL_STATUS = 'Canceled'; //?
+    const OLD_STATUS = 'Old';
 
     use HasFactory;
 

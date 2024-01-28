@@ -10,6 +10,7 @@ use App\Services\Activate\Order\OrderStrategy;
 use App\Services\External\BottApi;
 use App\Services\External\PartnerApi;
 use App\Services\MainService;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
@@ -142,7 +143,10 @@ class OrderService extends MainService
         $partnerApi = new PartnerApi($botDto->api_key);
         $request_order = $partnerApi->status($order->order_id);
 
-        $status = $request_order['status'];
+        if ($order->created_at < Carbon::now()->subMonth())
+            $status = Order::OLD_STATUS;
+        else
+            $status = $request_order['status'];
 
         isset($request_order['start_count']) ? $start_count = $request_order['start_count'] : $start_count = null;
         isset($request_order['remains']) ? $remains = $request_order['remains'] : $remains = null;
