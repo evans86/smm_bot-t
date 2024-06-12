@@ -163,7 +163,7 @@ class SmmService extends MainService
             $id = intval($id);
             $results[$id]['id'] = $id;
             $desc = $modal->first('.modal-body')->html();
-            $results[$id]['desc_ru'] = $desc;
+            $results[$id]['desс'] = $desc;
         }
 
         $client = new Client(['base_uri' => 'https://partner.soc-proof.su/']);
@@ -176,7 +176,7 @@ class SmmService extends MainService
             $id = substr($modal->getAttribute('id'), 6);
             $id = intval($id);
             $desc = $modal->first('.modal-body')->html();
-            $results[$id]['desc_eng'] = $desc;
+            $results[$id]['desc'] = $desc;
         }
 
         return $results;
