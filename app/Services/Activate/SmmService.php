@@ -156,13 +156,13 @@ class SmmService extends MainService
 
         $content = $response->getBody()->getContents();
         $document = new Document($content);
-        $modals = $document->find('.modal');
+        $modals = $document->find('.desc_service');
         $results = [];
         foreach ($modals as $modal) {
             $id = substr($modal->getAttribute('id'), 6);
             $id = intval($id);
             $results[$id]['id'] = $id;
-            $desc = $modal->first('.service_description')->html();
+            $desc = $modal->first('.desc')->html();
             $results[$id]['desc_ru'] = $desc;
         }
 
@@ -171,11 +171,11 @@ class SmmService extends MainService
         $content = $response->getBody()->getContents();
 
         $document = new Document($content);
-        $modals = $document->find('.modal');
+        $modals = $document->find('.desc_service');
         foreach ($modals as $modal) {
             $id = substr($modal->getAttribute('id'), 6);
             $id = intval($id);
-            $desc = $modal->first('.service_description')->html();
+            $desc = $modal->first('.desc')->html();
             $results[$id]['desc_eng'] = $desc;
         }
 
