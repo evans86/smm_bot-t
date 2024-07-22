@@ -122,7 +122,8 @@ class SmmService extends MainService
                     break;
                 case 'Default':
                 case 'Poll':
-                    if (!is_null($botDto->white)) {
+                    if (($service['category'] == $name_category)) {
+
                         $description = Description::query()->where(['type_id' => $service['service']])->first();
                         $amountStart = (int)ceil(floatval($service['rate']) * 100);
                         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
@@ -137,29 +138,11 @@ class SmmService extends MainService
                             'desc_ru' => $description->desc_ru,
                             'desc_eng' => $description->desc_eng,
                         ]);
-                    } else {
-                        if (($service['category'] == $name_category)) {
-
-                            $description = Description::query()->where(['type_id' => $service['service']])->first();
-                            $amountStart = (int)ceil(floatval($service['rate']) * 100);
-                            $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
-
-                            array_push($result, [
-                                'type_id' => $service['service'],//ид типа товара
-                                'name' => $service['name'],//название товара
-                                'min' => $service['min'],//минимаьлное количество товара
-                                'max' => $service['max'],//максимально возможное количество единиц товара
-                                'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
-                                'type' => $service['type'],//с каким типом дальше создавать заказ
-                                'desc_ru' => $description->desc_ru,
-                                'desc_eng' => $description->desc_eng,
-                            ]);
-                        }
                     }
             }
 
         }
-//        dd($result);
+        dd($result);
 
         return $result;
     }
