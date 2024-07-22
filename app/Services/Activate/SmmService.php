@@ -142,7 +142,7 @@ class SmmService extends MainService
             }
 
         }
-        dd($result);
+//        dd($result);
 
         return $result;
     }
