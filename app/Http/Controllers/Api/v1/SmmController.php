@@ -102,7 +102,10 @@ class SmmController extends Controller
 
             $botDto = BotFactory::fromEntity($bot);
 
-            $result = $this->smmService->formingTypesArray($botDto, $request->name_category);
+            $result = $this->smmService->formingTypesArray(
+                $botDto,
+                $request->name_category
+            );
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $r) {

@@ -96,7 +96,8 @@ class SmmService extends MainService
 
         if (!is_null($botDto->white))
             $white_array = explode(',', $botDto->white);
-
+//        dd($white_array);
+//        dd($services);
 
         foreach ($services as $key => $service) {
 
@@ -104,10 +105,13 @@ class SmmService extends MainService
                 if (in_array($service['service'], $black_array))
                     continue;
             }
+
             if (!is_null($botDto->white)) {
+//                dd($service);
                 if (!in_array($service['service'], $white_array))
                     continue;
             }
+//            dd($service);
 
             switch ($service['type']) {
                 case 'Package':
@@ -118,8 +122,7 @@ class SmmService extends MainService
                     break;
                 case 'Default':
                 case 'Poll':
-                    if (($service['category'] == $name_category)) {
-
+                    if (!is_null($botDto->white)) {
                         $description = Description::query()->where(['type_id' => $service['service']])->first();
                         $amountStart = (int)ceil(floatval($service['rate']) * 100);
                         $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
@@ -134,10 +137,29 @@ class SmmService extends MainService
                             'desc_ru' => $description->desc_ru,
                             'desc_eng' => $description->desc_eng,
                         ]);
+                    } else {
+                        if (($service['category'] == $name_category)) {
+
+                            $description = Description::query()->where(['type_id' => $service['service']])->first();
+                            $amountStart = (int)ceil(floatval($service['rate']) * 100);
+                            $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+
+                            array_push($result, [
+                                'type_id' => $service['service'],//ид типа товара
+                                'name' => $service['name'],//название товара
+                                'min' => $service['min'],//минимаьлное количество товара
+                                'max' => $service['max'],//максимально возможное количество единиц товара
+                                'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
+                                'type' => $service['type'],//с каким типом дальше создавать заказ
+                                'desc_ru' => $description->desc_ru,
+                                'desc_eng' => $description->desc_eng,
+                            ]);
+                        }
                     }
             }
 
         }
+//        dd($result);
 
         return $result;
     }
