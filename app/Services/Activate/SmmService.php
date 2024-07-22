@@ -50,9 +50,14 @@ class SmmService extends MainService
         $services = $partnerApi->services();
         $social = Social::query()->where(['id' => $social])->first();
 
+        if (!is_null($botDto->white))
+            $white_array = explode(',', $botDto->white);
+
         $result = [];
 
         foreach ($services as $key => $service) {
+//            dd($service);
+
             switch ($service['type']) {
                 case 'Package':
                 case 'Subscriptions ':
@@ -64,9 +69,19 @@ class SmmService extends MainService
                 case 'Poll':
                     if (str_contains($service['category'], $social->name_en)) {
 
-                        array_push($result, [
-                            'name_category' => $service['category'],
-                        ]);
+                        if (!is_null($botDto->white)) {
+                            if (in_array($service['service'], $white_array)) {
+                                array_push($result, [
+                                    'name_category' => $service['category'],
+                                ]);
+                            } else {
+                                break;
+                            }
+                        } else {
+                            array_push($result, [
+                                'name_category' => $service['category'],
+                            ]);
+                        }
                     }
             }
         }
