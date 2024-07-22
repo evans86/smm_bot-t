@@ -71,27 +71,27 @@ class SmmService extends MainService
         return $result;
     }
 
-    /**
-     * Формирование массива соц.сетей
-     *
-     * @param $socials
-     * @return array
-     */
-    public function formingSocialArrays($socials)
-    {
-        $result = [];
-
-        foreach ($socials as $key => $social) {
-            array_push($result, [
-                'id' => $social->id,
-                'name_en' => $social->name_en,
-                'name_ru' => $social->name_ru,
-                'image' => $social->image,
-            ]);
-        }
-
-        return $result;
-    }
+//    /**
+//     * Формирование массива соц.сетей
+//     *
+//     * @param $socials
+//     * @return array
+//     */
+//    public function formingSocialArrays($socials)
+//    {
+//        $result = [];
+//
+//        foreach ($socials as $key => $social) {
+//            array_push($result, [
+//                'id' => $social->id,
+//                'name_en' => $social->name_en,
+//                'name_ru' => $social->name_ru,
+//                'image' => $social->image,
+//            ]);
+//        }
+//
+//        return $result;
+//    }
 
     /**
      * формирование массива категорий
@@ -148,46 +148,46 @@ class SmmService extends MainService
         return $result;
     }
 
-    /**
-     * формирование массива категорий
-     *
-     * @param BotDto $botDto
-     * @param $social
-     * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function formingCategoriesArrays(BotDto $botDto, $social)
-    {
-        $partnerApi = new PartnerApi($botDto->api_key);
-        $services = $partnerApi->services();
-        $social = Social::query()->where(['id' => $social])->first();
-
-        $result = [];
-
-        foreach ($services as $key => $service) {
-
-            switch ($service['type']) {
-                case 'Package':
-                case 'Subscriptions ':
-                case 'Custom Comments':
-                case 'Mentions User Followers':
-                case 'Custom Comments Package':
-                    break;
-                case 'Default':
-                case 'Poll':
-                    if (str_contains($service['category'], $social->name_en)) {
-
-                        array_push($result, [
-                            'name_category' => $service['category'],
-                        ]);
-                    }
-            }
-        }
-
-        $result = array_unique($result, SORT_REGULAR);
-
-        return $result;
-    }
+//    /**
+//     * формирование массива категорий
+//     *
+//     * @param BotDto $botDto
+//     * @param $social
+//     * @return array
+//     * @throws \GuzzleHttp\Exception\GuzzleException
+//     */
+//    public function formingCategoriesArrays(BotDto $botDto, $social)
+//    {
+//        $partnerApi = new PartnerApi($botDto->api_key);
+//        $services = $partnerApi->services();
+//        $social = Social::query()->where(['id' => $social])->first();
+//
+//        $result = [];
+//
+//        foreach ($services as $key => $service) {
+//
+//            switch ($service['type']) {
+//                case 'Package':
+//                case 'Subscriptions ':
+//                case 'Custom Comments':
+//                case 'Mentions User Followers':
+//                case 'Custom Comments Package':
+//                    break;
+//                case 'Default':
+//                case 'Poll':
+//                    if (str_contains($service['category'], $social->name_en)) {
+//
+//                        array_push($result, [
+//                            'name_category' => $service['category'],
+//                        ]);
+//                    }
+//            }
+//        }
+//
+//        $result = array_unique($result, SORT_REGULAR);
+//
+//        return $result;
+//    }
 
     /**
      * Формирование массива типа товаров
