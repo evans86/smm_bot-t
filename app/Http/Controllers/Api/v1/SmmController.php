@@ -28,9 +28,17 @@ class SmmController extends Controller
      *
      * @return array|string
      */
-    public function getSocial()
+    public function getSocial(Request $request)
     {
         try {
+//            if (is_null($request->public_key))
+//                return ApiHelpers::error('Not found params: public_key');
+//
+//            $bot = Bot::query()->where('public_key', $request->public_key)->first();
+//            if (empty($bot))
+//                return ApiHelpers::error('Not found module.');
+//
+//            $botDto = BotFactory::fromEntity($bot);
 
             $socials = \Cache::get('social');
             if($socials === null){
@@ -38,7 +46,14 @@ class SmmController extends Controller
                 \Cache::put('social', $socials, 900);
             }
 
-            $result = $this->smmService->formingSocialArray($socials);
+//            $result = $this->smmService->formingSocialArray(
+//                $socials,
+//                $botDto
+//            );
+
+            $result = $this->smmService->formingSocialArrays(
+                $socials
+            );
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $r) {
@@ -70,7 +85,9 @@ class SmmController extends Controller
 
             $botDto = BotFactory::fromEntity($bot);
 
-            $result = $this->smmService->formingCategoriesArray($botDto, $request->social);
+//            $result = $this->smmService->formingCategoriesArray($botDto, $request->social);
+
+            $result = $this->smmService->formingCategoriesArrays($botDto, $request->social);
 
             return ApiHelpers::success($result);
         } catch (\RuntimeException $r) {
