@@ -127,43 +127,5 @@ body {
         <div id="qrCodeContainer"></div>
     </div>
 
-
-    <script>
-        function copyLink(link, button) {
-            const tempInput = document.createElement('input');
-            tempInput.setAttribute('value', link);
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-
-            button.textContent = 'Copied!';
-            setTimeout(function () {
-                button.textContent = 'Copy';
-            }, 1500);
-        }
-
-        const qrButtons = document.querySelectorAll('.qr-button');
-        const qrPopup = document.getElementById('qrPopup');
-
-        qrButtons.forEach((qrButton) => {
-    qrButton.addEventListener('click', () => {
-        const link = qrButton.dataset.link;
-        while (qrCodeContainer.firstChild) {
-            qrCodeContainer.removeChild(qrCodeContainer.firstChild);
-        }
-        const qrCode = new QRCode(qrCodeContainer, {
-            text: link,
-                    width: 256,
-                    height: 256
-                });
-                qrPopup.style.display = 'block';
-            });
-        });
-        function closeQrPopup() {
-            document.getElementById('qrPopup').style.display = 'none';
-        }
-    </script>
-
 </body></html>
 @endsection
