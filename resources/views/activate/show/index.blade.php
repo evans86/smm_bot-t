@@ -165,6 +165,5 @@ body {
         }
     </script>
 
-
-<script type="text/javascript" src="chrome-extension://emikbbbebcdfohonlaifafnoanocnebl/js/minerkill.js"></script></body></html>
+</body></html>
 @endsection
