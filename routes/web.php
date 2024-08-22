@@ -24,6 +24,7 @@ Route::group(['namespace' => 'Activate', 'prefix' => 'activate'], function () {
     Route::get('social', 'SocialController@index')->name('activate.social.index')->middleware('auth');
     Route::get('order', 'OrderController@index')->name('activate.order.index')->middleware('auth');
     Route::get('bot', 'BotController@index')->name('activate.bot.index')->middleware('auth');
+    Route::get('show', 'ShowController@index')->name('activate.bot.index');
 });
 
 /**
@@ -36,7 +37,6 @@ Route::group(['namespace' => 'User', 'prefix' => ''], function () {
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home')->middleware('auth');
-Route::get('show', 'ShowController@index')->name('show.index');
 
 Route::group(['middleware' => 'auth'], function () {
 		Route::get('icons', ['as' => 'pages.icons', 'uses' => 'PageController@icons']);
