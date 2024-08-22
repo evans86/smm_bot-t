@@ -1,3 +1,5 @@
+@extends('layouts.app', ['page' => __('Show'), 'pageSlug' => 'show'])
+
 @section('content')
 
     <h1>User Information</h1>
