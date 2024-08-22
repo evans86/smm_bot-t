@@ -1,73 +1,6 @@
 @section('content')
 <html><head>
     <title>Subscription Information</title>
-    <style>
-body {
-    font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        h1 {
-    margin-top: 0;
-        }
-
-        .link-input {
-    margin-bottom: 10px;
-        }
-
-        .copy-button {
-    margin-left: 10px;
-        }
-
-        .status {
-    display: inline-block;
-    padding: 3px 8px;
-            border-radius: 3px;
-            font-weight: bold;
-            font-size: 16px;
-            line-height: 1;
-        }
-
-        .active {
-    background-color: #4CAF50;
-            color: white;
-        }
-
-        .limited {
-    background-color: #F44336;
-            color: white;
-        }
-
-        .expired {
-    background-color: #FF9800;
-            color: white;
-        }
-
-        .disabled {
-    background-color: #9E9E9E;
-            color: white;
-        }
-
-        .qr-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-            padding: 10px 25px 25px 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            display: none;
-            z-index: 9999;
-        }
-
-        .qr-close-button {
-    text-align: right;
-            margin-bottom: 5px;
-            margin-right: -15px;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -122,7 +55,6 @@ body {
     </ul>
     <div class="qr-popup" id="qrPopup">
         <div class="qr-close-button">
-            <button onclick="closeQrPopup()">X</button>
         </div>
         <div id="qrCodeContainer"></div>
     </div>
