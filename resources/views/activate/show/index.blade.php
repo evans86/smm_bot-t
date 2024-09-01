@@ -1,6 +1,4 @@
-@section('content')
-    <pre style="width: 1423ch; contain-intrinsic-height: 482.4em; content-visibility: visible">
-
+<pre style="width: 1423ch; contain-intrinsic-height: 482.4em; content-visibility: visible">
 #profile-title: base64:VFZDIHwgTUlY
 #profile-update-interval: 1
 #subscription-userinfo: upload=0; download=0; total=10737418240000000; expire=2546249531
