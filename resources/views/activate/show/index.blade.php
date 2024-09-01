@@ -1,5 +1,3 @@
-@extends('layouts.app', ['page' => __('Show'), 'pageSlug' => 'show'])
-
 @section('content')
     <pre style="width: 1423ch; contain-intrinsic-height: 482.4em; content-visibility: visible">
 
@@ -407,5 +405,3 @@ hy2://f40b1e441addaec3@64.176.191.187:443?insecure=1&obfs=salamander&obfs-passwo
 hy2://
 
     </pre>
-
-@endsection
