@@ -32,14 +32,14 @@ Route::get('getCategories', [SmmController::class, 'getCategories']);
 Route::get('getTypes', [SmmController::class, 'getTypes']);
 
 
-Route::get('createOrder', [OrderController::class, 'createOrder']);
-Route::get('getOrder', [OrderController::class, 'getOrder']);
-Route::get('orders', [OrderController::class, 'orders']);
+Route::get('createOrder', [OrderController::class, 'createOrder'])->middleware('throttle_user_secret_key');
+Route::get('getOrder', [OrderController::class, 'getOrder'])->middleware('throttle_user_secret_key');
+Route::get('orders', [OrderController::class, 'orders'])->middleware('throttle_user_secret_key');
 
 /**
  * Роуты API (пользователи)
  */
-Route::get('setLanguage', [UserController::class, 'setLanguage']);
+Route::get('setLanguage', [UserController::class, 'setLanguage'])->middleware('throttle_user_secret_key');
 Route::get('getUser', [UserController::class, 'getUser']);
 
 /**
