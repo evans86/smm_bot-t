@@ -33,8 +33,8 @@ Route::get('getTypes', [SmmController::class, 'getTypes']);
 
 
 Route::get('createOrder', [OrderController::class, 'createOrder'])->middleware('throttle_user_secret_key');
-Route::get('getOrder', [OrderController::class, 'getOrder'])->middleware('throttle_user_secret_key');
-Route::get('orders', [OrderController::class, 'orders'])->middleware('throttle_user_secret_key');
+Route::get('getOrder', [OrderController::class, 'getOrder']);
+Route::get('orders', [OrderController::class, 'orders']);
 
 /**
  * Роуты API (пользователи)
