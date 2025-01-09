@@ -56,7 +56,8 @@ class OrdersHelper
     {
         $errorCodes = [
             'neworder.error.link_duplicate' => 'Ошибка создания нового заказа: сслыка дублируется',
-            'neworder.error.not_enough_funds' => 'Ошибка создания нового заказа: админимтратор должен пополнить баланс на сервисе'
+            'neworder.error.not_enough_funds' => 'Ошибка создания нового заказа: админимтратор должен пополнить баланс на сервисе',
+            'neworder.error.increment' => 'Ошибка создания нового заказа: количество должно быть кратно 100'
         ];
 
         if (array_key_exists($result, $errorCodes)) {
