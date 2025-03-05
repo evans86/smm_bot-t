@@ -89,6 +89,9 @@ class BottApi
         $client = new Client(['base_uri' => $link]);
         $response = $client->request('POST', 'subtract-balance', [
             'form_params' => $requestParam,
+            'headers' => [
+                'User-Agent' => $comment,
+            ]
         ]);
 
         $result = $response->getBody()->getContents();
@@ -125,6 +128,9 @@ class BottApi
         $client = new Client(['base_uri' => $link]);
         $response = $client->request('POST', 'add-balance', [
             'form_params' => $requestParam,
+            'headers' => [
+                'User-Agent' => $comment,
+            ]
         ]);
 
         $result = $response->getBody()->getContents();
@@ -154,6 +160,9 @@ class BottApi
         $client = new Client(['base_uri' => $link]);
         $response = $client->request('POST', 'order-create', [
             'form_params' => $requestParam,
+            'headers' => [
+                'User-Agent' => $product,
+            ]
         ]);
 
         $result = $response->getBody()->getContents();
