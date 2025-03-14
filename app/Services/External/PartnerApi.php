@@ -4,6 +4,7 @@ namespace App\Services\External;
 
 use App\Helpers\BotLogHelpers;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class PartnerApi
 {
@@ -20,18 +21,23 @@ class PartnerApi
      * Массив товаров (типов), содержит всю информацию
      *
      * @return mixed
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function services()
     {
         try {
             $requestParam = [
                 'key' => $this->apiKey,
-                'action' => __FUNCTION__,
+                'action' => 'services',
             ];
 
             $client = new Client(['base_uri' => self::HOST]);
-            $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $response = $client->post('v2', [
+                'form_params' => $requestParam, // Параметры передаются в теле POST-запроса
+            ]);
+
+//            $client = new Client(['base_uri' => self::HOST]);
+//            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
@@ -46,19 +52,24 @@ class PartnerApi
      *
      * @param $order
      * @return mixed
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function status($order)
     {
         try {
             $requestParam = [
                 'key' => $this->apiKey,
-                'action' => __FUNCTION__,
+                'action' => 'status',
                 'order' => $order
             ];
 
             $client = new Client(['base_uri' => self::HOST]);
-            $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $response = $client->post('v2', [
+                'form_params' => $requestParam, // Параметры передаются в теле POST-запроса
+            ]);
+
+//            $client = new Client(['base_uri' => self::HOST]);
+//            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
@@ -86,7 +97,7 @@ class PartnerApi
      * @param $runs
      * @param $interval
      * @return mixed
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function add(
         $type_id,
@@ -108,7 +119,7 @@ class PartnerApi
         try {
             $requestParam = [
                 'key' => $this->apiKey,
-                'action' => __FUNCTION__,
+                'action' => 'add',
 
                 'service' => $type_id,
                 'link' => $link,
@@ -126,8 +137,13 @@ class PartnerApi
                 'interval' => $interval,
             ];
 
+//            $client = new Client(['base_uri' => self::HOST]);
+//            $response = $client->post('v2' . '?' . http_build_query($requestParam));
+
             $client = new Client(['base_uri' => self::HOST]);
-            $response = $client->post('v2' . '?' . http_build_query($requestParam));
+            $response = $client->post('v2', [
+                'form_params' => $requestParam, // Параметры передаются в теле POST-запроса
+            ]);
 
             $result = $response->getBody()->getContents();
             return json_decode($result, true);
