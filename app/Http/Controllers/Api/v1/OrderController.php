@@ -56,6 +56,8 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
             $result = BottApi::checkUser(
                 $request->user_id,
                 $request->user_secret_key,
@@ -109,6 +111,8 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found params: user_secret_key');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
             $result = BottApi::checkUser(
                 $request->user_id,
                 $request->user_secret_key,
@@ -161,6 +165,8 @@ class OrderController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
             $result = BottApi::checkUser(
                 $request->user_id,
                 $request->user_secret_key,

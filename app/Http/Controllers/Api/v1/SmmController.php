@@ -39,6 +39,8 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
 
             $socials = \Cache::get('social');
             if($socials === null){
@@ -84,6 +86,8 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
 
             $result = $this->smmService->formingCategoriesArray($botDto, $request->social);
 
@@ -118,6 +122,8 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
+            if ($botDto->version != 2)
+                return ApiHelpers::error('Fatal Error');
 
             $result = $this->smmService->formingTypesArray(
                 $botDto,
