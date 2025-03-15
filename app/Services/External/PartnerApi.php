@@ -42,7 +42,8 @@ class PartnerApi
 
             $result = $response->getBody()->getContents();
             if (preg_match('/\berror\b/', $result)) {
-                throw new RuntimeException('Ошибка API');
+                BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . substr($this->apiKey, -10));
+                throw new RuntimeException('Ошибка API: ' . substr($this->apiKey, -10));
             }
 
             return json_decode($result, true);
@@ -78,6 +79,7 @@ class PartnerApi
 
             $result = $response->getBody()->getContents();
             if (preg_match('/\berror\b/', $result)) {
+                BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . substr($this->apiKey, -10));
                 throw new RuntimeException('Ошибка API');
             }
 
@@ -156,6 +158,7 @@ class PartnerApi
 
             $result = $response->getBody()->getContents();
             if (preg_match('/\berror\b/', $result)) {
+                BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . substr($this->apiKey, -10));
                 throw new RuntimeException('Ошибка API');
             }
 
