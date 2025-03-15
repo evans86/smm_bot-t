@@ -5,6 +5,7 @@ namespace App\Services\External;
 use App\Helpers\BotLogHelpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use RuntimeException;
 
 class PartnerApi
 {
@@ -40,10 +41,14 @@ class PartnerApi
 //            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
             $result = $response->getBody()->getContents();
+            if (preg_match('/\berror\b/', $result)) {
+                throw new RuntimeException('Ошибка API');
+            }
+
             return json_decode($result, true);
-        } catch (\RuntimeException $r) {
+        } catch (RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
-            throw new \RuntimeException('Ошибка в получении данных провайдера');
+            throw new RuntimeException('Ошибка в получении данных провайдера');
         }
     }
 
@@ -72,10 +77,14 @@ class PartnerApi
 //            $response = $client->post('v2' . '?' . http_build_query($requestParam));
 
             $result = $response->getBody()->getContents();
+            if (preg_match('/\berror\b/', $result)) {
+                throw new RuntimeException('Ошибка API');
+            }
+
             return json_decode($result, true);
-        } catch (\RuntimeException $r) {
+        } catch (RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
-            throw new \RuntimeException('Ошибка в получении данных провайдера');
+            throw new RuntimeException('Ошибка в получении данных провайдера');
         }
     }
 
@@ -146,10 +155,14 @@ class PartnerApi
             ]);
 
             $result = $response->getBody()->getContents();
+            if (preg_match('/\berror\b/', $result)) {
+                throw new RuntimeException('Ошибка API');
+            }
+
             return json_decode($result, true);
-        } catch (\RuntimeException $r) {
+        } catch (RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
-            throw new \RuntimeException('Ошибка в получении данных провайдера');
+            throw new RuntimeException('Ошибка в получении данных провайдера');
         }
     }
 }
