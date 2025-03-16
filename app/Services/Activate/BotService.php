@@ -28,7 +28,7 @@ class BotService extends MainService
         $bot->api_key = '';
         $bot->category_id = 0;
         $bot->percent = 5;
-        $bot->version = 1;
+        $bot->version = 2;
         $bot->color = 1;
         $bot->black = null;
         $bot->white = null;
