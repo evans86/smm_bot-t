@@ -4,15 +4,16 @@ namespace App\Dto;
 
 class BotDto
 {
-    public int    $id;
+    public int $id;
     public string $public_key;
     public string $private_key;
-    public int    $bot_id;
+    public int $bot_id;
     public string $api_key;
-    public int    $category_id;
-    public int    $percent;
-    public int    $version;
-    public int    $color;
+    public int $category_id;
+    public int $percent;
+    public int $version;
+    public int $color;
+    public bool $is_saved;
     public ?string $black;
     public ?string $white;
     public string $resource_link;
@@ -29,13 +30,22 @@ class BotDto
             'percent' => $this->percent,
             'version' => $this->version,
             'color' => $this->color,
+//            'is_saved' => $this->is_saved,
             'black' => $this->black,
             'white' => $this->white,
 //            'resource_link' => $this->resource_link,
-         ];
+        ];
     }
 
-
+    public function getSettings(): array
+    {
+        return [
+            'color' => $this->color,
+            'black' => $this->black,
+            'white' => $this->white,
+            'is_saved' => $this->is_saved,
+        ];
+    }
 
 
 }

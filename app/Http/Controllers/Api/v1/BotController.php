@@ -116,15 +116,18 @@ class BotController extends Controller
             if (empty($bot))
                 throw new \RuntimeException('Not found module.');
 
-            $botDto = BotFactory::fromEntity($bot);
+            if ($bot->is_saved) {
+                return ApiHelpers::success(BotFactory::fromEntity($bot)->getSettings());
+            } else {
+                $botDto = BotFactory::fromEntity($bot);
 
-            $result = [
-                'color' => $botDto->color,
-                'black' => $botDto->black,
-                'white' => $botDto->white,
-            ];
-
-            return ApiHelpers::success($result);
+                $result = [
+                    'color' => $botDto->color,
+                    'black' => $botDto->black,
+                    'white' => $botDto->white,
+                ];
+                return ApiHelpers::success($result);
+            }
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error($r->getMessage());
