@@ -13,7 +13,7 @@ class BotDto
     public int $percent;
     public int $version;
     public int $color;
-    public bool $is_saved;
+    public ?bool $is_saved;
     public ?string $black;
     public ?string $white;
     public string $resource_link;
