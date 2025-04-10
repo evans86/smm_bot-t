@@ -87,7 +87,7 @@ class PartnerApi
         ]);
 
         // Добавляем HMAC подпись
-        $requestParams['hmac'] = $this->generateHmac($requestParams);
+//        $requestParams['hmac'] = $this->generateHmac($requestParams);
 
         $client = new Client([
             'base_uri' => self::HOST,
