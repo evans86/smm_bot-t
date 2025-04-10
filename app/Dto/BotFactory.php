@@ -18,7 +18,7 @@ class BotFactory
         $dto->private_key = $bot->private_key;
         $dto->bot_id = $bot->bot_id;
         $dto->api_key = $bot->api_key;
-        $dto->setEncryptedApiKey($bot->getRawOriginal('api_key')); // Зашифрованная версия
+        $dto->setEncryptedApiKey($bot->api_key); // Зашифрованная версия
         $dto->category_id = $bot->category_id;
         $dto->percent = $bot->percent;
         $dto->version = $bot->version;
