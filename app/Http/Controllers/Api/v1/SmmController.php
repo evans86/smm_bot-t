@@ -39,7 +39,7 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-            if ($botDto->version != 2) {
+            if ($botDto->version != 3) {
                 BotLogHelpers::notifyBotLog('(🟣KEY не поменял ' . $botDto->bot_id);
                 return ApiHelpers::error('Fatal Error');
             }
@@ -88,7 +88,7 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-            if ($botDto->version != 2) {
+            if ($botDto->version != 3) {
                 BotLogHelpers::notifyBotLog('(🟣KEY не поменял ' . $botDto->bot_id);
                 return ApiHelpers::error('Fatal Error');
             }
@@ -126,7 +126,7 @@ class SmmController extends Controller
                 return ApiHelpers::error('Not found module.');
 
             $botDto = BotFactory::fromEntity($bot);
-            if ($botDto->version != 2) {
+            if ($botDto->version != 3) {
                 BotLogHelpers::notifyBotLog('(🟣KEY не поменял ' . $botDto->bot_id);
                 return ApiHelpers::error('Fatal Error');
             }
