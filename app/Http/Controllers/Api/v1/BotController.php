@@ -35,6 +35,7 @@ class BotController extends Controller
 
     /**
      * Запрос создания веб–модуля
+     * добавить возврат ключа в виде
      *
      * @param BotCreateRequest $request
      * @return array|string
@@ -60,6 +61,7 @@ class BotController extends Controller
 
     /**
      * Получение актуальных настроек
+     * добавить возврат ключа в виде
      *
      * @param BotGetRequest $request
      * @return array|string
@@ -67,9 +69,14 @@ class BotController extends Controller
     public function get(BotGetRequest $request)
     {
         try {
-            $bot = Bot::query()->where('public_key', $request->public_key)->where('private_key', $request->private_key)->first();
+            $bot = Bot::query()
+                ->where('public_key', $request->public_key)
+                ->where('private_key', $request->private_key)
+                ->first();
+
             if (empty($bot))
                 return ApiHelpers::error('Not found module.');
+
             return ApiHelpers::success(BotFactory::fromEntity($bot)->getArray());
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
@@ -91,7 +98,12 @@ class BotController extends Controller
     {
         try {
             $bot = $this->botService->update($request->getDto());
-            $bot = Bot::query()->where('public_key', $bot->public_key)->where('private_key', $bot->private_key)->first();
+
+//            $bot = Bot::query()
+//                ->where('public_key', $bot->public_key)
+//                ->where('private_key', $bot->private_key)
+//                ->first();
+
             return ApiHelpers::success(BotFactory::fromEntity($bot)->getArray());
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());

@@ -46,6 +46,4 @@ class BotDto
             'is_saved' => $this->is_saved,
         ];
     }
-
-
 }

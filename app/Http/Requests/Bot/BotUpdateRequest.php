@@ -21,13 +21,27 @@ class BotUpdateRequest extends FormRequest
             'id' => 'required|integer',
             'public_key' => 'required|string',
             'private_key' => 'required|string',
-            'version' => 'required|integer|min:2|max:2',
+            'version' => 'required|integer|min:3|max:3',
             'category_id' => 'required|integer|min:1',
             'percent' => 'required|integer|min:0',
             'color' => 'required|integer|min:1|max:6',
             'black' => 'nullable|string',
             'white' => 'nullable|string',
-            'api_key' => 'required|string',
+            'api_key' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    // Пропускаем проверку для маскированных ключей
+                    if (strpos($value, '****') === 0) {
+                        return;
+                    }
+
+                    // Проверяем формат ключа (32 символа, hex)
+                    if (!preg_match('/^[a-f0-9]{32}$/i', $value)) {
+                        $fail('API key must be 32-character hexadecimal string');
+                    }
+                }
+            ],
             'resource_link' => 'string|nullable',
         ];
     }

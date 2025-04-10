@@ -28,7 +28,7 @@ class BotService extends MainService
         $bot->api_key = '';
         $bot->category_id = 0;
         $bot->percent = 5;
-        $bot->version = 2;
+        $bot->version = 3;
         $bot->color = 1;
         $bot->black = null;
         $bot->white = null;
@@ -46,19 +46,29 @@ class BotService extends MainService
      */
     public function update(BotDto $dto): Bot
     {
-        $bot = Bot::query()->where('public_key', $dto->public_key)->where('private_key', $dto->private_key)->first();
+        $bot = Bot::query()
+            ->where('public_key', $dto->public_key)
+            ->where('private_key', $dto->private_key)
+            ->first();
+
         if (empty($bot))
             return ApiHelpers::error('Not found module.');
+
+        // Обновляем только если ключ не замаскирован
+        if (strpos($dto->api_key, '****') === false) {
+            $bot->api_key = $dto->api_key; // Автоматически зашифруется через мутатор
+        }
         $bot->version = $dto->version;
         $bot->percent = $dto->percent;
-        $bot->api_key = $dto->api_key;
         $bot->color = $dto->color;
         $bot->black = $dto->black;
         $bot->white = $dto->white;
         $bot->category_id = $dto->category_id;
         $bot->resource_link = $dto->resource_link;
+
         if (!$bot->save())
             throw new \RuntimeException('bot dont save');
+
         return $bot;
     }
 
