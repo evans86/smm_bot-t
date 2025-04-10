@@ -34,7 +34,7 @@ class SubscriptionsConcreteStrategy extends MainConcreteStrategy implements Orde
         $min = $request->min;
         $max = $request->max;
 
-        $partnerApi = new PartnerApi($this->botDto->api_key);
+        $partnerApi = new PartnerApi($this->botDto->getEncryptedApiKey());
 
         $order = $partnerApi->add(
             $type_id, //id товара в ресрусе

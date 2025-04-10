@@ -31,7 +31,7 @@ class MentionsUserConcreteStrategy extends MainConcreteStrategy implements Order
         $quantity = $request->quantity;
         $username = $request->username;
 
-        $partnerApi = new PartnerApi($this->botDto->api_key);
+        $partnerApi = new PartnerApi($this->botDto->getEncryptedApiKey());
 
         $order = $partnerApi->add(
             $type_id, //id товара в ресрусе

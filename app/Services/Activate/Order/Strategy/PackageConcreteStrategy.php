@@ -25,7 +25,7 @@ class PackageConcreteStrategy extends MainConcreteStrategy implements OrderInter
         $type_id = $request->type_id;
         $link = $request->link;
 
-        $partnerApi = new PartnerApi($this->botDto->api_key);
+        $partnerApi = new PartnerApi($this->botDto->getEncryptedApiKey());
 
         $order = $partnerApi->add(
             $type_id, //id товара в ресрусе

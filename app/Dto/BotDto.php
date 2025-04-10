@@ -9,6 +9,7 @@ class BotDto
     public string $private_key;
     public int $bot_id;
     public string $api_key;
+    private ?string $encrypted_api_key = null; // Зашифрованная версия
     public int $category_id;
     public int $percent;
     public int $version;
@@ -17,6 +18,19 @@ class BotDto
     public ?string $black;
     public ?string $white;
     public string $resource_link;
+
+    public function getEncryptedApiKey(): string
+    {
+        if ($this->encrypted_api_key === null) {
+            throw new \RuntimeException('Encrypted API key not available');
+        }
+        return $this->encrypted_api_key;
+    }
+
+    public function setEncryptedApiKey(string $encryptedKey): void
+    {
+        $this->encrypted_api_key = $encryptedKey;
+    }
 
     public function getArray(): array
     {

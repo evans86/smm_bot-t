@@ -20,10 +20,10 @@ class PartnerApi
     private string $clientIp;
     private string $userAgent;
 
-    public function __construct(string $possiblyEncryptedApiKey)
+    public function __construct(string $encryptedApiKey)
     {
         // Дешифровка ключа (если он зашифрован)
-        $this->realApiKey = $this->decryptApiKey($possiblyEncryptedApiKey);
+        $this->realApiKey = $this->decryptApiKey($encryptedApiKey);
 
         // Получаем данные о клиенте
         $this->clientIp = request()->ip();
@@ -39,9 +39,9 @@ class PartnerApi
     private function decryptApiKey(string $key): string
     {
         // Если ключ не зашифрован (не начинается с префикса шифрования Laravel)
-        if (!str_starts_with($key, 'eyJpdiI6')) {
-            return $key;
-        }
+//        if (!str_starts_with($key, 'eyJpdiI6')) {
+//            return $key;
+//        }
 
         try {
             return Crypt::decryptString($key);
@@ -86,7 +86,7 @@ class PartnerApi
             'timestamp' => time(),
         ]);
 
-        BotLogHelpers::notifyBotLog('ЧТО с КЛЮЧОМ: ' . $this->realApiKey);
+//        BotLogHelpers::notifyBotLog('ЧТО с КЛЮЧОМ: ' . $this->realApiKey);
 
         // Добавляем HMAC подпись
 //        $requestParams['hmac'] = $this->generateHmac($requestParams);
