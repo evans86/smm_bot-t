@@ -86,6 +86,8 @@ class PartnerApi
             'timestamp' => time(),
         ]);
 
+        BotLogHelpers::notifyBotLog('ЧТО с КЛЮЧОМ: ' . $this->realApiKey);
+
         // Добавляем HMAC подпись
 //        $requestParams['hmac'] = $this->generateHmac($requestParams);
 
