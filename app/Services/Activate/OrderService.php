@@ -140,7 +140,7 @@ class OrderService extends MainService
      */
     public function order(BotDto $botDto, Order $order)
     {
-        $partnerApi = new PartnerApi($botDto->api_key);
+        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
         $request_order = $partnerApi->status($order->order_id);
 
         if ($order->created_at < Carbon::now()->subMonth())
@@ -167,7 +167,7 @@ class OrderService extends MainService
      */
     public function getServiceInform(BotDto $botDto, $service_id)
     {
-        $partnerApi = new PartnerApi($botDto->api_key);
+        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
         $services = $partnerApi->services();
 
         $result = [];

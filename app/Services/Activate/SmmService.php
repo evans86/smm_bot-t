@@ -21,7 +21,7 @@ class SmmService extends MainService
      */
     public function formingSocialArray($socials, BotDto $botDto)
     {
-        $partnerApi = new PartnerApi($botDto->api_key);
+        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
         $services = $partnerApi->services();
 
         if (!is_null($botDto->white))
@@ -103,7 +103,7 @@ class SmmService extends MainService
      */
     public function formingCategoriesArray(BotDto $botDto, $social)
     {
-        $partnerApi = new PartnerApi($botDto->api_key);
+        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
         $services = $partnerApi->services();
         $social = Social::query()->where(['id' => $social])->first();
 
@@ -199,7 +199,7 @@ class SmmService extends MainService
      */
     public function formingTypesArray(BotDto $botDto, $name_category)
     {
-        $partnerApi = new PartnerApi($botDto->api_key);
+        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
         $services = $partnerApi->services();
 
         $result = [];
