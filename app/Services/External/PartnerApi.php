@@ -56,7 +56,7 @@ class PartnerApi
      */
     private function logAccess(): void
     {
-        BotLogHelpers::notifyBotLog("API access from IP: {$this->clientIp}, User-Agent: {$this->userAgent}");
+//        BotLogHelpers::notifyBotLog("API access from IP: {$this->clientIp}, User-Agent: {$this->userAgent}");
 
         Log::channel('api_audit')->info('API initialized', [
             'ip' => $this->clientIp,
