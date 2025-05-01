@@ -8,7 +8,7 @@ class BotDto
     public string $public_key;
     public string $private_key;
     public int $bot_id;
-    public string $api_key;
+    public ?string $api_key;
     private ?string $encrypted_api_key = null; // Зашифрованная версия
     public int $category_id;
     public int $percent;
@@ -17,7 +17,7 @@ class BotDto
     public ?bool $is_saved;
     public ?string $black;
     public ?string $white;
-    public string $resource_link;
+    public ?string $resource_link;
 
     public function getEncryptedApiKey(): string
     {

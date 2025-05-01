@@ -25,7 +25,7 @@ class BotService extends MainService
         $bot->public_key = $public_key;
         $bot->private_key = $private_key;
         $bot->bot_id = $bot_id;
-        $bot->api_key = '';
+        $bot->api_key = null;
         $bot->category_id = 0;
         $bot->percent = 5;
         $bot->version = 3;
