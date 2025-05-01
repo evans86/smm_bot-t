@@ -27,7 +27,7 @@ class BotDto
         return $this->encrypted_api_key;
     }
 
-    public function setEncryptedApiKey(string $encryptedKey): void
+    public function setEncryptedApiKey(?string $encryptedKey): void
     {
         $this->encrypted_api_key = $encryptedKey;
     }
