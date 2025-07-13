@@ -220,38 +220,81 @@ class OrderService extends MainService
         }
     }
 
+//    public function notifyTelegram($text)
+//    {
+//        $client = new Client();
+//
+//        $ids = [
+//            6715142449,
+////            778591134
+//        ];
+//
+//        //CronLogBot#1
+//        try {
+//            foreach ($ids as $id) {
+//                $client->post('https://api.telegram.org/bot6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY/sendMessage', [
+//
+//                    RequestOptions::JSON => [
+//                        'chat_id' => $id,
+//                        'text' => $text,
+//                    ]
+//                ]);
+//            }
+//            //CronLogBot#2
+//        } catch (\Exception $e) {
+//            foreach ($ids as $id) {
+//                $client->post('https://api.telegram.org/bot6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg/sendMessage', [
+//
+//                    RequestOptions::JSON => [
+//                        'chat_id' => $id,
+//                        'text' => $text,
+//                    ]
+//                ]);
+//            }
+//        }
+//    }
+
     public function notifyTelegram($text)
     {
-        $client = new Client();
+        $client = new Client([
+            'curl' => [
+                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4, // Принудительно IPv4
+            ],
+            'timeout' => 10,
+            'connect_timeout' => 5,
+        ]);
 
-        $ids = [
-            6715142449,
-//            778591134
+        $ids = [6715142449]; // Список chat_id
+        $bots = [
+            '6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY', // Основной бот
+            '6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg'  // Резервный бот
         ];
 
-        //CronLogBot#1
-        try {
-            foreach ($ids as $id) {
-                $client->post('https://api.telegram.org/bot6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY/sendMessage', [
+        // Если текст пустой, заменяем его на заглушку (или оставляем пустым)
+        $message = ($text === '') ? '[Empty message]' : $text;
 
-                    RequestOptions::JSON => [
-                        'chat_id' => $id,
-                        'text' => $text,
-                    ]
-                ]);
-            }
-            //CronLogBot#2
-        } catch (\Exception $e) {
-            foreach ($ids as $id) {
-                $client->post('https://api.telegram.org/bot6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg/sendMessage', [
+        $lastError = null;
 
-                    RequestOptions::JSON => [
-                        'chat_id' => $id,
-                        'text' => $text,
-                    ]
-                ]);
+        foreach ($bots as $botToken) {
+            try {
+                foreach ($ids as $id) {
+                    $client->post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                        RequestOptions::JSON => [
+                            'chat_id' => $id,
+                            'text' => $message,
+                        ],
+                    ]);
+                }
+                return true; // Успешно отправлено
+            } catch (\Exception $e) {
+                $lastError = $e;
+                continue; // Пробуем следующего бота
             }
         }
+
+        // Если все боты не сработали, логируем ошибку (или просто игнорируем)
+        error_log("Telegram send failed: " . $lastError->getMessage());
+        return false;
     }
 }
 
