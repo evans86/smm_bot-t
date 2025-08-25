@@ -7,16 +7,46 @@ use GuzzleHttp\RequestOptions;
 
 class BotLogHelpers
 {
-    public static function notifyBotLog($message)
+    public static function notifyBotLog($text)
     {
-        $client = new Client();
-
-        $client->post('https://api.telegram.org/bot6967494667:AAHx-f9rORNBcHM7DqTUx2EBhGTxVVUvesA/sendMessage', [
-
-            RequestOptions::JSON => [
-                'chat_id' => 6715142449,
-                'text' => $message,
-            ]
+        $client = new Client([
+            'curl' => [
+                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4, // Принудительно IPv4
+            ],
+            'timeout' => 10,
+            'connect_timeout' => 5,
         ]);
+
+        $ids = [6715142449]; // Список chat_id
+        $bots = [
+            '6967494667:AAHx-f9rORNBcHM7DqTUx2EBhGTxVVUvesA', // Основной бот
+            '8206353450:AAERaeApwW9iDEa5Nik7fqugQu2eroXNLPQ'  // Резервный бот
+        ];
+
+        // Если текст пустой, заменяем его на заглушку (или оставляем пустым)
+        $message = ($text === '') ? '[Empty message]' : $text;
+
+        $lastError = null;
+
+        foreach ($bots as $botToken) {
+            try {
+                foreach ($ids as $id) {
+                    $client->post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                        RequestOptions::JSON => [
+                            'chat_id' => $id,
+                            'text' => $message,
+                        ],
+                    ]);
+                }
+                return true; // Успешно отправлено
+            } catch (\Exception $e) {
+                $lastError = $e;
+                continue; // Пробуем следующего бота
+            }
+        }
+
+        // Если все боты не сработали, логируем ошибку (или просто игнорируем)
+        error_log("Telegram send failed: " . $lastError->getMessage());
+        return false;
     }
 }
