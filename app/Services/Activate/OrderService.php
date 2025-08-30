@@ -266,8 +266,8 @@ class OrderService extends MainService
 
         $ids = [6715142449]; // Список chat_id
         $bots = [
-            '6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY', // Основной бот
-            '6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg'  // Резервный бот
+            config('services.bot_api_keys.cron_log_bot_1'), // Основной бот
+            config('services.bot_api_keys.cron_log_bot_2')  // Резервный бот
         ];
 
         // Если текст пустой, заменяем его на заглушку (или оставляем пустым)

@@ -19,8 +19,8 @@ class BotLogHelpers
 
         $ids = [6715142449]; // Список chat_id
         $bots = [
-            '6967494667:AAHx-f9rORNBcHM7DqTUx2EBhGTxVVUvesA', // Основной бот
-            '8206353450:AAERaeApwW9iDEa5Nik7fqugQu2eroXNLPQ'  // Резервный бот
+            config('services.bot_api_keys.modules_log_bot_1'), // Основной бот
+            config('services.bot_api_keys.modules_log_bot_2')  // Резервный бот
         ];
 
         // Если текст пустой, заменяем его на заглушку (или оставляем пустым)
