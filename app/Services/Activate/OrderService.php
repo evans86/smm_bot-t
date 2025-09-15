@@ -84,8 +84,8 @@ class OrderService extends MainService
             'user_id' => $user->id,
             'bot_id' => $botDto->id,
             'order_id' => $order_id,
-            'start_count' => $request->quantity,
-            'remains' => $request->quantity,
+            'start_count' => $request->quantity === '' ? null : (int)$request->quantity,
+            'remains' => $request->quantity === '' ? null : (int)$request->quantity,
             'type' => $type,
             'type_name' => $service_name,
             'type_id' => $request->type_id,
@@ -148,8 +148,13 @@ class OrderService extends MainService
         else
             $status = $request_order['status'];
 
-        isset($request_order['start_count']) ? $start_count = $request_order['start_count'] : $start_count = null;
-        isset($request_order['remains']) ? $remains = $request_order['remains'] : $remains = null;
+        $start_count = isset($request_order['start_count']) && $request_order['start_count'] !== ''
+            ? (int)$request_order['start_count']
+            : null;
+
+        $remains = isset($request_order['remains']) && $request_order['remains'] !== ''
+            ? (int)$request_order['remains']
+            : null;
 
         $order->status = $status;
         $order->start_count = $start_count;
