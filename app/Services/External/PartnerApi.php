@@ -110,7 +110,7 @@ class PartnerApi
 
             return $result;
         } catch (GuzzleException $e) {
-            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
+//            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             $this->logError($action, $e);
             throw new RuntimeException('API request failed');
         }
