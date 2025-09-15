@@ -247,7 +247,7 @@ class OrderService extends MainService
         } catch (\Exception $e) {
             $errorMsg = "Cron Error: " . $e->getMessage();
             file_put_contents($logFile, $errorMsg . "\n", FILE_APPEND);
-            $this->notifyTelegram('🔴 ' . $errorMsg);
+//            $this->notifyTelegram('🔴 ' . $errorMsg);
         }
     }
 
