@@ -140,27 +140,39 @@ class OrderService extends MainService
      */
     public function order(BotDto $botDto, Order $order)
     {
-        $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
-        $request_order = $partnerApi->status($order->order_id);
+        try {
+            $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
+            $request_order = $partnerApi->status($order->order_id);
 
-        if ($order->created_at < Carbon::now()->subMonth())
-            $status = Order::OLD_STATUS;
-        else
-            $status = $request_order['status'];
+            if ($order->created_at < Carbon::now()->subMonth())
+                $status = Order::OLD_STATUS;
+            else
+                $status = $request_order['status'];
 
-        $start_count = isset($request_order['start_count']) && $request_order['start_count'] !== ''
-            ? (int)$request_order['start_count']
-            : null;
+            $start_count = isset($request_order['start_count']) && $request_order['start_count'] !== ''
+                ? (int)$request_order['start_count']
+                : null;
 
-        $remains = isset($request_order['remains']) && $request_order['remains'] !== ''
-            ? (int)$request_order['remains']
-            : null;
+            $remains = isset($request_order['remains']) && $request_order['remains'] !== ''
+                ? (int)$request_order['remains']
+                : null;
 
-        $order->status = $status;
-        $order->start_count = $start_count;
-        $order->remains = $remains;
+            $order->status = $status;
+            $order->start_count = $start_count;
+            $order->remains = $remains;
 
-        $order->save();
+            $order->save();
+        } catch (\Exception $e) {
+            // Логируем ошибку, но не прерываем выполнение
+            \Log::error("Order update failed: {$e->getMessage()}", [
+                'order_id' => $order->id,
+                'bot_id' => $botDto->id
+            ]);
+
+            // Помечаем заказ как проблемный или оставляем как есть
+            $order->status = Order::OLD_STATUS; // или другой статус
+            $order->save();
+        }
     }
 
     /**
