@@ -199,63 +199,83 @@ class OrderService extends MainService
      */
     public function cronUpdateOrders()
     {
+        $logFile = storage_path('logs/order_cron.log');
+        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Cron started\n", FILE_APPEND);
+
         try {
             $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
-            $orders = Order::query()->whereIn('status', $statuses)->get();
+            $total = Order::query()->whereIn('status', $statuses)->count();
 
-            echo "START count:" . count($orders) . PHP_EOL;
+            file_put_contents($logFile, "Total orders: $total\n", FILE_APPEND);
+            $this->notifyTelegram("Smm Start: $total orders");
 
-            $start_text = "Smm Start count: " . count($orders) . PHP_EOL;
-            $this->notifyTelegram($start_text);
+            $processed = 0;
+            $errors = 0;
 
-            foreach ($orders as $key => $order) {
-                echo "START" . $order->id . PHP_EOL;
+            Order::query()
+                ->whereIn('status', $statuses)
+                ->with('bot') // eager loading для избежания N+1
+                ->chunk(50, function ($orders) use (&$processed, &$errors, $total, $logFile) {
+                    foreach ($orders as $order) {
+                        try {
+                            $botDto = BotFactory::fromEntity($order->bot);
+                            $this->order($botDto, $order);
+                            $processed++;
 
-                $botDto = BotFactory::fromEntity($order->bot);
-                $this->order($botDto, $order);
+                        } catch (\Exception $e) {
+                            $errors++;
+                            file_put_contents($logFile, "Error order {$order->id}: " . $e->getMessage() . "\n", FILE_APPEND);
+                        }
 
-                echo "FINISH" . $order->id . PHP_EOL;
-            }
+                        // Логируем прогресс
+                        if ($processed % 100 === 0) {
+                            $progress = "Processed: $processed/$total, Errors: $errors";
+                            file_put_contents($logFile, $progress . "\n", FILE_APPEND);
+                        }
 
-            $finish_text = "Smm finish count: " . count($orders) . PHP_EOL;
-            $this->notifyTelegram($finish_text);
+                        unset($order, $botDto);
+                        if ($processed % 10 === 0) {
+                            gc_collect_cycles();
+                        }
+                    }
+                });
+
+            $message = "Smm finish: $processed processed, $errors errors";
+            file_put_contents($logFile, $message . "\n", FILE_APPEND);
+            $this->notifyTelegram($message);
 
         } catch (\Exception $e) {
-            $this->notifyTelegram('🔴' . $e->getMessage());
+            $errorMsg = "Cron Error: " . $e->getMessage();
+            file_put_contents($logFile, $errorMsg . "\n", FILE_APPEND);
+            $this->notifyTelegram('🔴 ' . $errorMsg);
         }
     }
 
-//    public function notifyTelegram($text)
+//    public function cronUpdateOrders()
 //    {
-//        $client = new Client();
-//
-//        $ids = [
-//            6715142449,
-////            778591134
-//        ];
-//
-//        //CronLogBot#1
 //        try {
-//            foreach ($ids as $id) {
-//                $client->post('https://api.telegram.org/bot6393333114:AAHaxf8M8lRdGXqq6OYwly6rFQy9HwPeHaY/sendMessage', [
+//            $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
+//            $orders = Order::query()->whereIn('status', $statuses)->get();
 //
-//                    RequestOptions::JSON => [
-//                        'chat_id' => $id,
-//                        'text' => $text,
-//                    ]
-//                ]);
+//            echo "START count:" . count($orders) . PHP_EOL;
+//
+//            $start_text = "Smm Start count: " . count($orders) . PHP_EOL;
+//            $this->notifyTelegram($start_text);
+//
+//            foreach ($orders as $key => $order) {
+//                echo "START" . $order->id . PHP_EOL;
+//
+//                $botDto = BotFactory::fromEntity($order->bot);
+//                $this->order($botDto, $order);
+//
+//                echo "FINISH" . $order->id . PHP_EOL;
 //            }
-//            //CronLogBot#2
+//
+//            $finish_text = "Smm finish count: " . count($orders) . PHP_EOL;
+//            $this->notifyTelegram($finish_text);
+//
 //        } catch (\Exception $e) {
-//            foreach ($ids as $id) {
-//                $client->post('https://api.telegram.org/bot6934899828:AAGg_f4k1LG_gcZNsNF2LHgdm7tym-1sYVg/sendMessage', [
-//
-//                    RequestOptions::JSON => [
-//                        'chat_id' => $id,
-//                        'text' => $text,
-//                    ]
-//                ]);
-//            }
+//            $this->notifyTelegram('🔴' . $e->getMessage());
 //        }
 //    }
 
