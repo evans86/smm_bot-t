@@ -13,7 +13,7 @@ use RuntimeException;
 
 class PartnerApi
 {
-    const HOST = 'https://partner.soc-proof.su/api/';
+    const HOST = 'https://partner.soc-proof.su/api/v2/';
     const HMAC_ALGORITHM = 'sha256';
 
     private string $realApiKey;
