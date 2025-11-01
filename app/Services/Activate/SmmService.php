@@ -269,7 +269,7 @@ class SmmService extends MainService
      */
     public function getDescription()
     {
-        $client = new Client(['base_uri' => 'https://partner.soc-proof.su/']);
+        $client = new Client(['base_uri' => 'https://soc-proof.su/']);
         $response = $client->request('GET', 'services');
 
         $content = $response->getBody()->getContents();
@@ -284,7 +284,7 @@ class SmmService extends MainService
             $results[$id]['desc_ru'] = $desc;
         }
 
-        $client = new Client(['base_uri' => 'https://partner.soc-proof.su/']);
+        $client = new Client(['base_uri' => 'https://soc-proof.su/']);
         $response = $client->request('GET', 'en/services');
         $content = $response->getBody()->getContents();
 
