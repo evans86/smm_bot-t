@@ -2,6 +2,9 @@
 
 @section('content')
     <div class="col-lg-4 col-md-6 ml-auto mr-auto">
+        @if(session('warning'))
+            <div class="alert alert-warning text-white mb-3" role="alert">{{ session('warning') }}</div>
+        @endif
         <form class="form" method="post" action="{{ route('login') }}">
             @csrf
 

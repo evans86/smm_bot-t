@@ -58,12 +58,15 @@ class AdminEnvAuthController extends Controller
         return redirect()->intended('/');
     }
 
+    /**
+     * Сброс только второго фактора (.env); сессия пользователя БД сохраняется.
+     */
     public function logout(Request $request)
     {
         $request->session()->forget('admin_env_auth');
-        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('admin.login');
     }
 }
+

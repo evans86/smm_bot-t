@@ -18,6 +18,6 @@ class ExampleTest extends TestCase
 
 //        $response->dumpSession();
 
-        $response->assertRedirect(route('admin.login'));
+        $response->assertRedirect(route('login'));
     }
 }

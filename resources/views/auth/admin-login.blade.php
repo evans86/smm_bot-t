@@ -5,6 +5,7 @@
         @if(session('warning'))
             <div class="alert alert-warning text-white mb-3" role="alert">{{ session('warning') }}</div>
         @endif
+        <p class="text-muted text-center small mb-3">{{ __('Сначала выполнен вход в аккаунт из базы данных. Здесь — второй шаг: логин и пароль из файла .env.') }}</p>
         @if(empty($adminConfigured))
             <div class="alert alert-warning text-white mb-3" role="alert">
                 Задайте в .env переменные <code>ADMIN_USERNAME</code> и <code>ADMIN_PASSWORD_BCRYPT</code> (или <code>ADMIN_PASSWORD</code> только для локальной разработки).

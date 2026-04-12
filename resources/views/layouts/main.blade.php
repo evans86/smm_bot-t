@@ -30,29 +30,43 @@
 
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        @if (! session('admin_env_auth'))
+                        @guest
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.login') }}">{{ __('Login') }}</a>
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Вход (аккаунт)') }}</a>
                             </li>
                         @else
+                            @if (! session('admin_env_auth'))
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.login') }}">{{ __('Доступ к панели (.env)') }}</a>
+                                </li>
+                            @endif
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ config('admin.username') ?: __('Админ') }}
+                                    {{ Auth::user()->name ?? Auth::user()->username }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('admin.logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                    @if (session('admin_env_auth'))
+                                        <a class="dropdown-item" href="{{ route('admin.logout') }}"
+                                           onclick="event.preventDefault(); document.getElementById('main-admin-env-logout').submit();">
+                                            {{ __('Сброс .env') }}
+                                        </a>
+                                    @endif
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('main-logout-form').submit();">
+                                        {{ __('Выход') }}
                                     </a>
-
-                                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
+                                    @if (session('admin_env_auth'))
+                                        <form id="main-admin-env-logout" action="{{ route('admin.logout') }}" method="POST" class="d-none">
+                                            @csrf
+                                        </form>
+                                    @endif
+                                    <form id="main-logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
                                 </div>
                             </li>
-                        @endif
+                        @endguest
 
                         <a class="nav-link" href="{{ route('users.index') }}">Пользователи</a>
                         <a class="nav-link" href="{{ route('activate.order.index') }}">Заказы</a>

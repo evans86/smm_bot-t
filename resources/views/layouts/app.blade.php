@@ -21,7 +21,7 @@
     <link href="{{ asset('black') }}/css/theme.css" rel="stylesheet"/>
 </head>
 <body class="{{ $class ?? '' }}">
-@if(session('admin_env_auth'))
+@if(Auth::check() && session('admin_env_auth'))
     <div class="wrapper">
 
         @include('layouts.navbars.sidebar')
@@ -34,7 +34,10 @@
             @include('layouts.footer')
         </div>
     </div>
-    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+    <form id="admin-env-logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
         @csrf
     </form>
 @else
