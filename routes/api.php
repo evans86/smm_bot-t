@@ -43,7 +43,7 @@ Route::get('create', [BotController::class, 'create']);
 Route::get('error', [BotController::class, 'error']);
 Route::get('get', [BotController::class, 'get']);
 Route::post('update', [BotController::class, 'update']);
-Route::post('rotatePrivateKey', [BotController::class, 'rotatePrivateKey']);
+Route::match(['get', 'post'], 'rotatePrivateKey', [BotController::class, 'rotatePrivateKey']);
 Route::get('delete', [BotController::class, 'delete']);
 Route::get('getSettings', [BotController::class, 'getSettings']);
 

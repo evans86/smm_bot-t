@@ -197,5 +197,13 @@ class BotTest extends TestCase
             'public_key' => 'RotatePublic',
             'private_key' => 'RotatePrivateNew',
         ]))->assertStatus(200);
+
+        $getRotate = $this->get('/rotatePrivateKey?' . http_build_query([
+            'public_key' => 'RotatePublic',
+            'private_key' => 'RotatePrivateNew',
+            'new_private_key' => 'RotatePrivateNewer',
+        ]));
+        $getRotate->assertStatus(200);
+        $this->assertStringContainsString('RotatePrivateNewer', $getRotate->baseResponse->content());
     }
 }
