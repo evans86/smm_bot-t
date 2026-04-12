@@ -31,7 +31,11 @@ class BotTest extends TestCase
         $response = $this->get('/create');
 
         $response->assertStatus(422);
-        $this->assertEquals($response->baseResponse->content(), '{"result":false,"message":"The bot id field is required."}');
+        $response->assertJson([
+            'result' => false,
+            'message' => 'The bot id field is required.',
+            'data' => [],
+        ]);
 
         $params = [
             'bot_id' => 1234,
@@ -146,7 +150,11 @@ class BotTest extends TestCase
             'private_key' => 'Private1',
         ];
         $response = $this->get('/create?' . http_build_query($params));
-        $this->assertEquals($response->baseResponse->content(), '{"result":false,"message":"The bot id has already been taken."}');
+        $response->assertJson([
+            'result' => false,
+            'message' => 'The bot id has already been taken.',
+            'data' => [],
+        ]);
         $response->assertStatus(422);
 
         $params = [

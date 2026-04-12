@@ -17,16 +17,18 @@ class ApiHelpers
     }
 
     /**
-     * @param string $message
-     * @return string
+     * Ответ об ошибке в том же контракте, что и успех: всегда есть ключ {@see $}data (массив),
+     * чтобы клиенты (например Bot-t) не падали на «в ответе не найден массив».
+     *
+     * @return array{result: bool, message: string, data: array<int, mixed>}
      */
-    public static function error(string $message): string
+    public static function error(string $message): array
     {
-        $result = [
+        return [
             'result' => false,
-            'message' => $message
+            'message' => $message,
+            'data' => [],
         ];
-        return json_encode($result);
     }
 
     /**

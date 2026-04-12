@@ -26,8 +26,10 @@ class BotRotatePrivateKeyRequest extends FormRequest
 
     protected function failedValidation(Validator $validator): void
     {
-        $response = response()
-            ->make(ApiHelpers::error($validator->errors()->first()), 422);
+        $response = response()->json(
+            ApiHelpers::error($validator->errors()->first()),
+            422
+        );
 
         throw (new ValidationException($validator, $response))
             ->errorBag($this->errorBag)
