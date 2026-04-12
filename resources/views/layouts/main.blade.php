@@ -32,35 +32,19 @@
                     <div class="navbar-nav">
                         @guest
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Вход (аккаунт)') }}</a>
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Вход') }}</a>
                             </li>
                         @else
-                            @if (! session('admin_env_auth'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.login') }}">{{ __('Доступ к панели (.env)') }}</a>
-                                </li>
-                            @endif
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name ?? Auth::user()->username }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    @if (session('admin_env_auth'))
-                                        <a class="dropdown-item" href="{{ route('admin.logout') }}"
-                                           onclick="event.preventDefault(); document.getElementById('main-admin-env-logout').submit();">
-                                            {{ __('Сброс .env') }}
-                                        </a>
-                                    @endif
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault(); document.getElementById('main-logout-form').submit();">
                                         {{ __('Выход') }}
                                     </a>
-                                    @if (session('admin_env_auth'))
-                                        <form id="main-admin-env-logout" action="{{ route('admin.logout') }}" method="POST" class="d-none">
-                                            @csrf
-                                        </form>
-                                    @endif
                                     <form id="main-logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>

@@ -27,10 +27,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-navbar">
                         <li class="nav-link">
-                            <a href="{{ route('admin.logout') }}" class="nav-item dropdown-item" onclick="event.preventDefault(); document.getElementById('admin-env-logout-form').submit();">{{ __('Сброс доступа .env') }}</a>
-                        </li>
-                        <li class="nav-link">
-                            <a href="{{ route('logout') }}" class="nav-item dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Выход из аккаунта') }}</a>
+                            <a href="{{ route('logout') }}" class="nav-item dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('Выход') }}</a>
                         </li>
                     </ul>
                 </li>

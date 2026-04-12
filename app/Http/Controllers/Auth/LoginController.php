@@ -54,8 +54,6 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->session()->forget('admin_env_auth');
-
         $this->guard()->logout();
 
         $request->session()->invalidate();
