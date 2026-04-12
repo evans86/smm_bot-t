@@ -206,7 +206,7 @@
                                                 </li>
                                                 <li class="dropdown-divider"></li>
                                                 <li class="nav-link">
-                                                    <a href="{{ route('logout') }}" class="nav-item dropdown-item" onclick="event.preventDefault();  document.getElementById('logout-form').submit();">{{ __('Log out') }}</a>
+                                                    <a href="{{ route('admin.logout') }}" class="nav-item dropdown-item" onclick="event.preventDefault();  document.getElementById('logout-form').submit();">{{ __('Log out') }}</a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -335,7 +335,7 @@
 </footer>
             </div>
         </div>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
             <input type="hidden" name="_token" value="ub2DzAIrgUnghVvu3l3KAbbq0UztNO8yfkrDNm6n">            </form>
             <div class="fixed-plugin">
         <div class="dropdown show-dropdown">

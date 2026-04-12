@@ -4,20 +4,13 @@ use App\Http\Controllers\Api\v1\BotController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\v1\SmmController;
-use App\Http\Controllers\Api\v1\ProxyController;
 use App\Http\Controllers\Api\v1\UserController;
-use App\Http\Controllers\Api\v1\SupportController;
 use App\Http\Controllers\Api\v1\OrderController;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -50,7 +43,7 @@ Route::get('create', [BotController::class, 'create']);
 Route::get('error', [BotController::class, 'error']);
 Route::get('get', [BotController::class, 'get']);
 Route::post('update', [BotController::class, 'update']);
+Route::post('rotatePrivateKey', [BotController::class, 'rotatePrivateKey']);
 Route::get('delete', [BotController::class, 'delete']);
 Route::get('getSettings', [BotController::class, 'getSettings']);
-
 

@@ -25,14 +25,26 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @php
+                                $maskSecret = function (?string $v): string {
+                                    if ($v === null || $v === '') {
+                                        return '—';
+                                    }
+                                    $len = strlen($v);
+                                    if ($len <= 8) {
+                                        return str_repeat('•', min($len, 12));
+                                    }
+                                    return substr($v, 0, 4) . str_repeat('•', $len - 8) . substr($v, -4);
+                                };
+                            @endphp
                             @foreach($bots as $bot)
                                 <tr>
                                     <td class="text-center">{{ $bot->id }}</td>
-                                    <td class="text-center">Private: {{ $bot->private_key }}
+                                    <td class="text-center">Private: {{ $maskSecret($bot->private_key) }}
                                         <br>Public: {{ $bot->public_key }}</td>
                                     <td class="text-center">{{ $bot->bot_id }}</td>
                                     <td class="text-center">{{ $bot->version }}</td>
-                                    <td class="text-center">API key: {{ $bot->api_key }}
+                                    <td class="text-center">API key: {{ $maskSecret($bot->api_key) }}
                                         <br>Link: {{ $bot->resource_link }}</td>
                                     <td class="text-center">{{ $bot->category_id }}</td>
                                     <td class="text-center">{{ $bot->percent }} %</td>

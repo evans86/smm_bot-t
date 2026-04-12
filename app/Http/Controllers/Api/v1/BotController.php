@@ -8,6 +8,7 @@ use App\Helpers\BotLogHelpers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Bot\BotCreateRequest;
 use App\Http\Requests\Bot\BotGetRequest;
+use App\Http\Requests\Bot\BotRotatePrivateKeyRequest;
 use App\Http\Requests\Bot\BotUpdateRequest;
 use App\Models\Bot\Bot;
 use App\Services\Activate\BotService;
@@ -168,6 +169,29 @@ class BotController extends Controller
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Module delete error');
+        }
+    }
+
+    /**
+     * Смена private_key модуля (вызывается из Bot-t при ротации секрета).
+     */
+    public function rotatePrivateKey(BotRotatePrivateKeyRequest $request)
+    {
+        try {
+            $bot = $this->botService->rotatePrivateKey(
+                $request->public_key,
+                $request->private_key,
+                $request->new_private_key
+            );
+
+            return ApiHelpers::success(BotFactory::fromEntity($bot)->getArray());
+        } catch (\RuntimeException $r) {
+            BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
+            return ApiHelpers::error($r->getMessage());
+        } catch (\Exception $e) {
+            BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
+            \Log::error($e->getMessage());
+            return ApiHelpers::error('Module rotate private key error');
         }
     }
 }

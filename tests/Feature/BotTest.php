@@ -168,4 +168,34 @@ class BotTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function testRotatePrivateKey(): void
+    {
+        $create = [
+            'bot_id' => 9991,
+            'public_key' => 'RotatePublic',
+            'private_key' => 'RotatePrivateOld',
+        ];
+        $this->get('/create?' . http_build_query($create))->assertStatus(200);
+
+        $response = $this->post('/rotatePrivateKey', [
+            'public_key' => 'RotatePublic',
+            'private_key' => 'RotatePrivateOld',
+            'new_private_key' => 'RotatePrivateNew',
+        ]);
+        $response->assertStatus(200);
+        $this->assertStringContainsString('RotatePrivateNew', $response->baseResponse->content());
+        $this->assertStringContainsString('"result":true', $response->baseResponse->content());
+
+        $oldGet = $this->get('/get?' . http_build_query([
+            'public_key' => 'RotatePublic',
+            'private_key' => 'RotatePrivateOld',
+        ]));
+        $this->assertStringContainsString('Not found module', $oldGet->baseResponse->content());
+
+        $this->get('/get?' . http_build_query([
+            'public_key' => 'RotatePublic',
+            'private_key' => 'RotatePrivateNew',
+        ]))->assertStatus(200);
+    }
 }

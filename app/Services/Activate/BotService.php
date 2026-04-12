@@ -87,4 +87,27 @@ class BotService extends MainService
         if (!$bot->delete())
             throw new \RuntimeException('bot dont delete');
     }
+
+    /**
+     * Смена private_key модуля (после проверки текущей пары public + private).
+     */
+    public function rotatePrivateKey(string $public_key, string $current_private_key, string $new_private_key): Bot
+    {
+        $bot = Bot::query()
+            ->where('public_key', $public_key)
+            ->where('private_key', $current_private_key)
+            ->first();
+
+        if (empty($bot)) {
+            throw new \RuntimeException('Not found module.');
+        }
+
+        $bot->private_key = $new_private_key;
+        if (! $bot->save()) {
+            throw new \RuntimeException('bot dont save');
+        }
+
+        return $bot;
+    }
 }
+
