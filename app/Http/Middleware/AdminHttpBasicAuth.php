@@ -6,10 +6,11 @@ use App\Services\Admin\AdminBasicAuthTelegramNotifier;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AdminHttpBasicAuth
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): SymfonyResponse
     {
         if (! self::isConfigured()) {
             if (app()->environment('testing', 'local')) {
@@ -21,21 +22,34 @@ class AdminHttpBasicAuth
 
         $expectedUser = (string) config('http_basic.username');
         $expectedPass = (string) config('http_basic.password');
-        $givenUser = (string) $request->getUser();
-        $givenPass = (string) $request->getPassword();
 
-        if ($givenUser === '' && $givenPass === '' && $request->headers->get('Php-Auth-User')) {
+        $givenUser = $request->getUser();
+        $givenPassword = $request->getPassword();
+
+        if (
+            ($givenUser === null || $givenUser === '')
+            && ($givenPassword === null || $givenPassword === '')
+            && $request->headers->get('Php-Auth-User')
+        ) {
             $givenUser = (string) $request->server->get('PHP_AUTH_USER', '');
-            $givenPass = (string) $request->server->get('PHP_AUTH_PW', '');
+            $givenPassword = (string) $request->server->get('PHP_AUTH_PW', '');
         }
 
-        $okUser = hash_equals($expectedUser, $givenUser);
-        $okPass = hash_equals($expectedPass, $givenPass);
+        $givenUserStr = $givenUser !== null ? (string) $givenUser : '';
+        $givenPassStr = $givenPassword !== null ? (string) $givenPassword : '';
+
+        $okUser = hash_equals($expectedUser, $givenUserStr);
+        $okPass = hash_equals($expectedPass, $givenPassStr);
 
         if (! $okUser || ! $okPass) {
-            $hasAttempt = ($givenUser !== '' || $givenPass !== '');
-            if ($hasAttempt) {
-                $this->queueInvalidTelegram($request, $givenUser);
+            $reason = ($givenUser === null || $givenPassword === null) ? 'missing' : 'invalid';
+            $attempted = $givenUser !== null ? (string) $givenUser : null;
+
+            // Как в vpn: только неверный логин/пароль; без Authorization — не шлём.
+            if ($reason === 'invalid') {
+                App::terminating(static function () use ($request, $attempted, $reason): void {
+                    app(AdminBasicAuthTelegramNotifier::class)->notifyFailure($request, $attempted, $reason);
+                });
             }
 
             return response('Unauthorized', 401, [
@@ -43,34 +57,17 @@ class AdminHttpBasicAuth
             ]);
         }
 
+        $basicUsername = $givenUserStr;
         $response = $next($request);
 
-        $notifier = app(AdminBasicAuthTelegramNotifier::class);
-        $session = $request->getSession();
-        if (
-            $notifier->isEnabled()
-            && $session !== null
-            && ! $session->get(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED)
-        ) {
-            $login = $givenUser;
-            App::terminating(static function () use ($request, $login): void {
-                app(AdminBasicAuthTelegramNotifier::class)->notifySuccess($request, $login);
+        if ($request->hasSession() && ! $request->session()->get(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED)) {
+            $request->session()->put(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED, true);
+            App::terminating(static function () use ($request, $basicUsername): void {
+                app(AdminBasicAuthTelegramNotifier::class)->notifySuccess($request, $basicUsername);
             });
         }
 
         return $response;
-    }
-
-    private function queueInvalidTelegram(Request $request, string $attemptedLogin): void
-    {
-        $notifier = app(AdminBasicAuthTelegramNotifier::class);
-        if (! $notifier->isEnabled()) {
-            return;
-        }
-
-        App::terminating(static function () use ($request, $attemptedLogin): void {
-            app(AdminBasicAuthTelegramNotifier::class)->notifyInvalid($request, $attemptedLogin);
-        });
     }
 
     public static function isConfigured(): bool

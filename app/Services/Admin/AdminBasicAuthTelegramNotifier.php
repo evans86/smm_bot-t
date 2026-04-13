@@ -2,36 +2,24 @@
 
 namespace App\Services\Admin;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Throwable;
+use Telegram\Bot\Api;
 
 /**
- * Один бот из .env; отправка как в OrderService (Guzzle + IPv4), плюс проверка JSON ok у Telegram.
+ * Как в проекте vpn: Telegram\Bot\Api, HTML, отдельные notifySuccess / notifyFailure.
  */
 class AdminBasicAuthTelegramNotifier
 {
-    private const USER_AGENT_MAX = 500;
-
-    /** Один «успех» в Telegram на сессию Laravel; ставится только после подтверждённой отправки. */
+    /** Совпадает с vpn (сессионный флаг «уже уведомляли об успехе»). */
     public const SESSION_KEY_SUCCESS_NOTIFIED = 'admin_basic_telegram_success_notified';
 
     public function isEnabled(): bool
     {
-        return $this->token() !== '' && $this->chatId() !== '';
-    }
+        $token = (string) (config('admin.http_basic_notify_telegram_token') ?? '');
+        $chatId = config('admin.http_basic_notify_telegram_chat_id');
 
-    private function token(): string
-    {
-        return trim((string) config('admin.http_basic_notify.telegram_token', ''));
-    }
-
-    private function chatId(): string
-    {
-        return trim((string) config('admin.http_basic_notify.telegram_chat_id', ''));
+        return $token !== '' && $chatId !== null && $chatId !== '';
     }
 
     /**
@@ -43,133 +31,14 @@ class AdminBasicAuthTelegramNotifier
             return false;
         }
 
-        return $this->sendMessage('Тест: уведомления Admin HTTP Basic (artisan).');
-    }
-
-    public function notifySuccess(Request $request, string $basicLogin): void
-    {
-        if (! $this->isEnabled()) {
-            return;
-        }
-
-        $lines = [
-            '✅ Admin HTTP Basic: успешный вход',
-            'Логин: ' . $basicLogin,
-        ];
-        $lines = array_merge($lines, $this->contextLines($request));
-
-        if ($this->sendMessage(implode("\n", $lines))) {
-            $this->markSuccessNotifiedInSession($request);
-        }
-    }
-
-    public function notifyInvalid(Request $request, string $attemptedLogin): void
-    {
-        if (! $this->isEnabled()) {
-            return;
-        }
-
-        $lines = [
-            '⚠️ Admin HTTP Basic: неверный логин или пароль',
-            'Указанный логин: ' . $attemptedLogin,
-        ];
-        $lines = array_merge($lines, $this->contextLines($request));
-
-        $this->sendMessage(implode("\n", $lines));
-    }
-
-    private function markSuccessNotifiedInSession(Request $request): void
-    {
-        $session = $request->getSession();
-        if ($session === null) {
-            return;
-        }
-
-        $session->put(self::SESSION_KEY_SUCCESS_NOTIFIED, true);
-        $session->save();
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function contextLines(Request $request): array
-    {
-        $ua = (string) $request->userAgent();
-        if (strlen($ua) > self::USER_AGENT_MAX) {
-            $ua = substr($ua, 0, self::USER_AGENT_MAX) . '…';
-        }
-
-        $xff = $request->headers->get('X-Forwarded-For');
-        $tz = (string) config('app.timezone', 'UTC');
-        $time = Carbon::now($tz)->toDateTimeString();
-
-        $lines = [
-            'IP: ' . $request->ip(),
-        ];
-        if ($xff !== null && $xff !== '') {
-            $lines[] = 'X-Forwarded-For: ' . $xff;
-        }
-        $lines[] = 'Запрос: ' . $request->getMethod() . ' ' . $request->getRequestUri();
-        $lines[] = 'User-Agent: ' . ($ua !== '' ? $ua : '(пусто)');
-        $lines[] = 'Время (' . $tz . '): ' . $time;
-
-        return $lines;
-    }
-
-    private function sendMessage(string $text): bool
-    {
-        $botToken = $this->token();
-        $chatId = $this->chatId();
-        if ($botToken === '' || $chatId === '') {
-            return false;
-        }
-
-        $message = $text === '' ? '[Empty message]' : $text;
-
-        $clientConfig = [
-            'curl' => [
-                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            ],
-            'timeout' => 10,
-            'connect_timeout' => 5,
-            'http_errors' => false,
-        ];
-
-        $proxy = trim((string) config('admin.http_basic_notify.http_proxy', ''));
-        if ($proxy !== '') {
-            $clientConfig['proxy'] = $proxy;
-        }
-
-        $client = new Client($clientConfig);
-
         try {
-            $response = $client->post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                RequestOptions::JSON => [
-                    'chat_id' => $this->normalizeChatIdForJson($chatId),
-                    'text' => $message,
-                ],
-            ]);
-
-            $body = (string) $response->getBody();
-            $data = json_decode($body, true);
-
-            if (! is_array($data) || empty($data['ok'])) {
-                Log::warning('Admin HTTP Basic Telegram: API ответил ok=false', [
-                    'http' => $response->getStatusCode(),
-                    'telegram' => $data,
-                    'body_raw' => strlen($body) > 500 ? substr($body, 0, 500) . '…' : $body,
-                ]);
-
-                return false;
-            }
-
-            Log::info('Admin HTTP Basic Telegram: сообщение отправлено');
+            $this->rawSend('<b>Тест</b>: уведомления Admin HTTP Basic (artisan).');
 
             return true;
-        } catch (Throwable $e) {
-            Log::warning('Admin HTTP Basic Telegram: исключение при sendMessage', [
-                'message' => $e->getMessage(),
-                'has_proxy' => $proxy !== '',
+        } catch (\Throwable $e) {
+            Log::warning('Admin HTTP Basic: тест Telegram не отправлен', [
+                'error' => $e->getMessage(),
+                'source' => 'admin.basic_auth.test',
             ]);
 
             return false;
@@ -177,14 +46,98 @@ class AdminBasicAuthTelegramNotifier
     }
 
     /**
-     * @return int|string
+     * Успешное прохождение HTTP Basic.
      */
-    private function normalizeChatIdForJson(string $chatId)
+    public function notifySuccess(Request $request, string $basicUsername): void
     {
-        if (preg_match('/^-?\d+$/', $chatId) === 1) {
-            return (int) $chatId;
+        $lines = [
+            '<b>✅ HTTP Basic: успех</b>',
+            '',
+            '<b>Логин:</b> '.e($basicUsername),
+        ];
+        $this->appendCommonLines($lines, $request);
+        $this->send(implode("\n", $lines));
+    }
+
+    /**
+     * Неудачная попытка (неверные данные; запрос без Authorization не уведомляем — см. middleware).
+     *
+     * @param  'invalid'  $reason
+     */
+    public function notifyFailure(Request $request, ?string $attemptedUsername, string $reason): void
+    {
+        $lines = [
+            '<b>❌ HTTP Basic: отказ</b>',
+            '',
+        ];
+        if ($reason === 'missing') {
+            $lines[] = '<b>Причина:</b> учётные данные не переданы (первый запрос, отмена окна или нет заголовка Authorization).';
+        } else {
+            $lines[] = '<b>Причина:</b> неверный логин или пароль.';
+            if ($attemptedUsername !== null && $attemptedUsername !== '') {
+                $lines[] = '<b>Указанный логин:</b> '.e($attemptedUsername);
+            }
+        }
+        $lines[] = '';
+        $this->appendCommonLines($lines, $request);
+        $this->send(implode("\n", $lines));
+    }
+
+    /**
+     * @param  array<int, string>  $lines
+     */
+    private function appendCommonLines(array &$lines, Request $request): void
+    {
+        $ip = $request->ip();
+        $forwarded = $request->header('X-Forwarded-For');
+        $ua = $request->header('User-Agent', '—');
+        $path = $request->getPathInfo();
+        $method = $request->getMethod();
+        $when = now()->timezone(config('app.timezone', 'UTC'))->format('Y-m-d H:i:s T');
+
+        $lines[] = '<b>IP:</b> '.e((string) $ip);
+        if (is_string($forwarded) && $forwarded !== '') {
+            $lines[] = '<b>X-Forwarded-For:</b> '.e($forwarded);
+        }
+        $lines[] = '<b>Метод / путь:</b> '.e($method).' '.e($path);
+        $lines[] = '<b>User-Agent:</b> '.e(mb_substr($ua, 0, 500));
+        $lines[] = '<b>Время:</b> '.e($when);
+    }
+
+    private function send(string $text): void
+    {
+        if (! $this->isEnabled()) {
+            return;
         }
 
-        return $chatId;
+        try {
+            $this->rawSend($text);
+        } catch (\Throwable $e) {
+            Log::warning('Admin HTTP Basic: не удалось отправить уведомление в Telegram', [
+                'error' => $e->getMessage(),
+                'source' => 'admin.basic_auth',
+            ]);
+        }
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function rawSend(string $text): void
+    {
+        $token = (string) (config('admin.http_basic_notify_telegram_token') ?? '');
+        $chatId = config('admin.http_basic_notify_telegram_chat_id');
+
+        if ($token === '' || $chatId === null || $chatId === '') {
+            return;
+        }
+
+        $api = new Api($token);
+        $api->sendMessage([
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'HTML',
+            'disable_web_page_preview' => true,
+        ]);
     }
 }

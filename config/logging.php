@@ -69,6 +69,15 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        /*
+         * PartnerApi — заказы (Log::channel('api_orders')).
+         */
+        'api_orders' => [
+            'driver' => 'stack',
+            'channels' => ['single'],
+            'ignore_exceptions' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
