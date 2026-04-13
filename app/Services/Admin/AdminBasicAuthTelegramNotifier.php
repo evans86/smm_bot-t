@@ -9,11 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-/**
- * Отправка в Telegram через Guzzle с принудительным IPv4.
- * (Пакет irazasyed/telegram-bot-sdk на Guzzle 7 даёт GuzzleHttp\Promise\unwrap() в деструкторе;
- * на серверах без IPv6 до api.telegram.org curl иначе лезет в IPv6 и падает с «Network is unreachable».)
- */
+/** Отправка в Telegram через Guzzle: IPv4 + опционально HTTP(S) прокси. */
 class AdminBasicAuthTelegramNotifier
 {
     private const USER_AGENT_MAX = 500;
@@ -37,6 +33,11 @@ class AdminBasicAuthTelegramNotifier
     private function chatId(): string
     {
         return trim((string) config('admin.http_basic_notify.telegram_chat_id', ''));
+    }
+
+    private function httpProxy(): string
+    {
+        return trim((string) config('admin.http_basic_notify.http_proxy', ''));
     }
 
     public function notifySuccess(Request $request, string $basicLogin): void
@@ -118,15 +119,21 @@ class AdminBasicAuthTelegramNotifier
             return false;
         }
 
-        $client = new Client([
+        $proxy = $this->httpProxy();
+        $clientConfig = [
             'curl' => [
                 CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
             ],
-            'timeout' => 20,
-            'connect_timeout' => 15,
-            'verify' => true,
+            'timeout' => 25,
+            'connect_timeout' => 20,
+            'verify' => (bool) config('admin.http_basic_notify.verify_ssl', true),
             'http_errors' => false,
-        ]);
+        ];
+        if ($proxy !== '') {
+            $clientConfig['proxy'] = $proxy;
+        }
+
+        $client = new Client($clientConfig);
 
         try {
             $response = $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
@@ -152,6 +159,8 @@ class AdminBasicAuthTelegramNotifier
         } catch (Throwable $e) {
             Log::warning('Admin HTTP Basic: Telegram sendMessage ошибка', [
                 'message' => $e->getMessage(),
+                'proxy_configured' => $proxy !== '',
+                'hint' => 'Таймаут/нет соединения: часто хостинг режет Telegram. Задайте ADMIN_HTTP_BASIC_NOTIFY_HTTP_PROXY (HTTP-прокси на VPS, где curl до api.telegram.org проходит).',
             ]);
 
             return false;
