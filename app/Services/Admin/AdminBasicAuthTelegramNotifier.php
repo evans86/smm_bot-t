@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Формат сообщений как в vpn (HTML), транспорт — прямой вызов Telegram HTTP API
- * (Guzzle, IPv4, опциональный прокси — устойчивее, чем только SDK на проблемных хостингах).
+ * Уведомления по HTTP Basic: отправка как в OrderService::notifyTelegram (Guzzle + IPv4 + те же timeout),
+ * отдельные TOKEN/CHAT из .env; HTML как в vpn. Прокси — только если задан в .env.
  */
 class AdminBasicAuthTelegramNotifier
 {
@@ -142,11 +142,10 @@ class AdminBasicAuthTelegramNotifier
             'curl' => [
                 CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
             ],
-            'timeout' => 15,
-            'connect_timeout' => 10,
+            'timeout' => 10,
+            'connect_timeout' => 5,
             'http_errors' => false,
         ];
-
         $proxy = trim((string) config('admin.http_basic_notify_http_proxy', ''));
         if ($proxy !== '') {
             $clientConfig['proxy'] = $proxy;
