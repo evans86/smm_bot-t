@@ -6,23 +6,21 @@ use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
-/** Отправка в Telegram через Guzzle: IPv4 + опционально HTTP(S) прокси. */
+/**
+ * Уведомления о HTTP Basic — тот же приём, что в OrderService::notifyTelegram / BotLogHelpers:
+ * Guzzle, CURLOPT_IPRESOLVE_V4, свой бот и chat_id из .env (другой бот, не cron/modules).
+ */
 class AdminBasicAuthTelegramNotifier
 {
     private const USER_AGENT_MAX = 500;
 
-    /** Ключ в сессии: успешное уведомление в Telegram уже отправлено (ставится только после успешного sendMessage). */
+    /** Один «успех» в Telegram на сессию Laravel; ставится только после удачной отправки. */
     public const SESSION_KEY_SUCCESS_NOTIFIED = 'admin_basic_telegram_success_notified';
 
     public function isEnabled(): bool
     {
-        $token = $this->token();
-        $chatId = $this->chatId();
-
-        return $token !== '' && $chatId !== '';
+        return $this->token() !== '' && $this->chatId() !== '';
     }
 
     private function token(): string
@@ -33,11 +31,6 @@ class AdminBasicAuthTelegramNotifier
     private function chatId(): string
     {
         return trim((string) config('admin.http_basic_notify.telegram_chat_id', ''));
-    }
-
-    private function httpProxy(): string
-    {
-        return trim((string) config('admin.http_basic_notify.http_proxy', ''));
     }
 
     public function notifySuccess(Request $request, string $basicLogin): void
@@ -52,7 +45,7 @@ class AdminBasicAuthTelegramNotifier
         ];
         $lines = array_merge($lines, $this->contextLines($request));
 
-        if ($this->send(implode("\n", $lines))) {
+        if ($this->sendMessage(implode("\n", $lines))) {
             $this->markSuccessNotifiedInSession($request);
         }
     }
@@ -69,7 +62,7 @@ class AdminBasicAuthTelegramNotifier
         ];
         $lines = array_merge($lines, $this->contextLines($request));
 
-        $this->send(implode("\n", $lines));
+        $this->sendMessage(implode("\n", $lines));
     }
 
     private function markSuccessNotifiedInSession(Request $request): void
@@ -110,25 +103,26 @@ class AdminBasicAuthTelegramNotifier
         return $lines;
     }
 
-    private function send(string $text): bool
+    /** Как OrderService::notifyTelegram: один бот, один вызов sendMessage. */
+    private function sendMessage(string $text): bool
     {
-        $token = $this->token();
+        $botToken = $this->token();
         $chatId = $this->chatId();
-
-        if ($token === '' || $chatId === '') {
+        if ($botToken === '' || $chatId === '') {
             return false;
         }
 
-        $proxy = $this->httpProxy();
+        $message = $text === '' ? '[Empty message]' : $text;
+
         $clientConfig = [
             'curl' => [
                 CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
             ],
-            'timeout' => 25,
-            'connect_timeout' => 20,
-            'verify' => (bool) config('admin.http_basic_notify.verify_ssl', true),
-            'http_errors' => false,
+            'timeout' => 10,
+            'connect_timeout' => 5,
         ];
+
+        $proxy = trim((string) config('admin.http_basic_notify.http_proxy', ''));
         if ($proxy !== '') {
             $clientConfig['proxy'] = $proxy;
         }
@@ -136,32 +130,16 @@ class AdminBasicAuthTelegramNotifier
         $client = new Client($clientConfig);
 
         try {
-            $response = $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
+            $client->post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                 RequestOptions::JSON => [
                     'chat_id' => $chatId,
-                    'text' => $text,
+                    'text' => $message,
                 ],
             ]);
 
-            $payload = json_decode((string) $response->getBody(), true);
-            if (! is_array($payload) || empty($payload['ok'])) {
-                Log::warning('Admin HTTP Basic: Telegram sendMessage ok=false', [
-                    'http' => $response->getStatusCode(),
-                    'response' => $payload,
-                ]);
-
-                return false;
-            }
-
-            Log::info('Admin HTTP Basic: уведомление в Telegram отправлено');
-
             return true;
-        } catch (Throwable $e) {
-            Log::warning('Admin HTTP Basic: Telegram sendMessage ошибка', [
-                'message' => $e->getMessage(),
-                'proxy_configured' => $proxy !== '',
-                'hint' => 'Таймаут/нет соединения: часто хостинг режет Telegram. Задайте ADMIN_HTTP_BASIC_NOTIFY_HTTP_PROXY (HTTP-прокси на VPS, где curl до api.telegram.org проходит).',
-            ]);
+        } catch (\Throwable $e) {
+            error_log('Admin HTTP Basic Telegram: ' . $e->getMessage());
 
             return false;
         }
