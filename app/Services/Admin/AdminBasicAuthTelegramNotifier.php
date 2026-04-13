@@ -2,10 +2,11 @@
 
 namespace App\Services\Admin;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Telegram\Bot\Api;
+use Throwable;
 
 class AdminBasicAuthTelegramNotifier
 {
@@ -13,10 +14,20 @@ class AdminBasicAuthTelegramNotifier
 
     public function isEnabled(): bool
     {
-        $token = (string) config('admin.http_basic_notify.telegram_token', '');
-        $chatId = (string) config('admin.http_basic_notify.telegram_chat_id', '');
+        $token = $this->token();
+        $chatId = $this->chatId();
 
         return $token !== '' && $chatId !== '';
+    }
+
+    private function token(): string
+    {
+        return trim((string) config('admin.http_basic_notify.telegram_token', ''));
+    }
+
+    private function chatId(): string
+    {
+        return trim((string) config('admin.http_basic_notify.telegram_chat_id', ''));
     }
 
     public function notifySuccess(Request $request, string $basicLogin): void
@@ -78,30 +89,23 @@ class AdminBasicAuthTelegramNotifier
 
     private function send(string $text): void
     {
-        $token = (string) config('admin.http_basic_notify.telegram_token', '');
-        $chatId = (string) config('admin.http_basic_notify.telegram_chat_id', '');
+        $token = $this->token();
+        $chatId = $this->chatId();
 
         if ($token === '' || $chatId === '') {
             return;
         }
 
-        $client = new Client([
-            'curl' => [
-                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            ],
-            'timeout' => 10,
-            'connect_timeout' => 5,
-        ]);
-
         try {
-            $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
-                RequestOptions::JSON => [
-                    'chat_id' => $chatId,
-                    'text' => $text,
-                ],
+            $telegram = new Api($token);
+            $telegram->sendMessage([
+                'chat_id' => $chatId,
+                'text' => $text,
             ]);
-        } catch (\Throwable $e) {
-            error_log('Admin HTTP Basic Telegram notify failed: ' . $e->getMessage());
+        } catch (Throwable $e) {
+            Log::warning('Admin HTTP Basic: Telegram sendMessage ошибка', [
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 }

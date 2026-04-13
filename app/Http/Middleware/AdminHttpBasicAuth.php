@@ -48,12 +48,13 @@ class AdminHttpBasicAuth
         $response = $next($request);
 
         $notifier = app(AdminBasicAuthTelegramNotifier::class);
+        $session = $request->getSession();
         if (
             $notifier->isEnabled()
-            && $request->hasSession()
-            && ! $request->session()->get(self::SESSION_KEY_SUCCESS_NOTIFIED)
+            && $session !== null
+            && ! $session->get(self::SESSION_KEY_SUCCESS_NOTIFIED)
         ) {
-            $request->session()->put(self::SESSION_KEY_SUCCESS_NOTIFIED, true);
+            $session->put(self::SESSION_KEY_SUCCESS_NOTIFIED, true);
             $login = $givenUser;
             App::terminating(static function () use ($request, $login): void {
                 app(AdminBasicAuthTelegramNotifier::class)->notifySuccess($request, $login);
