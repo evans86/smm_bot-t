@@ -20,7 +20,7 @@
         "league/iso3166": "^4.2",
         "nesbot/carbon": "^2.66",
         "ext-curl": "*",
-        "irazasyed/telegram-bot-sdk": "^3.4.1"
+        "ext-json": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
@@ -63,9 +63,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-                "irazasyed/telegram-bot-sdk"
-            ]
+            "dont-discover": []
         }
     },
     "config": {

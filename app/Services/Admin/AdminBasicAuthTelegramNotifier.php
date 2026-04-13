@@ -2,12 +2,18 @@
 
 namespace App\Services\Admin;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Telegram\Bot\Api;
 use Throwable;
 
+/**
+ * Отправка в Telegram через Guzzle с принудительным IPv4.
+ * (Пакет irazasyed/telegram-bot-sdk на Guzzle 7 даёт GuzzleHttp\Promise\unwrap() в деструкторе;
+ * на серверах без IPv6 до api.telegram.org curl иначе лезет в IPv6 и падает с «Network is unreachable».)
+ */
 class AdminBasicAuthTelegramNotifier
 {
     private const USER_AGENT_MAX = 500;
@@ -112,12 +118,33 @@ class AdminBasicAuthTelegramNotifier
             return false;
         }
 
+        $client = new Client([
+            'curl' => [
+                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            ],
+            'timeout' => 20,
+            'connect_timeout' => 15,
+            'verify' => true,
+            'http_errors' => false,
+        ]);
+
         try {
-            $telegram = new Api($token);
-            $telegram->sendMessage([
-                'chat_id' => $chatId,
-                'text' => $text,
+            $response = $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
+                RequestOptions::JSON => [
+                    'chat_id' => $chatId,
+                    'text' => $text,
+                ],
             ]);
+
+            $payload = json_decode((string) $response->getBody(), true);
+            if (! is_array($payload) || empty($payload['ok'])) {
+                Log::warning('Admin HTTP Basic: Telegram sendMessage ok=false', [
+                    'http' => $response->getStatusCode(),
+                    'response' => $payload,
+                ]);
+
+                return false;
+            }
 
             Log::info('Admin HTTP Basic: уведомление в Telegram отправлено');
 
