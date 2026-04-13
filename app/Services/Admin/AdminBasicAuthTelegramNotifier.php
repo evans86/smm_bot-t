@@ -2,15 +2,11 @@
 
 namespace App\Services\Admin;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 /**
- * Уведомления по HTTP Basic: отправка как в OrderService::notifyTelegram (Guzzle + IPv4 + те же timeout),
- * отдельные TOKEN/CHAT из .env; HTML как в vpn. Прокси — только если задан в .env.
+ * Как в проекте proxy: TelegramHttpClientFactory + sendMessage JSON (HTML).
  */
 class AdminBasicAuthTelegramNotifier
 {
@@ -18,8 +14,8 @@ class AdminBasicAuthTelegramNotifier
 
     public function isEnabled(): bool
     {
-        $token = (string) (config('admin.http_basic_notify_telegram_token') ?? '');
-        $chatId = config('admin.http_basic_notify_telegram_chat_id');
+        $token = (string) (config('http_basic.notify_telegram_token') ?? '');
+        $chatId = config('http_basic.notify_telegram_chat_id');
 
         return $token !== '' && $chatId !== null && $chatId !== '';
     }
@@ -30,8 +26,6 @@ class AdminBasicAuthTelegramNotifier
     }
 
     /**
-     * Для artisan: вернуть текст ошибки (токен в URL замазан).
-     *
      * @return array{ok: bool, error: ?string}
      */
     public function sendTestWithDiagnostics(): array
@@ -39,29 +33,23 @@ class AdminBasicAuthTelegramNotifier
         if (! $this->isEnabled()) {
             return [
                 'ok' => false,
-                'error' => 'В .env не заданы ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_TOKEN и/или ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_CHAT_ID (или пустой кэш config — выполните php artisan config:clear).',
+                'error' => 'В .env задайте ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_TOKEN и ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_CHAT_ID; затем php artisan config:clear.',
             ];
         }
 
-        try {
-            $this->sendRaw('<b>Тест</b>: уведомления Admin HTTP Basic (artisan).');
+        $r = $this->postHtmlMessage('<b>Тест</b>: уведомления Admin HTTP Basic (artisan).');
 
-            return ['ok' => true, 'error' => null];
-        } catch (Throwable $e) {
-            $msg = self::redactTelegramSecrets($e->getMessage());
-            Log::warning('Admin HTTP Basic: тест Telegram не отправлен', [
-                'error' => $msg,
-                'source' => 'admin.basic_auth.test',
-            ]);
-
-            return ['ok' => false, 'error' => $msg];
-        }
+        return [
+            'ok' => $r['ok'],
+            'error' => $r['error'],
+        ];
     }
 
     public function notifySuccess(Request $request, string $basicUsername): void
     {
         $lines = [
             '<b>✅ HTTP Basic: успех</b>',
+            '<b>Проект:</b> smm',
             '',
             '<b>Логин:</b> '.e($basicUsername),
         ];
@@ -73,6 +61,7 @@ class AdminBasicAuthTelegramNotifier
     {
         $lines = [
             '<b>❌ HTTP Basic: отказ</b>',
+            '<b>Проект:</b> smm',
             '',
         ];
         if ($reason === 'missing') {
@@ -111,79 +100,87 @@ class AdminBasicAuthTelegramNotifier
 
     private function send(string $text): void
     {
-        if (! $this->isEnabled()) {
+        $token = (string) (config('http_basic.notify_telegram_token') ?? '');
+        $chatId = config('http_basic.notify_telegram_chat_id');
+
+        if ($token === '' || $chatId === null || $chatId === '') {
+            Log::debug('Admin HTTP Basic: Telegram notify skipped (ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_TOKEN / CHAT_ID).');
+
             return;
+        }
+
+        $r = $this->postHtmlMessage($text);
+        if ($r['ok']) {
+            Log::info('Admin HTTP Basic: сообщение в Telegram отправлено');
+        } elseif ($r['error'] !== null) {
+            Log::warning('Admin HTTP Basic: не удалось отправить в Telegram', [
+                'error' => self::redactTelegramSecrets($r['error']),
+                'source' => 'admin.basic_auth',
+            ]);
+        }
+    }
+
+    /**
+     * @return array{ok: bool, error: ?string}
+     */
+    private function postHtmlMessage(string $htmlText): array
+    {
+        $token = (string) (config('http_basic.notify_telegram_token') ?? '');
+        $chatId = config('http_basic.notify_telegram_chat_id');
+
+        if ($token === '' || $chatId === null || $chatId === '') {
+            return ['ok' => false, 'error' => 'not configured'];
+        }
+
+        if (is_string($chatId) && ctype_digit($chatId)) {
+            $chatId = (int) $chatId;
+        } elseif (is_string($chatId) && preg_match('/^-?\d+$/', $chatId) === 1) {
+            $chatId = (int) $chatId;
         }
 
         try {
-            $this->sendRaw($text);
-            Log::info('Admin HTTP Basic: сообщение в Telegram отправлено');
-        } catch (Throwable $e) {
-            Log::warning('Admin HTTP Basic: не удалось отправить в Telegram', [
-                'error' => self::redactTelegramSecrets($e->getMessage()),
-                'source' => 'admin.basic_auth',
-                'has_proxy' => trim((string) config('admin.http_basic_notify_http_proxy', '')) !== '',
+            $client = TelegramHttpClientFactory::make();
+            $response = $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
+                'http_errors' => false,
+                'json' => [
+                    'chat_id' => $chatId,
+                    'text' => $htmlText,
+                    'parse_mode' => 'HTML',
+                    'disable_web_page_preview' => true,
+                ],
             ]);
-        }
-    }
+            $status = $response->getStatusCode();
+            $body = (string) $response->getBody();
+            if ($status !== 200) {
+                Log::warning('Admin HTTP Basic: Telegram API вернул ошибку', [
+                    'status' => $status,
+                    'body' => $body,
+                    'source' => 'admin.basic_auth',
+                ]);
 
-    /**
-     * @throws Throwable
-     */
-    private function sendRaw(string $htmlText): void
-    {
-        $token = (string) (config('admin.http_basic_notify_telegram_token') ?? '');
-        $chatId = config('admin.http_basic_notify_telegram_chat_id');
-        if ($token === '' || $chatId === null || $chatId === '') {
-            return;
-        }
+                return ['ok' => false, 'error' => "HTTP {$status}: {$body}"];
+            }
 
-        $clientConfig = [
-            'curl' => [
-                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            ],
-            'timeout' => 10,
-            'connect_timeout' => 5,
-            'http_errors' => false,
-        ];
-        $proxy = trim((string) config('admin.http_basic_notify_http_proxy', ''));
-        if ($proxy !== '') {
-            $clientConfig['proxy'] = $proxy;
-        }
+            $data = json_decode($body, true);
+            if (is_array($data) && ! empty($data['ok'])) {
+                return ['ok' => true, 'error' => null];
+            }
 
-        $client = new Client($clientConfig);
-        $response = $client->post("https://api.telegram.org/bot{$token}/sendMessage", [
-            RequestOptions::JSON => [
-                'chat_id' => $this->normalizeChatId($chatId),
-                'text' => $htmlText,
-                'parse_mode' => 'HTML',
-                'disable_web_page_preview' => true,
-            ],
-        ]);
-
-        $body = (string) $response->getBody();
-        $data = json_decode($body, true);
-
-        if (! is_array($data) || empty($data['ok'])) {
             Log::warning('Admin HTTP Basic: Telegram ok=false', [
-                'http' => $response->getStatusCode(),
                 'payload' => $data,
+                'source' => 'admin.basic_auth',
             ]);
-            throw new \RuntimeException('Telegram API: '.($data['description'] ?? 'ok=false'));
-        }
-    }
 
-    /**
-     * @param  mixed  $chatId
-     * @return int|string
-     */
-    private function normalizeChatId($chatId)
-    {
-        if (is_string($chatId) && preg_match('/^-?\d+$/', $chatId) === 1) {
-            return (int) $chatId;
-        }
+            return ['ok' => false, 'error' => is_array($data) ? (string) ($data['description'] ?? 'ok=false') : $body];
+        } catch (\Throwable $e) {
+            $msg = self::redactTelegramSecrets($e->getMessage());
+            Log::warning('Admin HTTP Basic: исключение при отправке в Telegram', [
+                'error' => $msg,
+                'source' => 'admin.basic_auth',
+            ]);
 
-        return $chatId;
+            return ['ok' => false, 'error' => $msg];
+        }
     }
 
     private static function redactTelegramSecrets(string $text): string
