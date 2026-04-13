@@ -60,6 +60,15 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        /*
+         * PartnerApi / внешние API (Log::channel('api_audit')) — без этого Laravel пишет EMERGENCY.
+         */
+        'api_audit' => [
+            'driver' => 'stack',
+            'channels' => ['single'],
+            'ignore_exceptions' => true,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
