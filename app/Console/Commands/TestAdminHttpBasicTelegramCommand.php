@@ -9,27 +9,32 @@ class TestAdminHttpBasicTelegramCommand extends Command
 {
     protected $signature = 'admin:http-basic-telegram-test';
 
-    protected $description = 'Проверить Telegram-бота для уведомлений HTTP Basic (те же TOKEN и CHAT_ID из .env)';
+    protected $description = 'Проверить отправку в Telegram для уведомлений HTTP Basic (те же TOKEN и CHAT_ID, что и в вебе)';
 
     public function handle(AdminBasicAuthTelegramNotifier $notifier): int
     {
-        if (! $notifier->isEnabled()) {
-            $this->error('Задайте в .env: ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_TOKEN и ADMIN_HTTP_BASIC_NOTIFY_TELEGRAM_CHAT_ID');
-            $this->line('После правок: php artisan config:clear');
+        $proxy = trim((string) config('admin.http_basic_notify_http_proxy', ''));
+        $this->line('Параметры: прокси '.($proxy !== '' ? 'задан' : 'не задан').' (ADMIN_HTTP_BASIC_NOTIFY_HTTP_PROXY).');
 
-            return 1;
-        }
+        $result = $notifier->sendTestWithDiagnostics();
 
-        $this->line('Отправка тестового сообщения…');
-
-        if ($notifier->sendTestMessage()) {
-            $this->info('Готово. Проверьте чат в Telegram.');
-            $this->line('Если пусто — смотрите storage/logs/laravel.log (ищите «Admin HTTP Basic Telegram»).');
+        if ($result['ok']) {
+            $this->info('Сообщение ушло. Проверьте чат в Telegram.');
+            $this->line('Подробности при сбоях: storage/logs/laravel.log (ищите «Admin HTTP Basic»).');
 
             return 0;
         }
 
-        $this->error('Отправка не удалась. Смотрите storage/logs/laravel.log');
+        $this->error('Отправка не удалась.');
+        if (! empty($result['error'])) {
+            $this->line('');
+            $this->warn($result['error']);
+        }
+        $this->line('');
+        $this->line('Частые причины:');
+        $this->line(' — с сервера нет маршрута до api.telegram.org (таймаут) → задайте ADMIN_HTTP_BASIC_NOTIFY_HTTP_PROXY');
+        $this->line(' — после правок .env: php artisan config:clear');
+        $this->line(' — сравнение с оболочкой: curl -4 -m 15 "https://api.telegram.org/bot<TOKEN>/getMe"');
 
         return 1;
     }

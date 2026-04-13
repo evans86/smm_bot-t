@@ -6,6 +6,7 @@ use App\Services\Admin\AdminBasicAuthTelegramNotifier;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AdminHttpBasicAuth
@@ -42,13 +43,13 @@ class AdminHttpBasicAuth
         $okPass = hash_equals($expectedPass, $givenPassStr);
 
         if (! $okUser || ! $okPass) {
-            $reason = ($givenUser === null || $givenPassword === null) ? 'missing' : 'invalid';
-            $attempted = $givenUser !== null ? (string) $givenUser : null;
+            // Пустые строки от движка ≠ null: считаем попытку только если передан логин или пароль.
+            $hasAttempt = $givenUserStr !== '' || $givenPassStr !== '';
+            $attempted = $givenUserStr !== '' ? $givenUserStr : null;
 
-            // Как в vpn: только неверный логин/пароль; без Authorization — не шлём.
-            if ($reason === 'invalid') {
-                App::terminating(static function () use ($request, $attempted, $reason): void {
-                    app(AdminBasicAuthTelegramNotifier::class)->notifyFailure($request, $attempted, $reason);
+            if ($hasAttempt) {
+                App::terminating(static function () use ($request, $attempted): void {
+                    app(AdminBasicAuthTelegramNotifier::class)->notifyFailure($request, $attempted, 'invalid');
                 });
             }
 
@@ -60,7 +61,15 @@ class AdminHttpBasicAuth
         $basicUsername = $givenUserStr;
         $response = $next($request);
 
-        if ($request->hasSession() && ! $request->session()->get(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED)) {
+        if (! $request->hasSession()) {
+            Log::warning('Admin HTTP Basic: сессия недоступна, уведомление об успехе в Telegram не ставится в очередь', [
+                'path' => $request->getPathInfo(),
+            ]);
+
+            return $response;
+        }
+
+        if (! $request->session()->get(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED)) {
             $request->session()->put(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED, true);
             App::terminating(static function () use ($request, $basicUsername): void {
                 app(AdminBasicAuthTelegramNotifier::class)->notifySuccess($request, $basicUsername);
