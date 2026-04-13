@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\App;
 
 class AdminHttpBasicAuth
 {
-    private const SESSION_KEY_SUCCESS_NOTIFIED = 'admin_basic_telegram_success_notified';
-
     public function handle(Request $request, Closure $next)
     {
         if (! self::isConfigured()) {
@@ -52,9 +50,8 @@ class AdminHttpBasicAuth
         if (
             $notifier->isEnabled()
             && $session !== null
-            && ! $session->get(self::SESSION_KEY_SUCCESS_NOTIFIED)
+            && ! $session->get(AdminBasicAuthTelegramNotifier::SESSION_KEY_SUCCESS_NOTIFIED)
         ) {
-            $session->put(self::SESSION_KEY_SUCCESS_NOTIFIED, true);
             $login = $givenUser;
             App::terminating(static function () use ($request, $login): void {
                 app(AdminBasicAuthTelegramNotifier::class)->notifySuccess($request, $login);

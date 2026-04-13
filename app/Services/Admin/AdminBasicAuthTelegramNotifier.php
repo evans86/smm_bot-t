@@ -12,6 +12,9 @@ class AdminBasicAuthTelegramNotifier
 {
     private const USER_AGENT_MAX = 500;
 
+    /** Ключ в сессии: успешное уведомление в Telegram уже отправлено (ставится только после успешного sendMessage). */
+    public const SESSION_KEY_SUCCESS_NOTIFIED = 'admin_basic_telegram_success_notified';
+
     public function isEnabled(): bool
     {
         $token = $this->token();
@@ -42,7 +45,9 @@ class AdminBasicAuthTelegramNotifier
         ];
         $lines = array_merge($lines, $this->contextLines($request));
 
-        $this->send(implode("\n", $lines));
+        if ($this->send(implode("\n", $lines))) {
+            $this->markSuccessNotifiedInSession($request);
+        }
     }
 
     public function notifyInvalid(Request $request, string $attemptedLogin): void
@@ -58,6 +63,17 @@ class AdminBasicAuthTelegramNotifier
         $lines = array_merge($lines, $this->contextLines($request));
 
         $this->send(implode("\n", $lines));
+    }
+
+    private function markSuccessNotifiedInSession(Request $request): void
+    {
+        $session = $request->getSession();
+        if ($session === null) {
+            return;
+        }
+
+        $session->put(self::SESSION_KEY_SUCCESS_NOTIFIED, true);
+        $session->save();
     }
 
     /**
@@ -87,13 +103,13 @@ class AdminBasicAuthTelegramNotifier
         return $lines;
     }
 
-    private function send(string $text): void
+    private function send(string $text): bool
     {
         $token = $this->token();
         $chatId = $this->chatId();
 
         if ($token === '' || $chatId === '') {
-            return;
+            return false;
         }
 
         try {
@@ -102,10 +118,16 @@ class AdminBasicAuthTelegramNotifier
                 'chat_id' => $chatId,
                 'text' => $text,
             ]);
+
+            Log::info('Admin HTTP Basic: уведомление в Telegram отправлено');
+
+            return true;
         } catch (Throwable $e) {
             Log::warning('Admin HTTP Basic: Telegram sendMessage ошибка', [
                 'message' => $e->getMessage(),
             ]);
+
+            return false;
         }
     }
 }
