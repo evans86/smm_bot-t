@@ -5,6 +5,18 @@ namespace App\Helpers;
 class ApiHelpers
 {
     /**
+     * Маскирует секреты, если в ответ случайно попал URL или текст исключения с query/form параметрами.
+     */
+    private static function sanitizeErrorMessage(string $message): string
+    {
+        return preg_replace(
+            '/((?:private_key|secret_key|user_secret_key|api_key|token)=)[^&\s"\']+/i',
+            '$1[redacted]',
+            $message
+        );
+    }
+
+    /**
      * @param $result
      * @return array
      */
@@ -26,7 +38,7 @@ class ApiHelpers
     {
         return [
             'result' => false,
-            'message' => $message,
+            'message' => self::sanitizeErrorMessage($message),
             'data' => [],
         ];
     }
@@ -51,7 +63,7 @@ class ApiHelpers
     {
         return [
             'result' => false,
-            'message' => $message
+            'message' => self::sanitizeErrorMessage($message)
         ];
     }
 

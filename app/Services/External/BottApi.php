@@ -4,10 +4,41 @@ namespace App\Services\External;
 
 use App\Dto\BotDto;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use RuntimeException;
 
 class BottApi
 {
     const HOST = 'https://api.bot-t.com/';
+
+    /**
+     * Выполняет запросы к Bot-t без утечки query/form параметров в тексты ошибок Guzzle.
+     *
+     * @throws RuntimeException
+     */
+    private static function requestJson(Client $client, string $method, string $uri, array $options = []): array
+    {
+        $options['http_errors'] = false;
+
+        try {
+            $response = $client->request($method, $uri, $options);
+        } catch (GuzzleException $e) {
+            throw new RuntimeException('Bott API request failed');
+        }
+
+        $contents = $response->getBody()->getContents();
+        $result = json_decode($contents, true);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        return [
+            'result' => false,
+            'message' => 'Bott API invalid response',
+            'data' => [],
+        ];
+    }
 
     /**
      * Проверка $secret_key
@@ -29,10 +60,9 @@ class BottApi
         ];
 
         $client = new Client(['base_uri' => self::HOST]);
-        $response = $client->get('v1/module/user/check-secret?' . http_build_query($requestParam));
-
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
+        return self::requestJson($client, 'GET', 'v1/module/user/check-secret', [
+            'query' => $requestParam,
+        ]);
     }
 
     /**
@@ -53,10 +83,9 @@ class BottApi
         ];
 
         $client = new Client(['base_uri' => self::HOST]);
-        $response = $client->get('v1/module/user/get?' . http_build_query($requestParam));
-
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
+        return self::requestJson($client, 'GET', 'v1/module/user/get', [
+            'query' => $requestParam,
+        ]);
     }
 
     /**
@@ -87,15 +116,12 @@ class BottApi
         ];
 
         $client = new Client(['base_uri' => $link]);
-        $response = $client->request('POST', 'subtract-balance', [
+        return self::requestJson($client, 'POST', 'subtract-balance', [
             'form_params' => $requestParam,
             'headers' => [
                 'User-Agent' => $comment,
             ]
         ]);
-
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
     }
 
     /**
@@ -126,15 +152,12 @@ class BottApi
         ];
 
         $client = new Client(['base_uri' => $link]);
-        $response = $client->request('POST', 'add-balance', [
+        return self::requestJson($client, 'POST', 'add-balance', [
             'form_params' => $requestParam,
             'headers' => [
                 'User-Agent' => $comment,
             ]
         ]);
-
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
     }
 
     public static function createOrder(BotDto $botDto, array $userData, int $amount, string $product)
@@ -158,14 +181,11 @@ class BottApi
         ];
 
         $client = new Client(['base_uri' => $link]);
-        $response = $client->request('POST', 'order-create', [
+        return self::requestJson($client, 'POST', 'order-create', [
             'form_params' => $requestParam,
             'headers' => [
                 'User-Agent' => $product,
             ]
         ]);
-
-        $result = $response->getBody()->getContents();
-        return json_decode($result, true);
     }
 }
