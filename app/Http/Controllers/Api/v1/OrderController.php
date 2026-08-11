@@ -7,15 +7,14 @@ use App\Helpers\ApiHelpers;
 use App\Helpers\BotLogHelpers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\api\OrderResource;
-use App\Models\Description\Country;
 use App\Models\Bot\Bot;
 use App\Models\Order\Order;
 use App\Models\User\User;
 use App\Services\Activate\OrderService;
 use App\Services\External\BottApi;
-use Exception;
 use Illuminate\Http\Request;
 use RuntimeException;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -24,8 +23,12 @@ class OrderController extends Controller
      */
     private OrderService $orderService;
 
+    /**
+     * @noinspection PhpMissingParentConstructorInspection
+     */
     public function __construct()
     {
+        // parent::__construct() adds auth middleware, while these API endpoints are public.
         $this->orderService = new OrderService();
     }
 
@@ -46,6 +49,8 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
+            if (!is_numeric($request->user_id))
+                return ApiHelpers::error('Invalid params: user_id');
             $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
@@ -83,7 +88,7 @@ class OrderController extends Controller
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error($r->getMessage());
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Create order error');
@@ -102,6 +107,8 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
+            if (!is_numeric($request->user_id))
+                return ApiHelpers::error('Invalid params: user_id');
             $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
@@ -136,7 +143,7 @@ class OrderController extends Controller
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error($r->getMessage());
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Orders error');
@@ -156,10 +163,15 @@ class OrderController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
+            if (!is_numeric($request->user_id))
+                return ApiHelpers::error('Invalid params: user_id');
             $user = User::query()->where(['telegram_id' => $request->user_id])->first();
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
+            /** @var Order|null $order */
             $order = Order::query()->where(['order_id' => $request->order_id])->first();
+            if (!$order instanceof Order)
+                return ApiHelpers::error('Not found order.');
             if (is_null($request->user_secret_key))
                 return ApiHelpers::error('Not found params: user_secret_key');
             if (is_null($request->public_key))
@@ -189,12 +201,11 @@ class OrderController extends Controller
                 $result['data']
             );
 
-            $order = Order::query()->where(['order_id' => $request->order_id])->first();
             return ApiHelpers::success(OrderResource::generateOrderArray($order));
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error($r->getMessage());
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get order error');

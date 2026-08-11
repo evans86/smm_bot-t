@@ -9,11 +9,21 @@ class ApiHelpers
      */
     private static function sanitizeErrorMessage(string $message): string
     {
-        return preg_replace(
-            '/((?:private_key|secret_key|user_secret_key|api_key|token)=)[^&\s"\']+/i',
+        $secretKeys = 'private_key|secret_key|user_secret_key|api_key|token';
+
+        $message = preg_replace([
+            '/((' . $secretKeys . ')=)[^&\s"\']+/i',
+            '/((' . $secretKeys . ')%3D)[^&\s"\']+/i',
+            '/(["\'](' . $secretKeys . ')["\']\s*:\s*["\'])[^"\']*(["\'])/i',
+            '/((' . $secretKeys . ')\s*:\s*)[^\s,;&"\']+/i',
+        ], [
             '$1[redacted]',
-            $message
-        );
+            '$1[redacted]',
+            '$1[redacted]$3',
+            '$1[redacted]',
+        ], $message);
+
+        return $message ?? 'Error';
     }
 
     /**
