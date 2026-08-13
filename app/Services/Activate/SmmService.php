@@ -386,7 +386,6 @@ class SmmService extends MainService
     ): string {
         $labels = $language === 'ru'
             ? [
-                'generated' => 'Описание сформировано автоматически на основе актуальной таблицы услуг провайдера.',
                 'service' => 'Услуга',
                 'rate' => 'Цена за 1000',
                 'min' => 'Минимальный заказ',
@@ -394,7 +393,6 @@ class SmmService extends MainService
                 'average_time' => 'Среднее время',
             ]
             : [
-                'generated' => 'Description generated automatically from the current provider services table.',
                 'service' => 'Service',
                 'rate' => 'Rate per 1000',
                 'min' => 'Min order',
@@ -410,7 +408,7 @@ class SmmService extends MainService
             $labels['average_time'] => $averageTime,
         ];
 
-        $html = '<p>' . $this->escapeDescriptionValue($labels['generated']) . '</p><ul>';
+        $html = '<ul>';
         foreach ($items as $label => $value) {
             $value = trim($value);
             if ($value === '') {
