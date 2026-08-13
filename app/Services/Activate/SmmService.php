@@ -36,36 +36,28 @@ class SmmService extends MainService
         foreach ($socials as $key => $social) {
 
             foreach ($services as $k => $service) {
-                switch ($service['type']) {
-                    case 'Package':
-                    case 'Subscriptions ':
-                    case 'Custom Comments':
-                    case 'Mentions User Followers':
-                    case 'Custom Comments Package':
-                        break;
-                    case 'Default':
-                    case 'Poll':
-                        if (str_contains($service['category'], $social->name_en)) {
-                            if (!is_null($botDto->white)) {
-                                if ($this->isAllowedByWhiteList($service, $white_array)) {
-                                    array_push($result, [
-                                        'id' => $social->id,
-                                        'name_en' => $social->name_en,
-                                        'name_ru' => $social->name_ru,
-                                        'image' => $social->image,
-                                    ]);
-                                } else {
-                                    break;
-                                }
-                            } else {
-                                array_push($result, [
-                                    'id' => $social->id,
-                                    'name_en' => $social->name_en,
-                                    'name_ru' => $social->name_ru,
-                                    'image' => $social->image,
-                                ]);
-                            }
+                if (!$this->isSupportedCatalogService($service)) {
+                    continue;
+                }
+
+                if (str_contains($service['category'], $social->name_en)) {
+                    if (!is_null($botDto->white)) {
+                        if ($this->isAllowedByWhiteList($service, $white_array)) {
+                            array_push($result, [
+                                'id' => $social->id,
+                                'name_en' => $social->name_en,
+                                'name_ru' => $social->name_ru,
+                                'image' => $social->image,
+                            ]);
                         }
+                    } else {
+                        array_push($result, [
+                            'id' => $social->id,
+                            'name_en' => $social->name_en,
+                            'name_ru' => $social->name_ru,
+                            'image' => $social->image,
+                        ]);
+                    }
                 }
             }
 
@@ -119,31 +111,22 @@ class SmmService extends MainService
         foreach ($services as $key => $service) {
 //            dd($service);
 
-            switch ($service['type']) {
-                case 'Package':
-                case 'Subscriptions ':
-                case 'Custom Comments':
-                case 'Mentions User Followers':
-                case 'Custom Comments Package':
-                    break;
-                case 'Default':
-                case 'Poll':
-                    if (str_contains($service['category'], $social->name_en)) {
+            if (!$this->isSupportedCatalogService($service)) {
+                continue;
+            }
 
-                        if (!is_null($botDto->white)) {
-                            if ($this->isAllowedByWhiteList($service, $white_array)) {
-                                array_push($result, [
-                                    'name_category' => $service['category'],
-                                ]);
-                            } else {
-                                break;
-                            }
-                        } else {
-                            array_push($result, [
-                                'name_category' => $service['category'],
-                            ]);
-                        }
+            if (str_contains($service['category'], $social->name_en)) {
+                if (!is_null($botDto->white)) {
+                    if ($this->isAllowedByWhiteList($service, $white_array)) {
+                        array_push($result, [
+                            'name_category' => $service['category'],
+                        ]);
                     }
+                } else {
+                    array_push($result, [
+                        'name_category' => $service['category'],
+                    ]);
+                }
             }
         }
 
@@ -230,32 +213,25 @@ class SmmService extends MainService
             }
 //            dd($service);
 
-            switch ($service['type']) {
-                case 'Package':
-                case 'Subscriptions ':
-                case 'Custom Comments':
-                case 'Mentions User Followers':
-                case 'Custom Comments Package':
-                    break;
-                case 'Default':
-                case 'Poll':
-                    if (($service['category'] == $name_category)) {
+            if (!$this->isSupportedCatalogService($service)) {
+                continue;
+            }
 
-                        $description = Description::query()->where(['type_id' => $service['service']])->first();
-                        $amountStart = (int)ceil(floatval($service['rate']) * 100);
-                        $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
+            if (($service['category'] == $name_category)) {
+                $description = Description::query()->where(['type_id' => $service['service']])->first();
+                $amountStart = (int)ceil(floatval($service['rate']) * 100);
+                $amountFinal = $amountStart + $amountStart * $botDto->percent / 100;
 
-                        array_push($result, [
-                            'type_id' => $service['service'],//ид типа товара
-                            'name' => $service['name'],//название товара
-                            'min' => $service['min'],//минимаьлное количество товара
-                            'max' => $service['max'],//максимально возможное количество единиц товара
-                            'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
-                            'type' => $service['type'],//с каким типом дальше создавать заказ
-                            'desc_ru' => $description ? $description->desc_ru : null,
-                            'desc_eng' => $description ? $description->desc_eng : null,
-                        ]);
-                    }
+                array_push($result, [
+                    'type_id' => $service['service'],//ид типа товара
+                    'name' => $service['name'],//название товара
+                    'min' => $service['min'],//минимаьлное количество товара
+                    'max' => $service['max'],//максимально возможное количество единиц товара
+                    'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
+                    'type' => $this->getCatalogServiceType($service),//с каким типом дальше создавать заказ
+                    'desc_ru' => $description ? $description->desc_ru : null,
+                    'desc_eng' => $description ? $description->desc_eng : null,
+                ]);
             }
 
         }
@@ -270,6 +246,25 @@ class SmmService extends MainService
 
         return in_array((string)$serviceId, array_map('strval', $whiteList), true)
             || in_array($serviceId, self::ALWAYS_VISIBLE_SERVICE_IDS, true);
+    }
+
+    private function isSupportedCatalogService(array $service): bool
+    {
+        $serviceId = intval($service['service'] ?? 0);
+
+        return in_array($service['type'] ?? null, ['Default', 'Poll'], true)
+            || in_array($serviceId, self::ALWAYS_VISIBLE_SERVICE_IDS, true);
+    }
+
+    private function getCatalogServiceType(array $service): string
+    {
+        $serviceId = intval($service['service'] ?? 0);
+
+        if (in_array($serviceId, self::ALWAYS_VISIBLE_SERVICE_IDS, true)) {
+            return 'Default';
+        }
+
+        return (string)($service['type'] ?? 'Default');
     }
 
     /**
