@@ -312,7 +312,11 @@ class SmmService extends MainService
         try {
             $descriptions = $this->getDescription();
 
-            echo 'Получен массив описаний' . PHP_EOL;
+            echo 'Получен массив описаний: ' . count($descriptions) . PHP_EOL;
+
+            if (count($descriptions) === 0) {
+                throw new \RuntimeException('Не найдены описания на странице soc-proof.su/services');
+            }
 
             $start_text = 'Smm: Получен массив описаний' . PHP_EOL;
             $this->notifyTelegram($start_text);
@@ -320,13 +324,13 @@ class SmmService extends MainService
             foreach ($descriptions as $key => $description) {
                 echo 'start to: ' . $key . PHP_EOL;
 
-                $data = [
-                    'type_id' => $key,
-                    'desc_ru' => $description['desc_ru'],
-                    'desc_eng' => $description['desc_eng'],
-                ];
-
-                Description::updateOrCreate($data);
+                Description::updateOrCreate(
+                    ['type_id' => $key],
+                    [
+                        'desc_ru' => $description['desc_ru'] ?? null,
+                        'desc_eng' => $description['desc_eng'] ?? null,
+                    ]
+                );
 
                 echo 'finish to: ' . $key . PHP_EOL;
             }
@@ -337,8 +341,14 @@ class SmmService extends MainService
             $this->notifyTelegram($finish_text);
 
         } catch (\Exception $e) {
+            echo 'Ошибка обновления описаний: ' . $this->sanitizeTelegramError($e->getMessage()) . PHP_EOL;
             $this->notifyTelegram('🔴' . $e->getMessage());
         }
+    }
+
+    private function sanitizeTelegramError(string $message): string
+    {
+        return preg_replace('/bot\d+:[A-Za-z0-9_-]+/i', 'bot[redacted]', $message) ?? $message;
     }
 
     public function notifyTelegram($text)
@@ -380,7 +390,8 @@ class SmmService extends MainService
         }
 
         // Если все боты не сработали, логируем ошибку (или просто игнорируем)
-        error_log("Telegram send failed: " . $lastError->getMessage());
+        $message = $lastError ? $this->sanitizeTelegramError($lastError->getMessage()) : 'unknown error';
+        error_log("Telegram send failed: " . $message);
         return false;
     }
 }

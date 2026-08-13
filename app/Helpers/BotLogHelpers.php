@@ -7,6 +7,11 @@ use GuzzleHttp\RequestOptions;
 
 class BotLogHelpers
 {
+    private static function sanitizeTelegramError(string $message): string
+    {
+        return preg_replace('/bot\d+:[A-Za-z0-9_-]+/i', 'bot[redacted]', $message) ?? $message;
+    }
+
     public static function notifyBotLog($text)
     {
         $client = new Client([
@@ -46,7 +51,8 @@ class BotLogHelpers
         }
 
         // Если все боты не сработали, логируем ошибку (или просто игнорируем)
-        error_log("Telegram send failed: " . $lastError->getMessage());
+        $message = $lastError ? self::sanitizeTelegramError($lastError->getMessage()) : 'unknown error';
+        error_log("Telegram send failed: " . $message);
         return false;
     }
 }
