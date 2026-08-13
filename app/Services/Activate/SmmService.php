@@ -13,6 +13,10 @@ use GuzzleHttp\RequestOptions;
 
 class SmmService extends MainService
 {
+    private const ALWAYS_VISIBLE_SERVICE_IDS = [
+        690, // TikTok Comment Likes
+    ];
+
     /**
      * Формирование массива соц.сетей
      *
@@ -43,7 +47,7 @@ class SmmService extends MainService
                     case 'Poll':
                         if (str_contains($service['category'], $social->name_en)) {
                             if (!is_null($botDto->white)) {
-                                if (in_array($service['service'], $white_array)) {
+                                if ($this->isAllowedByWhiteList($service, $white_array)) {
                                     array_push($result, [
                                         'id' => $social->id,
                                         'name_en' => $social->name_en,
@@ -127,7 +131,7 @@ class SmmService extends MainService
                     if (str_contains($service['category'], $social->name_en)) {
 
                         if (!is_null($botDto->white)) {
-                            if (in_array($service['service'], $white_array)) {
+                            if ($this->isAllowedByWhiteList($service, $white_array)) {
                                 array_push($result, [
                                     'name_category' => $service['category'],
                                 ]);
@@ -221,7 +225,7 @@ class SmmService extends MainService
 
             if (!is_null($botDto->white)) {
 //                dd($service);
-                if (!in_array($service['service'], $white_array))
+                if (!$this->isAllowedByWhiteList($service, $white_array))
                     continue;
             }
 //            dd($service);
@@ -248,8 +252,8 @@ class SmmService extends MainService
                             'max' => $service['max'],//максимально возможное количество единиц товара
                             'rate' => $amountFinal,//цена за 1000 единиц (посчитать с наценкой)
                             'type' => $service['type'],//с каким типом дальше создавать заказ
-                            'desc_ru' => $description->desc_ru,
-                            'desc_eng' => $description->desc_eng,
+                            'desc_ru' => $description ? $description->desc_ru : null,
+                            'desc_eng' => $description ? $description->desc_eng : null,
                         ]);
                     }
             }
@@ -258,6 +262,14 @@ class SmmService extends MainService
 //        dd($result);
 
         return $result;
+    }
+
+    private function isAllowedByWhiteList(array $service, array $whiteList): bool
+    {
+        $serviceId = intval($service['service'] ?? 0);
+
+        return in_array((string)$serviceId, array_map('strval', $whiteList), true)
+            || in_array($serviceId, self::ALWAYS_VISIBLE_SERVICE_IDS, true);
     }
 
     /**
