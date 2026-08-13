@@ -273,31 +273,160 @@ class SmmService extends MainService
         $response = $client->request('GET', 'services');
 
         $content = $response->getBody()->getContents();
-        $document = new Document($content);
-        $modals = $document->find('.modal');
         $results = [];
-        foreach ($modals as $modal) {
-            $id = substr($modal->getAttribute('id'), 6);
-            $id = intval($id);
-            $results[$id]['id'] = $id;
-            $desc = $modal->first('.modal-body')->html();
-            $results[$id]['desc_ru'] = $desc;
-        }
+        $results = $this->mergeDescriptionResults(
+            $results,
+            $this->parseModalDescriptions($content, 'desc_ru')
+        );
 
         $client = new Client(['base_uri' => 'https://soc-proof.su/']);
         $response = $client->request('GET', 'en/services');
         $content = $response->getBody()->getContents();
 
+        $results = $this->mergeDescriptionResults(
+            $results,
+            $this->parseModalDescriptions($content, 'desc_eng')
+        );
+
+        if (count($results) > 0) {
+            return $results;
+        }
+
+        $response = $client->request('GET', 'services');
+        $ruContent = $response->getBody()->getContents();
+        $results = $this->mergeDescriptionResults(
+            $results,
+            $this->parseTableDescriptions($ruContent, 'desc_ru', 'ru')
+        );
+
+        $response = $client->request('GET', 'en/services');
+        $enContent = $response->getBody()->getContents();
+        return $this->mergeDescriptionResults(
+            $results,
+            $this->parseTableDescriptions($enContent, 'desc_eng', 'eng')
+        );
+    }
+
+    private function parseModalDescriptions(string $content, string $field): array
+    {
         $document = new Document($content);
-        $modals = $document->find('.modal');
-        foreach ($modals as $modal) {
-            $id = substr($modal->getAttribute('id'), 6);
-            $id = intval($id);
-            $desc = $modal->first('.modal-body')->html();
-            $results[$id]['desc_eng'] = $desc;
+        $results = [];
+
+        foreach ($document->find('.modal') as $modal) {
+            $id = intval(substr((string)$modal->getAttribute('id'), 6));
+            $body = $modal->first('.modal-body');
+
+            if ($id <= 0 || $body === null) {
+                continue;
+            }
+
+            $results[$id] = [
+                'id' => $id,
+                $field => $body->html(),
+            ];
         }
 
         return $results;
+    }
+
+    private function parseTableDescriptions(string $content, string $field, string $language): array
+    {
+        $document = new Document($content);
+        $results = [];
+
+        foreach ($document->find('table tr') as $row) {
+            $cells = $row->find('td');
+
+            if (count($cells) < 6) {
+                continue;
+            }
+
+            $idText = trim($cells[0]->text());
+            if (!preg_match('/^\d+$/', $idText)) {
+                continue;
+            }
+
+            $id = intval($idText);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $results[$id] = [
+                'id' => $id,
+                $field => $this->buildTableDescriptionHtml(
+                    $cells[1]->text(),
+                    $cells[2]->text(),
+                    $cells[3]->text(),
+                    $cells[4]->text(),
+                    $cells[5]->text(),
+                    $language
+                ),
+            ];
+        }
+
+        return $results;
+    }
+
+    private function mergeDescriptionResults(array $base, array $incoming): array
+    {
+        foreach ($incoming as $id => $description) {
+            $base[$id] = array_merge($base[$id] ?? ['id' => $id], $description);
+        }
+
+        return $base;
+    }
+
+    private function buildTableDescriptionHtml(
+        string $name,
+        string $rate,
+        string $min,
+        string $max,
+        string $averageTime,
+        string $language
+    ): string {
+        $labels = $language === 'ru'
+            ? [
+                'generated' => 'Описание сформировано автоматически на основе актуальной таблицы услуг провайдера.',
+                'service' => 'Услуга',
+                'rate' => 'Цена за 1000',
+                'min' => 'Минимальный заказ',
+                'max' => 'Максимальный заказ',
+                'average_time' => 'Среднее время',
+            ]
+            : [
+                'generated' => 'Description generated automatically from the current provider services table.',
+                'service' => 'Service',
+                'rate' => 'Rate per 1000',
+                'min' => 'Min order',
+                'max' => 'Max order',
+                'average_time' => 'Average time',
+            ];
+
+        $items = [
+            $labels['service'] => $name,
+            $labels['rate'] => $rate,
+            $labels['min'] => $min,
+            $labels['max'] => $max,
+            $labels['average_time'] => $averageTime,
+        ];
+
+        $html = '<p>' . $this->escapeDescriptionValue($labels['generated']) . '</p><ul>';
+        foreach ($items as $label => $value) {
+            $value = trim($value);
+            if ($value === '') {
+                continue;
+            }
+
+            $html .= '<li><strong>' . $this->escapeDescriptionValue($label) . ':</strong> '
+                . $this->escapeDescriptionValue($value) . '</li>';
+        }
+
+        return $html . '</ul>';
+    }
+
+    private function escapeDescriptionValue(string $value): string
+    {
+        return htmlspecialchars(trim($value), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /**
