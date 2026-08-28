@@ -300,13 +300,15 @@ class OrderService extends MainService
         }
 
         $data = $result['data'];
-        if (empty($data['secret_user_key']) && !empty($data['secret_key'])) {
-            $data['secret_user_key'] = $data['secret_key'];
-        }
+        $secret = $data['secret_user_key'] ?? $data['secret_key'] ?? '';
+        $telegramId = $data['user']['telegram_id'] ?? $data['telegram_id'] ?? $user->telegram_id;
 
-        if (empty($data['secret_user_key']) || empty($data['user']['telegram_id'])) {
+        if ($secret === '' || empty($telegramId)) {
             return [];
         }
+
+        $data['secret_user_key'] = $secret;
+        $data['user']['telegram_id'] = (int) $telegramId;
 
         return $data;
     }
