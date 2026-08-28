@@ -213,13 +213,8 @@ class OrderService extends MainService
         }
 
         $refundStatuses = [Order::CANCEL_STATUS, Order::TO_PROCESS_STATUS];
-        $alreadyClosed = [Order::CANCEL_STATUS, Order::TO_PROCESS_STATUS, Order::FINISH_STATUS, Order::OLD_STATUS];
 
         if (!in_array($order->status, $refundStatuses, true)) {
-            return;
-        }
-
-        if (in_array((string)$previousStatus, $alreadyClosed, true)) {
             return;
         }
 
@@ -304,7 +299,16 @@ class OrderService extends MainService
             return [];
         }
 
-        return $result['data'];
+        $data = $result['data'];
+        if (empty($data['secret_user_key']) && !empty($data['secret_key'])) {
+            $data['secret_user_key'] = $data['secret_key'];
+        }
+
+        if (empty($data['secret_user_key']) || empty($data['user']['telegram_id'])) {
+            return [];
+        }
+
+        return $data;
     }
 
     /**
