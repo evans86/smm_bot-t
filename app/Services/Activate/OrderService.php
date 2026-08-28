@@ -119,7 +119,12 @@ class OrderService extends MainService
      */
     public function updateOrders(BotDto $botDto, $user_id)
     {
-        $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
+        $statuses = [
+            Order::CREATE_STATUS,
+            Order::TO_PROCESS_STATUS,
+            Order::WORK_STATUS,
+            Order::TO_PROCESSING_STATUS,
+        ];
 
         $orders = Order::query()->whereIn('status', $statuses)
             ->where(['user_id' => $user_id])
@@ -136,13 +141,16 @@ class OrderService extends MainService
      *
      * @param BotDto $botDto
      * @param Order $order
+     * @param array $userData
      * @return void
      */
-    public function order(BotDto $botDto, Order $order)
+    public function order(BotDto $botDto, Order $order, array $userData = [])
     {
         try {
             $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
             $request_order = $partnerApi->status($order->order_id);
+
+            $previousStatus = $order->status;
 
             if ($order->created_at < Carbon::now()->subMonth())
                 $status = Order::OLD_STATUS;
@@ -158,10 +166,12 @@ class OrderService extends MainService
                 : null;
 
             $order->status = $status;
-            $order->start_count = $start_count;
+            $order->start_count = $start_count ?? $order->start_count;
             $order->remains = $remains;
 
             $order->save();
+
+            $this->refundIfNeeded($botDto, $order, $previousStatus, $userData);
         } catch (\Exception $e) {
             // Логируем ошибку, но не прерываем выполнение
             \Log::error("Order update failed: {$e->getMessage()}", [
@@ -173,6 +183,119 @@ class OrderService extends MainService
             $order->status = Order::OLD_STATUS; // или другой статус
             $order->save();
         }
+    }
+
+    private function refundIfNeeded(BotDto $botDto, Order $order, ?string $previousStatus, array $userData = []): void
+    {
+        try {
+            $this->processRefund($botDto, $order, $previousStatus, $userData);
+        } catch (\Throwable $e) {
+            \Log::error('SMM refund exception: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'provider_order_id' => $order->order_id,
+            ]);
+        }
+    }
+
+    private function processRefund(BotDto $botDto, Order $order, ?string $previousStatus, array $userData = []): void
+    {
+        if ($order->refunded_at) {
+            return;
+        }
+
+        $refundStatuses = [Order::CANCEL_STATUS, Order::TO_PROCESS_STATUS];
+        $alreadyClosed = [Order::CANCEL_STATUS, Order::TO_PROCESS_STATUS, Order::FINISH_STATUS, Order::OLD_STATUS];
+
+        if (!in_array($order->status, $refundStatuses, true)) {
+            return;
+        }
+
+        if (in_array((string)$previousStatus, $alreadyClosed, true)) {
+            return;
+        }
+
+        $amount = $this->calculateRefundAmount($order);
+        if ($amount <= 0) {
+            $order->refunded_at = now();
+            $order->save();
+            return;
+        }
+
+        $userData = $this->resolveUserData($botDto, $order, $userData);
+        if ($userData === []) {
+            \Log::error('SMM refund skipped: user data not found', [
+                'order_id' => $order->id,
+                'provider_order_id' => $order->order_id,
+            ]);
+            return;
+        }
+
+        $result = BottApi::addBalance(
+            $botDto,
+            $userData,
+            $amount,
+            'Возврат SMM заказ #' . $order->order_id
+        );
+
+        if (!($result['result'] ?? false)) {
+            \Log::error('SMM refund failed', [
+                'order_id' => $order->id,
+                'provider_order_id' => $order->order_id,
+                'amount' => $amount,
+                'message' => $result['message'] ?? 'unknown',
+            ]);
+            return;
+        }
+
+        $order->refunded_at = now();
+        $order->save();
+    }
+
+    private function calculateRefundAmount(Order $order): int
+    {
+        $price = (int) round((float) $order->price);
+        if ($price <= 0) {
+            return 0;
+        }
+
+        $startCount = (int) $order->start_count;
+        $remains = (int) $order->remains;
+
+        if ($order->status === Order::TO_PROCESS_STATUS) {
+            if ($startCount <= 0 || $remains <= 0) {
+                return 0;
+            }
+
+            return (int) round($price * $remains / $startCount);
+        }
+
+        if ($startCount > 0 && $remains > 0 && $remains < $startCount) {
+            return (int) round($price * $remains / $startCount);
+        }
+
+        return $price;
+    }
+
+    private function resolveUserData(BotDto $botDto, Order $order, array $userData): array
+    {
+        if (
+            isset($userData['secret_user_key'], $userData['user']['telegram_id'])
+            && $userData['secret_user_key'] !== ''
+        ) {
+            return $userData;
+        }
+
+        $user = $order->user ?: User::query()->find($order->user_id);
+        if (!$user || !$user->telegram_id) {
+            return [];
+        }
+
+        $result = BottApi::get((int) $user->telegram_id, $botDto->public_key, $botDto->private_key);
+        if (!($result['result'] ?? false) || !is_array($result['data'] ?? null)) {
+            return [];
+        }
+
+        return $result['data'];
     }
 
     /**
@@ -215,8 +338,21 @@ class OrderService extends MainService
         file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Cron started\n", FILE_APPEND);
 
         try {
-            $statuses = [Order::CREATE_STATUS, Order::TO_PROCESS_STATUS, Order::WORK_STATUS];
-            $total = Order::query()->whereIn('status', $statuses)->count();
+            $statuses = [
+                Order::CREATE_STATUS,
+                Order::TO_PROCESS_STATUS,
+                Order::WORK_STATUS,
+                Order::TO_PROCESSING_STATUS,
+            ];
+            $ordersQuery = Order::query()
+                ->where(function ($query) use ($statuses) {
+                    $query->whereIn('status', $statuses)
+                        ->orWhere(function ($unrefunded) {
+                            $unrefunded->where('status', Order::CANCEL_STATUS)
+                                ->whereNull('refunded_at');
+                        });
+                });
+            $total = (clone $ordersQuery)->count();
 
             file_put_contents($logFile, "Total orders: $total\n", FILE_APPEND);
             $this->notifyTelegram("Smm Start: $total orders");
@@ -224,12 +360,15 @@ class OrderService extends MainService
             $processed = 0;
             $errors = 0;
 
-            Order::query()
-                ->whereIn('status', $statuses)
-                ->with('bot') // eager loading для избежания N+1
+            $ordersQuery
+                ->with(['bot', 'user'])
                 ->chunk(50, function ($orders) use (&$processed, &$errors, $total, $logFile) {
                     foreach ($orders as $order) {
                         try {
+                            if (!$order->bot) {
+                                $errors++;
+                                continue;
+                            }
                             $botDto = BotFactory::fromEntity($order->bot);
                             $this->order($botDto, $order);
                             $processed++;

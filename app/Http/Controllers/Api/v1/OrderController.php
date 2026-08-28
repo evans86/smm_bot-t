@@ -110,6 +110,8 @@ class OrderController extends Controller
             if (!is_numeric($request->user_id))
                 return ApiHelpers::error('Invalid params: user_id');
             $user = User::query()->where(['telegram_id' => $request->user_id])->first();
+            if (is_null($user))
+                return ApiHelpers::error('Not found user.');
             if (is_null($request->public_key))
                 return ApiHelpers::error('Not found params: public_key');
             $bot = Bot::query()->where('public_key', $request->public_key)->first();
@@ -166,6 +168,8 @@ class OrderController extends Controller
             if (!is_numeric($request->user_id))
                 return ApiHelpers::error('Invalid params: user_id');
             $user = User::query()->where(['telegram_id' => $request->user_id])->first();
+            if (is_null($user))
+                return ApiHelpers::error('Not found user.');
             if (is_null($request->order_id))
                 return ApiHelpers::error('Not found params: order_id');
             /** @var Order|null $order */
@@ -193,6 +197,10 @@ class OrderController extends Controller
             );
             if (!$result['result']) {
                 throw new RuntimeException($result['message']);
+            }
+
+            if ((int) $order->user_id !== (int) $user->id || (int) $order->bot_id !== (int) $bot->id) {
+                return ApiHelpers::error('Not found order.');
             }
 
             $this->orderService->order(

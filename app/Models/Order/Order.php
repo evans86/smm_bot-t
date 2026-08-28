@@ -3,8 +3,6 @@
 namespace App\Models\Order;
 
 use App\Models\Bot\Bot;
-use App\Models\Description\Country;
-use App\Models\Proxy\Proxy;
 use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +29,11 @@ class Order extends Model
 
     protected $guarded = false;
     protected $table = 'order';
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'refunded_at',
+    ];
 
     public function bot()
     {
