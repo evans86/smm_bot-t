@@ -15,6 +15,15 @@ class Bot extends Model
     protected $guarded = false;
     protected $table = 'bot';
 
+    protected $casts = [
+        'bot_id' => 'integer',
+        'category_id' => 'integer',
+        'percent' => 'integer',
+        'version' => 'integer',
+        'color' => 'integer',
+        'is_saved' => 'boolean',
+    ];
+
     public function setApiKeyAttribute($value)
     {
         $this->setSecretAttribute($value);
