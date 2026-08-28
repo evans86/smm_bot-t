@@ -36,12 +36,14 @@ class UserController extends Controller
         try {
             if (is_null($request->user_id))
                 return ApiHelpers::error('Not found params: user_id');
-            $user = $this->userService->getOrCreate($request->user_id);
+            if (!is_numeric($request->user_id))
+                return ApiHelpers::error('Invalid params: user_id');
+            $user = $this->userService->getOrCreate((int) $request->user_id);
             return ApiHelpers::success(UserResource::generateUserArray($user));
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error($r->getMessage());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get user error');

@@ -63,7 +63,7 @@ class SmmController extends Controller
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error('Ошибка получения данных провайдера');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get Social error');
@@ -101,7 +101,7 @@ class SmmController extends Controller
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error('Ошибка получения данных провайдера');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get categories error');
@@ -140,7 +140,7 @@ class SmmController extends Controller
         } catch (\RuntimeException $r) {
             BotLogHelpers::notifyBotLog('(🟣R ' . __FUNCTION__ . ' Smm): ' . $r->getMessage());
             return ApiHelpers::error('Ошибка получения данных провайдера');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             BotLogHelpers::notifyBotLog('(🟣E ' . __FUNCTION__ . ' Smm): ' . $e->getMessage());
             \Log::error($e->getMessage());
             return ApiHelpers::error('Get Types error');
