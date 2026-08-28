@@ -84,7 +84,7 @@ class BottApi
 
         $client = new Client(['base_uri' => self::HOST]);
         return self::requestJson($client, 'POST', 'v1/module/user/get', [
-            'json' => $requestParam,
+            'query' => $requestParam,
         ]);
     }
 
