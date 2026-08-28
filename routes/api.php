@@ -20,9 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 /**
  * Получение данных (Товары, категории, соц. сети)
  */
-Route::get('getSocial', [SmmController::class, 'getSocial']);
-Route::get('getCategories', [SmmController::class, 'getCategories']);
-Route::get('getTypes', [SmmController::class, 'getTypes']);
+Route::get('getSocial', [SmmController::class, 'getSocial'])->withoutMiddleware('throttle:api');
+Route::get('getCategories', [SmmController::class, 'getCategories'])->withoutMiddleware('throttle:api');
+Route::get('getTypes', [SmmController::class, 'getTypes'])->withoutMiddleware('throttle:api');
 
 
 Route::get('createOrder', [OrderController::class, 'createOrder'])->middleware('throttle_user_secret_key');
@@ -33,7 +33,7 @@ Route::get('orders', [OrderController::class, 'orders']);
  * Роуты API (пользователи)
  */
 Route::get('setLanguage', [UserController::class, 'setLanguage'])->middleware('throttle_user_secret_key');
-Route::get('getUser', [UserController::class, 'getUser']);
+Route::get('getUser', [UserController::class, 'getUser'])->withoutMiddleware('throttle:api');
 
 /**
  * Роуты API (боты)
@@ -45,5 +45,5 @@ Route::get('get', [BotController::class, 'get']);
 Route::post('update', [BotController::class, 'update']);
 Route::match(['get', 'post'], 'rotatePrivateKey', [BotController::class, 'rotatePrivateKey']);
 Route::get('delete', [BotController::class, 'delete']);
-Route::get('getSettings', [BotController::class, 'getSettings']);
+Route::get('getSettings', [BotController::class, 'getSettings'])->withoutMiddleware('throttle:api');
 

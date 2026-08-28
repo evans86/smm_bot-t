@@ -4,20 +4,20 @@ namespace App\Dto;
 
 class BotDto
 {
-    public int $id;
-    public string $public_key;
-    public string $private_key;
-    public int $bot_id;
-    public ?string $api_key;
-    private ?string $encrypted_api_key = null; // Зашифрованная версия
-    public int $category_id;
-    public int $percent;
-    public int $version;
-    public int $color;
-    public ?bool $is_saved;
-    public ?string $black;
-    public ?string $white;
-    public ?string $resource_link;
+    public $id;
+    public $public_key;
+    public $private_key;
+    public $bot_id;
+    public $api_key;
+    private $encrypted_api_key = null;
+    public $category_id;
+    public $percent;
+    public $version;
+    public $color;
+    public $is_saved;
+    public $black;
+    public $white;
+    public $resource_link;
 
     public function getEncryptedApiKey(): string
     {
@@ -44,10 +44,8 @@ class BotDto
             'percent' => $this->percent,
             'version' => $this->version,
             'color' => $this->color,
-//            'is_saved' => $this->is_saved,
             'black' => $this->black,
             'white' => $this->white,
-//            'resource_link' => $this->resource_link,
         ];
     }
 

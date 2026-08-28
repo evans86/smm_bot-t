@@ -14,8 +14,9 @@ class UserService extends MainService
      * @param int $telegram_id
      * @return User
      */
-    public function getOrCreate(int $telegram_id): User
+    public function getOrCreate($telegram_id): User
     {
+        $telegram_id = (int) $telegram_id;
         $user = User::query()->where(['telegram_id' => $telegram_id])->first();
         if (is_null($user)) {
             $user = new User();
