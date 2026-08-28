@@ -18,9 +18,12 @@ class BotController extends Controller
 {
     private BotService $botService;
 
+    /**
+     * @noinspection PhpMissingParentConstructorInspection
+     */
     public function __construct()
     {
-        $this->middleware('api');
+        // parent::__construct() вешает auth для веб-админки; эти API-методы публичные.
         $this->botService = new BotService();
     }
 

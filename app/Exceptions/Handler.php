@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Helpers\ApiHelpers;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -40,6 +41,14 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($request->expectsJson() || $this->isApiRoute($request)) {
+            if ($e instanceof HttpExceptionInterface) {
+                $status = $e->getStatusCode();
+                if ($status < 500) {
+                    $message = $status === 429 ? 'Too many requests' : 'Request error';
+                    return response()->json(ApiHelpers::error($message), $status);
+                }
+            }
+
             return response()->json(ApiHelpers::error('Server error'), 500);
         }
 

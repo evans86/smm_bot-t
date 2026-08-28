@@ -22,14 +22,14 @@ class PartnerApi
 
     public function __construct(string $encryptedApiKey)
     {
-        // Дешифровка ключа (если он зашифрован)
-        $this->realApiKey = $this->decryptApiKey($encryptedApiKey);
-
-        // Получаем данные о клиенте
-        $this->clientIp = request()->ip();
+        $this->clientIp = request()->ip() ?? 'cli';
         $this->userAgent = request()->userAgent() ?? 'unknown';
 
-        // Логируем инициализацию
+        if ($encryptedApiKey === '') {
+            throw new RuntimeException('API key is empty');
+        }
+
+        $this->realApiKey = $this->decryptApiKey($encryptedApiKey);
         $this->logAccess();
     }
 
@@ -38,15 +38,10 @@ class PartnerApi
      */
     private function decryptApiKey(string $key): string
     {
-        // Если ключ не зашифрован (не начинается с префикса шифрования Laravel)
-//        if (!str_starts_with($key, 'eyJpdiI6')) {
-//            return $key;
-//        }
-
         try {
             return Crypt::decryptString($key);
         } catch (\Exception $e) {
-            BotLogHelpers::notifyBotLog("API key decryption failed for IP: {$this->clientIp}");
+            BotLogHelpers::notifyBotLog('API key decryption failed for IP: ' . $this->clientIp);
             throw new RuntimeException('Invalid API key format');
         }
     }

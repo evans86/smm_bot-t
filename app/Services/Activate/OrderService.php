@@ -147,7 +147,21 @@ class OrderService extends MainService
     public function order(BotDto $botDto, Order $order, array $userData = [])
     {
         try {
-            $partnerApi = new PartnerApi($botDto->getEncryptedApiKey());
+            try {
+                $encryptedKey = $botDto->getEncryptedApiKey();
+            } catch (\Throwable $e) {
+                $encryptedKey = '';
+            }
+
+            if ($encryptedKey === '') {
+                \Log::warning('Order update skipped: empty partner API key', [
+                    'order_id' => $order->id,
+                    'bot_id' => $botDto->id,
+                ]);
+                return;
+            }
+
+            $partnerApi = new PartnerApi($encryptedKey);
             $request_order = $partnerApi->status($order->order_id);
 
             $previousStatus = $order->status;
@@ -172,16 +186,11 @@ class OrderService extends MainService
             $order->save();
 
             $this->refundIfNeeded($botDto, $order, $previousStatus, $userData);
-        } catch (\Exception $e) {
-            // Логируем ошибку, но не прерываем выполнение
+        } catch (\Throwable $e) {
             \Log::error("Order update failed: {$e->getMessage()}", [
                 'order_id' => $order->id,
-                'bot_id' => $botDto->id
+                'bot_id' => $botDto->id,
             ]);
-
-            // Помечаем заказ как проблемный или оставляем как есть
-            $order->status = Order::OLD_STATUS; // или другой статус
-            $order->save();
         }
     }
 
@@ -373,7 +382,7 @@ class OrderService extends MainService
                             $this->order($botDto, $order);
                             $processed++;
 
-                        } catch (\Exception $e) {
+                        } catch (\Throwable $e) {
                             $errors++;
                             file_put_contents($logFile, "Error order {$order->id}: " . $e->getMessage() . "\n", FILE_APPEND);
                         }
@@ -395,7 +404,7 @@ class OrderService extends MainService
             file_put_contents($logFile, $message . "\n", FILE_APPEND);
             $this->notifyTelegram($message);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $errorMsg = "Cron Error: " . $e->getMessage();
             file_put_contents($logFile, $errorMsg . "\n", FILE_APPEND);
             $this->notifyTelegram('🔴 ' . $errorMsg);
