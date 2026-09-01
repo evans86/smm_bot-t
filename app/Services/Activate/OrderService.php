@@ -180,8 +180,9 @@ class OrderService extends MainService
                 : null;
 
             $order->status = $status;
-            // Провайдер на отмене часто отдаёт start_count=0 — не затираем quantity с создания заказа.
-            if ($start_count !== null && $start_count > 0) {
+            // Не затираем исходный quantity нулём/единицей с панели — иначе Partial считает refund как price*remains/1.
+            $savedStart = (int) $order->start_count;
+            if ($start_count !== null && $start_count > 0 && ($savedStart <= 0 || $start_count >= $savedStart)) {
                 $order->start_count = $start_count;
             }
             if ($remains !== null) {
@@ -302,7 +303,8 @@ class OrderService extends MainService
                 return 0;
             }
 
-            return (int) round($price * $remains / $startCount);
+            $amount = (int) round($price * $remains / $startCount);
+            return min($price, max(0, $amount));
         }
 
         if ($startCount > 0 && $remains > 0 && $remains < $startCount) {
