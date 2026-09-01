@@ -219,18 +219,41 @@ class OrderService extends MainService
         }
 
         $amount = $this->calculateRefundAmount($order);
-        if ($amount <= 0) {
-            $order->refunded_at = now();
-            $order->save();
+        if ($amount < 0) {
+            \Log::warning('SMM refund skipped: amount cannot be calculated', [
+                'order_id' => $order->id,
+                'provider_order_id' => $order->order_id,
+                'price' => $order->price,
+                'start_count' => $order->start_count,
+                'remains' => $order->remains,
+                'status' => $order->status,
+            ]);
             return;
         }
 
-        $userData = $this->resolveUserData($botDto, $order, $userData);
-        if ($userData === []) {
+        $userData = $amount > 0 ? $this->resolveUserData($botDto, $order, $userData) : [];
+        if ($amount > 0 && $userData === []) {
             \Log::error('SMM refund skipped: user data not found', [
                 'order_id' => $order->id,
                 'provider_order_id' => $order->order_id,
             ]);
+            return;
+        }
+
+        // Захватываем заказ ДО выплаты, чтобы крон и витрина не начислили дважды.
+        $claimed = Order::query()
+            ->whereKey($order->id)
+            ->whereNull('refunded_at')
+            ->whereIn('status', $refundStatuses)
+            ->update(['refunded_at' => now()]);
+
+        if ($claimed === 0) {
+            return;
+        }
+
+        $order->refunded_at = now();
+
+        if ($amount === 0) {
             return;
         }
 
@@ -242,6 +265,8 @@ class OrderService extends MainService
         );
 
         if (!($result['result'] ?? false)) {
+            Order::query()->whereKey($order->id)->update(['refunded_at' => null]);
+            $order->refunded_at = null;
             \Log::error('SMM refund failed', [
                 'order_id' => $order->id,
                 'provider_order_id' => $order->order_id,
@@ -251,10 +276,18 @@ class OrderService extends MainService
             return;
         }
 
-        $order->refunded_at = now();
-        $order->save();
+        \Log::info('SMM refund ok', [
+            'order_id' => $order->id,
+            'provider_order_id' => $order->order_id,
+            'amount' => $amount,
+            'user_id' => $order->user_id,
+            'bot_id' => $order->bot_id,
+        ]);
     }
 
+    /**
+     * @return int Сумма в копейках. -1 — посчитать нельзя, повтор без выплаты.
+     */
     private function calculateRefundAmount(Order $order): int
     {
         $price = (int) round((float) $order->price);
@@ -271,6 +304,11 @@ class OrderService extends MainService
             }
 
             return (int) round($price * $remains / $startCount);
+        }
+
+        // Canceled без start_count, но с remains: нельзя понять долю, полный refund даёт лишние деньги.
+        if ($startCount <= 0 && $remains > 0) {
+            return -1;
         }
 
         if ($startCount > 0 && $remains > 0 && $remains < $startCount) {
@@ -350,6 +388,16 @@ class OrderService extends MainService
     public function cronUpdateOrders()
     {
         $logFile = storage_path('logs/order_cron.log');
+        $lockFile = storage_path('logs/order_cron.lock');
+        $lock = fopen($lockFile, 'c');
+        if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+            if (is_resource($lock)) {
+                fclose($lock);
+            }
+            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Cron skipped: already running\n", FILE_APPEND);
+            return;
+        }
+
         file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Cron started\n", FILE_APPEND);
 
         try {
@@ -414,6 +462,11 @@ class OrderService extends MainService
             $errorMsg = "Cron Error: " . $e->getMessage();
             file_put_contents($logFile, $errorMsg . "\n", FILE_APPEND);
             $this->notifyTelegram('🔴 ' . $errorMsg);
+        } finally {
+            if (is_resource($lock)) {
+                flock($lock, LOCK_UN);
+                fclose($lock);
+            }
         }
     }
 
