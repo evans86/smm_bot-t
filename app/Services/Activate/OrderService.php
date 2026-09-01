@@ -180,8 +180,13 @@ class OrderService extends MainService
                 : null;
 
             $order->status = $status;
-            $order->start_count = $start_count ?? $order->start_count;
-            $order->remains = $remains;
+            // Провайдер на отмене часто отдаёт start_count=0 — не затираем quantity с создания заказа.
+            if ($start_count !== null && $start_count > 0) {
+                $order->start_count = $start_count;
+            }
+            if ($remains !== null) {
+                $order->remains = $remains;
+            }
 
             $order->save();
 
@@ -219,20 +224,17 @@ class OrderService extends MainService
         }
 
         $amount = $this->calculateRefundAmount($order);
-        if ($amount < 0) {
-            \Log::warning('SMM refund skipped: amount cannot be calculated', [
-                'order_id' => $order->id,
-                'provider_order_id' => $order->order_id,
-                'price' => $order->price,
-                'start_count' => $order->start_count,
-                'remains' => $order->remains,
-                'status' => $order->status,
-            ]);
+        if ($amount <= 0) {
+            Order::query()
+                ->whereKey($order->id)
+                ->whereNull('refunded_at')
+                ->update(['refunded_at' => now()]);
+            $order->refunded_at = now();
             return;
         }
 
-        $userData = $amount > 0 ? $this->resolveUserData($botDto, $order, $userData) : [];
-        if ($amount > 0 && $userData === []) {
+        $userData = $this->resolveUserData($botDto, $order, $userData);
+        if ($userData === []) {
             \Log::error('SMM refund skipped: user data not found', [
                 'order_id' => $order->id,
                 'provider_order_id' => $order->order_id,
@@ -252,10 +254,6 @@ class OrderService extends MainService
         }
 
         $order->refunded_at = now();
-
-        if ($amount === 0) {
-            return;
-        }
 
         $result = BottApi::addBalance(
             $botDto,
@@ -285,9 +283,6 @@ class OrderService extends MainService
         ]);
     }
 
-    /**
-     * @return int Сумма в копейках. -1 — посчитать нельзя, повтор без выплаты.
-     */
     private function calculateRefundAmount(Order $order): int
     {
         $price = (int) round((float) $order->price);
@@ -298,17 +293,16 @@ class OrderService extends MainService
         $startCount = (int) $order->start_count;
         $remains = (int) $order->remains;
 
+        if ($startCount <= 0 && $remains > 0) {
+            $startCount = $remains;
+        }
+
         if ($order->status === Order::TO_PROCESS_STATUS) {
             if ($startCount <= 0 || $remains <= 0) {
                 return 0;
             }
 
             return (int) round($price * $remains / $startCount);
-        }
-
-        // Canceled без start_count, но с remains: нельзя понять долю, полный refund даёт лишние деньги.
-        if ($startCount <= 0 && $remains > 0) {
-            return -1;
         }
 
         if ($startCount > 0 && $remains > 0 && $remains < $startCount) {
